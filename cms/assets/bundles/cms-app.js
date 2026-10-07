@@ -8440,26 +8440,13 @@ const SW_PUBLIC_EFFECTS=Object.freeze({
 });
 function swPublicEffectsShellPatch_(html){
   html=String(html||'');if(!html)return html;
-  /* UI 25.1+ has its own progressive enhancement layer (uiux-system).
-     Do not stack the legacy v24 public-effects layer on top: it duplicates
-     ambient orbs, tilt loops and reveal animation, increasing jank. */
-  if(/name=[\"']signwell-ui[\"'][^>]*content=[\"']25\.1[\"']/i.test(html)||/assets\/uiux-system\.js/i.test(html)){
-    const sa=html.indexOf(SW_PUBLIC_EFFECTS.STYLE_START),sb=html.indexOf(SW_PUBLIC_EFFECTS.STYLE_END);
-    if(sa>=0&&sb>sa)html=html.slice(0,sa)+html.slice(sb+SW_PUBLIC_EFFECTS.STYLE_END.length);
-    const ra=html.indexOf(SW_PUBLIC_EFFECTS.RUNTIME_START),rb=html.indexOf(SW_PUBLIC_EFFECTS.RUNTIME_END);
-    if(ra>=0&&rb>ra)html=html.slice(0,ra)+html.slice(rb+SW_PUBLIC_EFFECTS.RUNTIME_END.length);
-    return html;
-  }
-  const build=encodeURIComponent(SW_CMS_RELEASE);
-  const styleBlock=SW_PUBLIC_EFFECTS.STYLE_START+'\n<link rel="stylesheet" href="'+SW_PUBLIC_EFFECTS.CSS_PATH+'?build='+build+'">\n'+SW_PUBLIC_EFFECTS.STYLE_END;
-  const runtimeBlock=SW_PUBLIC_EFFECTS.RUNTIME_START+'\n<script src="'+SW_PUBLIC_EFFECTS.JS_PATH+'?build='+build+'" defer><\/script>\n'+SW_PUBLIC_EFFECTS.RUNTIME_END;
-  function replaceOrInsert(src,start,end,beforeTag,block){const a=src.indexOf(start),b=src.indexOf(end);if(a>=0&&b>a)return src.slice(0,a)+block+src.slice(b+end.length);return new RegExp(beforeTag,'i').test(src)?src.replace(new RegExp(beforeTag,'i'),block+'\n'+beforeTag.replace(/\\/g,'')):src+'\n'+block+'\n'}
-  let out=html;
-  const sa=out.indexOf(SW_PUBLIC_EFFECTS.STYLE_START),sb=out.indexOf(SW_PUBLIC_EFFECTS.STYLE_END);
-  if(sa>=0&&sb>sa)out=out.slice(0,sa)+styleBlock+out.slice(sb+SW_PUBLIC_EFFECTS.STYLE_END.length);else if(/<\/head>/i.test(out))out=out.replace(/<\/head>/i,styleBlock+'\n</head>');else out=styleBlock+'\n'+out;
-  const ra=out.indexOf(SW_PUBLIC_EFFECTS.RUNTIME_START),rb=out.indexOf(SW_PUBLIC_EFFECTS.RUNTIME_END);
-  if(ra>=0&&rb>ra)out=out.slice(0,ra)+runtimeBlock+out.slice(rb+SW_PUBLIC_EFFECTS.RUNTIME_END.length);else if(/<\/body>/i.test(out))out=out.replace(/<\/body>/i,runtimeBlock+'\n</body>');else out+='\n'+runtimeBlock+'\n';
-  return out;
+  // Legacy public-effects assets were retired. UI 25.1 / uiux-system is the canonical layer.
+  // Remove stale markers if present, but never inject missing legacy assets.
+  const sa=html.indexOf(SW_PUBLIC_EFFECTS.STYLE_START),sb=html.indexOf(SW_PUBLIC_EFFECTS.STYLE_END);
+  if(sa>=0&&sb>sa)html=html.slice(0,sa)+html.slice(sb+SW_PUBLIC_EFFECTS.STYLE_END.length);
+  const ra=html.indexOf(SW_PUBLIC_EFFECTS.RUNTIME_START),rb=html.indexOf(SW_PUBLIC_EFFECTS.RUNTIME_END);
+  if(ra>=0&&rb>ra)html=html.slice(0,ra)+html.slice(rb+SW_PUBLIC_EFFECTS.RUNTIME_END.length);
+  return html;
 }
 const SW_PUBLIC_LIQUID_NAV=Object.freeze({
   VERSION:'24.36.0-v1',
@@ -8588,13 +8575,11 @@ function swArticleIdCardLegacyShareRedirectHTML_(){
 }
 async function swArticleIdCardPublicShellEntries_(token){
   const backendCfg=await swPublicBackendRuntimeConfig_();
-  const [publicJs,publicCss,liquidJs,liquidCss,effectsJs,effectsCss,iosThemeCss,liquidHeroJs,liquidHeroCss,identityJs,retiredEntries]=await Promise.all([
+  const [publicJs,publicCss,liquidJs,liquidCss,iosThemeCss,liquidHeroJs,liquidHeroCss,identityJs,retiredEntries]=await Promise.all([
     swArticleIdCardLocalAssetText_(SW_ARTICLE_ID_CARD.JS_PATH),
     swArticleIdCardLocalAssetText_(SW_ARTICLE_ID_CARD.CSS_PATH),
     swArticleIdCardLocalAssetText_(SW_PUBLIC_LIQUID_NAV.JS_PATH),
     swArticleIdCardLocalAssetText_(SW_PUBLIC_LIQUID_NAV.CSS_PATH),
-    swArticleIdCardLocalAssetText_(SW_PUBLIC_EFFECTS.JS_PATH),
-    swArticleIdCardLocalAssetText_(SW_PUBLIC_EFFECTS.CSS_PATH),
     swArticleIdCardLocalAssetText_(SW_IOS_GLASS_THEME.CSS_PATH),
     swArticleIdCardLocalAssetText_(SW_PUBLIC_LIQUID_HERO.JS_PATH),
     swArticleIdCardLocalAssetText_(SW_PUBLIC_LIQUID_HERO.CSS_PATH),
@@ -8606,8 +8591,6 @@ async function swArticleIdCardPublicShellEntries_(token){
     {path:SW_ARTICLE_ID_CARD.CSS_PATH,mode:'100644',type:'blob',content:publicCss},
     {path:SW_PUBLIC_LIQUID_NAV.JS_PATH,mode:'100644',type:'blob',content:liquidJs},
     {path:SW_PUBLIC_LIQUID_NAV.CSS_PATH,mode:'100644',type:'blob',content:liquidCss},
-    {path:SW_PUBLIC_EFFECTS.JS_PATH,mode:'100644',type:'blob',content:effectsJs},
-    {path:SW_PUBLIC_EFFECTS.CSS_PATH,mode:'100644',type:'blob',content:effectsCss},
     {path:SW_IOS_GLASS_THEME.CSS_PATH,mode:'100644',type:'blob',content:iosThemeCss},
     {path:SW_PUBLIC_LIQUID_HERO.JS_PATH,mode:'100644',type:'blob',content:liquidHeroJs},
     {path:SW_PUBLIC_LIQUID_HERO.CSS_PATH,mode:'100644',type:'blob',content:liquidHeroCss},
