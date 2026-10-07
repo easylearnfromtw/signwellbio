@@ -212,6 +212,8 @@ jobs:
 
           await runPage('public-desktop',publicUrl,{width:1440,height:1000});
           await runPage('public-mobile',publicUrl,{width:390,height:844});
+          await runPage('public-topics-desktop',publicUrl+'topics.html?topic=signwellnownews',{width:1440,height:1000});
+          await runPage('public-topics-mobile',publicUrl+'topics.html?topic=signwellnownews',{width:390,height:844});
           await runPage('cms-desktop',cmsUrl,{width:1440,height:1000});
           await runPage('cms-mobile',cmsUrl,{width:390,height:844});
 
@@ -250,7 +252,15 @@ jobs:
             if(info?.pageErrors?.length)report.summary.errors.push(label+' page errors: '+info.pageErrors.length);
             const meaningful404=(info?.httpErrors||[]).filter(x=>x.status===404);
             if(meaningful404.length)report.summary.errors.push(label+' 404 resources: '+meaningful404.length);
-            if(info?.consoleErrors?.length)report.summary.warnings.push(label+' console errors: '+info.consoleErrors.length);
+            const meaningfulConsole=(info?.consoleErrors||[]).filter(msg=>{
+              const s=String(msg||'');
+              return !/^Potential permissions policy violation:/i.test(s)
+                && !/^\[Report Only\] Refused to frame /i.test(s)
+                && !/csp\.withgoogle\.com/i.test(s);
+            });
+            info.consoleNoiseCount=(info?.consoleErrors||[]).length-meaningfulConsole.length;
+            info.meaningfulConsoleErrors=meaningfulConsole;
+            if(meaningfulConsole.length)report.summary.warnings.push(label+' meaningful console errors: '+meaningfulConsole.length);
           }
 
           report.finishedAt=new Date().toISOString();
