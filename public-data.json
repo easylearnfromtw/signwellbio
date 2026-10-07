@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "revision": 0,
-  "publishedAt": "",
+  "revision": 1791386700631,
+  "publishedAt": "2026-10-07T15:25:00.628Z",
   "siteText": {
     "siteTitle": "SIGN WELL · 欣緯生醫",
     "metaDescription": "SIGN WELL · 欣緯生醫 — 醫學白話文、臨床推理與值得留下的知識。",
@@ -34,9 +34,99 @@
     "shareTitle": "把 SIGN WELL 分享給需要的人。",
     "shareSubtitle": "文章分享與 QR Code 已統一放在每篇文章的 Article ID Card。"
   },
-  "topics": [],
+  "topics": [
+    {
+      "id": "topic-1789132939821",
+      "name": "營養品科普",
+      "slug": "swmedical",
+      "description": "",
+      "order": 0,
+      "active": true
+    },
+    {
+      "id": "topic-1789132972590",
+      "name": "減重醫學",
+      "slug": "nonfat",
+      "description": "",
+      "order": 1,
+      "active": true
+    },
+    {
+      "id": "topic-1789133007315",
+      "name": "抗衰老醫學",
+      "slug": "抗衰老醫學",
+      "description": "",
+      "order": 2,
+      "active": true
+    },
+    {
+      "id": "topic-1789133021571",
+      "name": "醫美科普",
+      "slug": "醫美科普",
+      "description": "",
+      "order": 3,
+      "active": true
+    },
+    {
+      "id": "topic-1789204762177",
+      "name": "時事探討",
+      "slug": "signwellnownews",
+      "description": "",
+      "order": 4,
+      "active": true
+    }
+  ],
   "people": [],
-  "glossary": [],
+  "glossary": [
+    {
+      "id": "term-mu3ooe3x-84os4w",
+      "term": "急性心肌梗塞",
+      "translation": "Acute Myocardial Infarction",
+      "definition": "指供應心臟肌肉養分的冠狀動脈突然發生阻塞,導致心肌組織因缺血缺氧而受損壞死的急性心血管疾病。",
+      "aliases": [
+        "心肌梗塞",
+        "AMI"
+      ],
+      "active": true,
+      "updatedAt": "2026-09-16T05:52:07.533Z"
+    },
+    {
+      "id": "term-mu3ooe3y-l4duxv",
+      "term": "心血管急症",
+      "translation": "Cardiovascular Emergency",
+      "definition": "指發病迅速且可能危及生命的心血管系統疾病,需要醫療團隊第一時間介入處置與治療。",
+      "aliases": [],
+      "active": true,
+      "updatedAt": "2026-09-16T05:52:07.533Z"
+    },
+    {
+      "id": "term-mu3ooe3y-vq5atp",
+      "term": "血管病變",
+      "translation": "Vascular Lesion",
+      "definition": "指血管結構或功能發生異常變化,如血管硬化、狹窄或阻塞等狀況,會影響正常的血液循環。",
+      "aliases": [],
+      "active": true,
+      "updatedAt": "2026-09-16T05:52:07.533Z"
+    },
+    {
+      "id": "term-mu3ooe3y-ztoe5m",
+      "term": "預後",
+      "translation": "Prognosis",
+      "definition": "醫療團隊根據疾病類型、個人體質及醫療處置結果,對患者未來病情變化與恢復狀況所做的評估與預測。",
+      "aliases": [],
+      "active": true,
+      "updatedAt": "2026-09-16T05:52:07.533Z"
+    },
+    {
+      "id": "term-mu3ooe3y-jdt4vu",
+      "term": "急性期",
+      "translation": "Acute Phase",
+      "definition": "疾病發作初期且病情較為緊急或不穩定的階段,通常需要積極的醫療介入與嚴密監測。",
+      "aliases": [],
+      "active": true,
+      "updatedAt": "2026-09-16T05:52:07.533Z"
+    }
+  ],
   "heroConfig": {
     "spinRate": 0.24,
     "ringSize": 0.78,
@@ -53,4 +143,3 @@
     "word": "SIGN WELL"
   }
 }
-
