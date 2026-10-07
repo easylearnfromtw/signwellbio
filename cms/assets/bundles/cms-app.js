@@ -7922,7 +7922,7 @@ async function swApplyLegacySnapshot(snapshot,{confirm=true}={}){
   try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(_){}
   return true;
 }
-async function syncFromGitHub(){
+async function syncFromGitHubLossless(){
   const status=$('#ghStatus'),token=currentTokenInput();
   if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return}
   githubToken=token;if(status)status.textContent='正在核對新站與 CMS 雲端資料…';
@@ -7955,7 +7955,7 @@ async function syncFromGitHub(){
     showToast('GitHub / CMS 安全同步完成');renderExport();
   }catch(e){if(status)status.textContent='同步失敗：'+String(e?.message||e);swShowOperationalError?.(e,{module:'github-sync',action:'syncFromGitHub'})}
 }
-async function publishGitHub(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return false}githubToken=token;if(status)status.textContent='正在核對遠端文章與網站文字…';let remoteArticles=[],articleSha=null,siteSha=null;try{const existing=await fetchRemoteArticles(token);articleSha=existing.sha;remoteArticles=existing.articles}catch(e){if(!/Not Found|404/i.test(e.message))throw e}try{const rs=await fetchRemoteSiteText(token);siteSha=rs.sha}catch(e){if(!/Not Found|404/i.test(e.message))throw e}
+async function publishGitHubLegacy(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return false}githubToken=token;if(status)status.textContent='正在核對遠端文章與網站文字…';let remoteArticles=[],articleSha=null,siteSha=null;try{const existing=await fetchRemoteArticles(token);articleSha=existing.sha;remoteArticles=existing.articles}catch(e){if(!/Not Found|404/i.test(e.message))throw e}try{const rs=await fetchRemoteSiteText(token);siteSha=rs.sha}catch(e){if(!/Not Found|404/i.test(e.message))throw e}
   const alreadySynced=localStorage.getItem(SYNC_KEY)==='1',localIds=new Set(data.articles.map(a=>a.id)),missing=remoteArticles.filter(a=>!localIds.has(a.id));if(!alreadySynced&&missing.length){throw new Error(`安全阻擋：公開站有 ${missing.length} 篇文章不在這台裝置。請先按「從 GitHub 同步」，避免覆蓋遺失。`)}
   if(status)status.textContent='正在提交文章資料…';const articlePayload={message:'Publish SIGN WELL articles '+new Date().toISOString().slice(0,19).replace('T',' '),content:utf8Base64(publishedJSText()),branch:PUBLIC_GITHUB.branch};if(articleSha)articlePayload.sha=articleSha;await githubRequest(githubContentURL(PUBLIC_GITHUB.path),token,{method:'PUT',body:JSON.stringify(articlePayload)});
   if(status)status.textContent='正在提交網站文字…';const sitePayload={message:'Update SIGN WELL site text '+new Date().toISOString().slice(0,19).replace('T',' '),content:utf8Base64(siteContentJSText()),branch:PUBLIC_GITHUB.branch};if(siteSha)sitePayload.sha=siteSha;await githubRequest(githubContentURL(PUBLIC_GITHUB.sitePath),token,{method:'PUT',body:JSON.stringify(sitePayload)});
@@ -9154,10 +9154,69 @@ async function publishTopicsOnly(){
   return true;
 }
 
-syncFromGitHub=async function(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){status.textContent='請先到「設定」完成 GitHub PAT 設定。';return}githubToken=token;status.textContent='正在讀取 GitHub 正式文章與主題…';try{const remote=await v10LoadRemoteArticles(token),remoteSite=await fetchRemoteSiteText(token);let remoteTopics=[],bundle=null;try{bundle=await fetchRemotePublicBundle(token)}catch(_){}
-if(bundle&&Array.isArray(bundle.topics)){remoteTopics=clone(bundle.topics);remoteSite.siteText={...DEFAULT_SITE_TEXT,...(bundle.siteText||{})};remoteSite.people=Array.isArray(bundle.people)?clone(bundle.people):[];remoteSite.heroConfig=normalizeHeroConfig(bundle.heroConfig)}
-else try{remoteTopics=await v11FetchTopicsRaw()}catch(_){const names=[...new Set(remote.articles.map(a=>a.category).filter(Boolean))];remoteTopics=names.map((name,i)=>({id:'topic-remote-'+i,name,slug:slugify(name),description:'瀏覽 '+name+' 相關文章與延伸整理。',order:i,active:true}))}const localDrafts=data.articles.filter(a=>a.status!=='Published'),draftIds=new Set(localDrafts.map(a=>a.id)),merged=[...localDrafts,...clone(remote.articles).filter(a=>!draftIds.has(a.id))];if(data.articles.length&&!(await swConfirm(`將同步 GitHub 上的 ${remote.articles.length} 篇公開文章與 ${remoteTopics.length} 個主題。\n目前 ${localDrafts.length} 篇本機草稿會保留。`,{title:'同步公開網站資料？',kicker:'GITHUB SYNC',confirmText:'開始同步'}))){status.textContent='已取消同步。';return}data={...data,articles:merged,topics:clone(remoteTopics),people:Array.isArray(remoteSite.people)?clone(remoteSite.people):(data.people||[]),glossary:Array.isArray(bundle?.glossary)?clone(bundle.glossary):(data.glossary||[]),siteText:{...DEFAULT_SITE_TEXT,...remoteSite.siteText},heroConfig:normalizeHeroConfig(remoteSite.heroConfig||data.heroConfig)};persist(true);localStorage.setItem(SYNC_KEY,'1');await maybeRememberToken(token);status.textContent=`✓ 已同步 ${remote.articles.length} 篇文章、${remoteTopics.length} 個主題與網站文字；保留草稿 ${localDrafts.length} 篇。`;showToast('GitHub 同步完成');showCmsSuccessUI('同步成功',`已同步 ${remote.articles.length} 篇文章與 ${remoteTopics.length} 個主題`);renderExport()}catch(e){status.textContent='同步失敗：'+e.message}};
-publishGitHub=async function(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return false}githubToken=token;if(status)status.textContent='正在檢查 GitHub 寫入權限與發布目標…';await ensureGithubWritable(false);if(status)status.textContent='正在準備 v10 發布資料…';let remoteIndex=[];try{remoteIndex=await v10FetchIndexRaw()}catch(err){if(err.status!==404)throw err;}const alreadySynced=localStorage.getItem(SYNC_KEY)==='1';if(!alreadySynced&&remoteIndex.length){const localIds=new Set(data.articles.map(a=>a.id)),missing=remoteIndex.filter(a=>!localIds.has(a.id));if(missing.length)throw new Error(`安全阻擋：公開站有 ${missing.length} 篇文章不在這台裝置。請先按「從 GitHub 同步」。`)}
+syncFromGitHub=syncFromGitHubLossless;
+
+async function swPublishPreflight(status){
+  if(status)status.textContent='正在檢查 Backend / GitHub 發布鏈…';
+  if(!newsletterEnabled())throw new Error('SIGN WELL Backend 尚未啟用');
+  const release=await signwellGasBridge('admin.release.status',{}, {adminKey:newsletterAdminKey(),timeoutMs:20000});
+  const g=release?.github||{};
+  assertSignwellMigrationTarget(g);
+  if(String(release?.environment||'production')!=='production')throw new Error('Backend 目前不是 production 環境');
+  const diagnosis=await ensureGithubWritable(true);
+  if(!diagnosis?.ok||diagnosis?.writable!==true)throw new Error('GitHub 寫入 preflight 未通過');
+  if(status)status.textContent=`✓ Preflight 通過 · ${g.owner}/${g.repo}@${g.branch} · Backend v${release?.releaseVersion||release?.version||'unknown'}`;
+  return {release,diagnosis};
+}
+function swIndexCoreCanon(list){
+  return (Array.isArray(list)?list:[]).map(x=>({
+    id:String(x?.id||''),slug:String(x?.slug||''),title:String(x?.title||''),
+    status:String(x?.status||''),revision:Number(x?.revision||0),file:String(x?.file||'')
+  })).sort((a,b)=>a.slug.localeCompare(b.slug,'zh-Hant'));
+}
+async function verifyPublishedArticles(expected,token){
+  const file=await githubRequest(
+    githubContentURL(V10_INDEX_PATH)+'?ref='+encodeURIComponent(PUBLIC_GITHUB.branch)+'&sw='+Date.now(),
+    token
+  );
+  let remote;
+  try{remote=JSON.parse(base64Utf8(file.content||''))}catch(_){throw new Error('GitHub 上的 articles/index.json 不是有效 JSON')}
+  if(JSON.stringify(swIndexCoreCanon(remote))!==JSON.stringify(swIndexCoreCanon(expected))){
+    throw new Error('GitHub 文章索引驗證失敗：遠端內容與本次發布不一致');
+  }
+  for(const meta of expected){
+    const slug=String(meta?.slug||'').trim();if(!slug)throw new Error('文章 slug 缺失');
+    const article=await v10FetchArticleRaw(`articles/${slug}.json`);
+    if(!article)throw new Error(`文章 JSON 不存在：${slug}`);
+    if(String(article.id||'')!==String(meta.id||''))throw new Error(`文章 ID 驗證失敗：${slug}`);
+    if(String(article.title||'')!==String(meta.title||''))throw new Error(`文章標題驗證失敗：${slug}`);
+    if(!String(article.content||'').trim())throw new Error(`文章內容為空：${slug}`);
+  }
+  return {ok:true,count:expected.length};
+}
+async function waitForLivePublicPublish(revision,expectedMetas,{timeoutMs=65000}={}){
+  const start=Date.now(),base=String(SW_CMS_PUBLIC_BASE||'../');
+  let last={revision:0,count:null,error:''};
+  while(Date.now()-start<timeoutMs){
+    try{
+      const q='?sw='+Date.now();
+      const [pdRes,idxRes]=await Promise.all([
+        fetch(new URL('public-data.json'+q,base),{cache:'no-store'}),
+        fetch(new URL('articles/index.json'+q,base),{cache:'no-store'})
+      ]);
+      if(pdRes.ok&&idxRes.ok){
+        const [pd,idx]=await Promise.all([pdRes.json(),idxRes.json()]);
+        last={revision:Number(pd?.revision||0),count:Array.isArray(idx)?idx.length:null,error:''};
+        if(last.revision===Number(revision)&&JSON.stringify(swIndexCoreCanon(idx))===JSON.stringify(swIndexCoreCanon(expectedMetas))){
+          return {ok:true,...last,latencyMs:Date.now()-start};
+        }
+      }else last.error=`HTTP ${pdRes.status}/${idxRes.status}`;
+    }catch(e){last.error=String(e?.message||e)}
+    await new Promise(r=>setTimeout(r,2500));
+  }
+  return {ok:false,...last,latencyMs:Date.now()-start};
+}
+publishGitHub=async function(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return false}githubToken=token;await swPublishPreflight(status);if(status)status.textContent='正在準備 v10 發布資料…';let remoteIndex=[];try{remoteIndex=await v10FetchIndexRaw()}catch(err){if(err.status!==404)throw err;}const alreadySynced=localStorage.getItem(SYNC_KEY)==='1';if(!alreadySynced&&remoteIndex.length){const localIds=new Set(data.articles.map(a=>a.id)),missing=remoteIndex.filter(a=>!localIds.has(a.id));if(missing.length)throw new Error(`安全阻擋：公開站有 ${missing.length} 篇文章不在這台裝置。請先按「從 GitHub 同步」。`)}
  const published=data.articles.filter(a=>a.status==='Published'),imageEntries=[],imageCache=new Map(),prepared=[];for(let i=0;i<published.length;i++){if(status)status.textContent=`正在處理文章與圖片 ${i+1}/${published.length}…`;prepared.push(await v10PrepareArticle(published[i],token,imageEntries,imageCache))}
  if(status)status.textContent='正在處理 About 人物圖片…';
  const preparedPeople=await v10PreparePeoplePhotos(data.people||[],token,imageEntries,imageCache);
@@ -9170,9 +9229,13 @@ publishGitHub=async function(){const status=$('#ghStatus'),token=currentTokenInp
  const liveSlugs=new Set(prepared.map(v10SafeSlug));for(const old of remoteIndex){const s=old.slug;if(s&&!liveSlugs.has(s)){entries.push({path:old.file||`articles/${s}.json`,mode:'100644',type:'blob',sha:null});entries.push({path:`article/${s}/index.html`,mode:'100644',type:'blob',sha:null})}}
  if(status)status.textContent='正在建立單一 GitHub 發布版本…';await v10BatchCommit(entries,token,'Publish SIGN WELL v10 '+new Date().toISOString().slice(0,19).replace('T',' '));
  if(status)status.textContent='正在驗證核心 Public 資料…';
+ await verifyPublishedArticles(metas,token);
  await verifyPublishedTopics(bundle.topics,token);
  await verifyPublicBundle(bundle,token);
+ if(status)status.textContent='GitHub 已驗證 · 正在等待 GitHub Pages 上線…';
+ const livePublic=await waitForLivePublicPublish(bundle.revision,metas);
  const optionalQaWarnings=[];
+ if(!livePublic.ok)optionalQaWarnings.push('GitHub Pages 尚未在等待時間內更新；GitHub commit 已完成');
  for(const [label,fn] of [
    ['Public cleanup',()=>swVerifyRetiredPublicFeatures_(token)],
    ['Backend Bridge',()=>swVerifyPublicBackendBridge_(token)],
@@ -9184,7 +9247,7 @@ publishGitHub=async function(){const status=$('#ghStatus'),token=currentTokenInp
  signalPublicDataRefresh();
  try{await signwellGasBridge('admin.aiPipeline.recordPublish',{...swAiPipelineLastPublish,manifestRevision:String(aiPipeline?.manifest?.generatedAt||'')},{adminKey:newsletterAdminKey(),timeoutMs:20000})}catch(_){ }
  // Replace successful data-URL assets in local CMS state with their permanent public paths.
- const byId=new Map(prepared.map(a=>[a.id,a]));data.articles=data.articles.map(a=>byId.has(a.id)?byId.get(a.id):a);data.people=preparedPeople;persist(true);localStorage.setItem(SYNC_KEY,'1');await maybeRememberToken(token);if(status)status.textContent=`✓ v${SW_CMS_RELEASE} 發布完成：${prepared.length} 篇文章${optionalQaWarnings.length?' · '+optionalQaWarnings.length+' 項進階 QA 警告':''}。`;showToast(optionalQaWarnings.length?'Public 已發佈 · 有進階 QA 警告':'SIGN WELL v'+SW_CMS_RELEASE+' 發布完成');showCmsSuccessUI(optionalQaWarnings.length?'Public 已發佈':'發佈成功',optionalQaWarnings.length?`核心資料已上線 · ${prepared.length} 篇文章 · ${optionalQaWarnings.length} 項進階檢查待處理`:`Public 已更新 · ${prepared.length} 篇文章`,{confetti:true});return true};
+ const byId=new Map(prepared.map(a=>[a.id,a]));data.articles=data.articles.map(a=>byId.has(a.id)?byId.get(a.id):a);data.people=preparedPeople;persist(true);localStorage.setItem(SYNC_KEY,'1');await maybeRememberToken(token);if(status)status.textContent=livePublic.ok?`✓ Public 已上線：${prepared.length} 篇文章 · revision ${bundle.revision}`:`✓ GitHub 已發布：${prepared.length} 篇文章 · Pages 部署仍在進行${optionalQaWarnings.length?' · '+optionalQaWarnings.length+' 項提示':''}`;showToast(livePublic.ok?'Public 已上線':'GitHub 已發布 · Pages 部署中');showCmsSuccessUI(livePublic.ok?'Public 已上線':'發布已提交',livePublic.ok?`已在線上驗證 ${prepared.length} 篇文章 · revision ${bundle.revision}`:`GitHub 資料已驗證完成；GitHub Pages 尚在部署，請稍後重新整理 Public`,{confetti:true,duration:2800});return true};
 
 async function verifyRemoteArticleDeleted(article,token='server-managed'){
   const file=await githubRequest(githubContentURL(V10_INDEX_PATH)+'?ref='+encodeURIComponent(PUBLIC_GITHUB.branch)+'&sw='+Date.now(),token);
