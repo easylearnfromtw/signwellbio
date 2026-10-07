@@ -62,7 +62,66 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
     </filter>
   </defs>
 </svg>
-<div class="sw-page-loader" id="swPageLoader" role="status" aria-live="polite" aria-label="頁面載入進度"><div class="sw-page-loader-card"><div class="sw-page-loader-brand">SIGN WELL</div><div class="sw-page-loader-sub">欣緯生醫</div><div class="sw-page-loader-track" aria-hidden="true"><i class="sw-page-loader-bar"></i></div><div class="sw-page-loader-meta"><span class="sw-page-loader-stage">準備頁面</span><strong class="sw-page-loader-pct">6%</strong></div></div></div>
+<style id="swOpeningRedesign">
+  :root{
+    --sw-open-bg:#f4f3ef;
+    --sw-open-ink:#111111;
+    --sw-open-muted:rgba(17,17,17,.48);
+    --sw-open-line:rgba(17,17,17,.14);
+    --sw-open-yellow:#f0c84b;
+    --sw-open-blue:#7faee8;
+    --sw-open-pink:#e9b5c5;
+  }
+  .sw-page-loader,.cms-opening,.login-sync-overlay,.login-greeting{
+    position:fixed!important;inset:0!important;z-index:99999!important;
+    background:var(--sw-open-bg)!important;color:var(--sw-open-ink)!important;
+    font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+  }
+  .sw-open-frame{
+    width:min(1120px,calc(100% - 40px));height:calc(100dvh - 40px);margin:20px auto;
+    display:grid;grid-template-rows:auto 1fr auto;box-sizing:border-box;
+    border:1px solid var(--sw-open-line);border-radius:24px;padding:24px 26px 22px;
+    background:rgba(255,255,255,.44);backdrop-filter:blur(14px);
+  }
+  .sw-open-top,.sw-open-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .sw-open-brand{font-size:12px;font-weight:750;letter-spacing:.18em}
+  .sw-open-mark{display:flex;align-items:center;gap:8px}
+  .sw-open-dot{width:8px;height:8px;border-radius:50%;background:var(--sw-open-yellow)}
+  .sw-open-meta{font-size:11px;letter-spacing:.08em;color:var(--sw-open-muted)}
+  .sw-open-center{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;max-width:650px}
+  .sw-open-kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--sw-open-muted);margin-bottom:18px}
+  .sw-open-title{font-size:clamp(44px,7vw,92px);line-height:.9;letter-spacing:-.065em;font-weight:650;margin:0}
+  .sw-open-title span{display:block}
+  .sw-open-sub{margin-top:22px;font-size:14px;line-height:1.7;color:var(--sw-open-muted);max-width:420px}
+  .sw-open-progress{width:min(360px,100%);height:2px;background:rgba(17,17,17,.1);overflow:hidden;margin-top:28px;border-radius:999px}
+  .sw-open-progress i{display:block;height:100%;width:18%;background:var(--sw-open-ink);border-radius:inherit;animation:swOpenProgress 1.4s cubic-bezier(.65,0,.35,1) infinite}
+  .sw-open-status{font-size:12px;color:var(--sw-open-muted)}
+  .sw-open-index{font-size:11px;letter-spacing:.1em;color:var(--sw-open-muted)}
+  @keyframes swOpenProgress{0%{transform:translateX(-120%)}55%{transform:translateX(280%)}100%{transform:translateX(560%)}}
+  @media(max-width:640px){
+    .sw-open-frame{width:calc(100% - 24px);height:calc(100dvh - 24px);margin:12px auto;padding:19px 18px;border-radius:20px}
+    .sw-open-title{font-size:clamp(46px,15vw,72px)}
+    .sw-open-meta{display:none}
+  }
+</style>
+<div class="sw-page-loader" id="swPageLoader" role="status" aria-live="polite" aria-label="頁面載入進度">
+  <div class="sw-open-frame">
+    <div class="sw-open-top">
+      <div class="sw-open-mark"><i class="sw-open-dot"></i><div class="sw-open-brand">SIGN WELL</div></div>
+      <div class="sw-open-meta">BIOMEDICAL EDITORIAL SYSTEM</div>
+    </div>
+    <div class="sw-open-center">
+      <div class="sw-open-kicker">CMS / PRIVATE WORKSPACE</div>
+      <h1 class="sw-open-title"><span>Open the</span><span>workspace.</span></h1>
+      <div class="sw-open-sub">正在準備內容、權限與工作環境。</div>
+      <div class="sw-open-progress" aria-hidden="true"><i class="sw-page-loader-bar"></i></div>
+    </div>
+    <div class="sw-open-bottom">
+      <span class="sw-page-loader-stage sw-open-status">準備頁面</span>
+      <strong class="sw-page-loader-pct sw-open-index">06</strong>
+    </div>
+  </div>
+</div>
 <script>
 /* SIGN WELL CMS loader hard failsafe v23.9.63
    Loader is decorative only and must never block the CMS. */
@@ -97,29 +156,57 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
 </script>
 
 <div class="cms-opening" id="cmsOpening" aria-hidden="true">
-  <div class="opening-inner">
-    <div class="opening-word" id="openingWord">哈囉</div>
-    <div class="opening-sub">SIGN WELL · 欣緯生醫</div>
-    <div class="opening-line"></div>
+  <div class="sw-open-frame">
+    <div class="sw-open-top">
+      <div class="sw-open-mark"><i class="sw-open-dot" style="background:var(--sw-open-blue)"></i><div class="sw-open-brand">SIGN WELL</div></div>
+      <div class="sw-open-meta">CMS / PRIVATE</div>
+    </div>
+    <div class="sw-open-center">
+      <div class="sw-open-kicker">EDITORIAL WORKSPACE</div>
+      <div class="sw-open-title" id="openingWord"><span>Content.</span><span>Clearly.</span></div>
+      <div class="sw-open-sub">欣緯生醫內容管理系統</div>
+    </div>
+    <div class="sw-open-bottom">
+      <span class="sw-open-status">SIGN WELL BIOMED</span>
+      <span class="sw-open-index">01 — CMS</span>
+    </div>
   </div>
 </div>
+
 <div class="login-sync-overlay" id="loginSyncOverlay" aria-hidden="true">
-  <div class="login-sync-card">
-    <div class="login-sync-orbit" aria-hidden="true">
-      <i></i><i></i><i></i>
-      <span>✦</span>
+  <div class="sw-open-frame">
+    <div class="sw-open-top">
+      <div class="sw-open-mark"><i class="sw-open-dot" style="background:var(--sw-open-pink)"></i><div class="sw-open-brand">SIGN WELL</div></div>
+      <div class="sw-open-meta">SECURE SESSION</div>
     </div>
-    <div class="login-sync-kicker">SIGN WELL CMS</div>
-    <div class="login-sync-title">同步內容中</div>
-    <div class="login-sync-copy">請稍後</div>
-    <div class="login-sync-progress" aria-hidden="true"><i></i></div>
+    <div class="sw-open-center">
+      <div class="sw-open-kicker login-sync-kicker">SIGN WELL CMS</div>
+      <div class="sw-open-title login-sync-title"><span>Syncing</span><span>workspace.</span></div>
+      <div class="sw-open-sub login-sync-copy">正在同步內容與權限。</div>
+      <div class="sw-open-progress login-sync-progress" aria-hidden="true"><i></i></div>
+    </div>
+    <div class="sw-open-bottom">
+      <span class="sw-open-status">Secure connection</span>
+      <span class="sw-open-index">02 — SYNC</span>
+    </div>
   </div>
 </div>
 
 <div class="login-greeting" id="loginGreeting" aria-hidden="true">
-  <div class="login-greeting-card">
-    <div class="login-greeting-word" id="loginGreetingWord">你好，主人</div>
-    <div class="login-greeting-small">SIGN WELL CMS · ACCESS GRANTED</div>
+  <div class="sw-open-frame">
+    <div class="sw-open-top">
+      <div class="sw-open-mark"><i class="sw-open-dot" style="background:var(--sw-open-yellow)"></i><div class="sw-open-brand">SIGN WELL</div></div>
+      <div class="sw-open-meta">ACCESS GRANTED</div>
+    </div>
+    <div class="sw-open-center">
+      <div class="sw-open-kicker">WELCOME BACK</div>
+      <div class="sw-open-title login-greeting-word" id="loginGreetingWord"><span>Workspace</span><span>ready.</span></div>
+      <div class="sw-open-sub login-greeting-small">內容工作台已準備完成。</div>
+    </div>
+    <div class="sw-open-bottom">
+      <span class="sw-open-status">SIGN WELL CMS</span>
+      <span class="sw-open-index">03 — READY</span>
+    </div>
   </div>
 </div>
 <div class="newsletter-send-overlay" id="newsletterSendOverlay" aria-hidden="true">
