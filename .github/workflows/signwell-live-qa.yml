@@ -130,16 +130,24 @@ jobs:
               const x=JSON.parse(pubData.text);
               report.summary.publicRevision=Number(x?.revision||0);
               report.summary.publicPublishedAt=String(x?.publishedAt||'');
-              if(!x?.revision)report.summary.warnings.push('public-data revision is 0');
+              if(!x?.revision)report.summary.errors.push('public-data revision is 0');
             }
           }catch(e){report.summary.errors.push('public-data invalid JSON');}
           try{
             if(articles?.text){
               const x=JSON.parse(articles.text);
               report.summary.articleCount=Array.isArray(x)?x.length:null;
-              if(Array.isArray(x)&&x.length===0)report.summary.warnings.push('articles/index.json is empty');
+              if(Array.isArray(x)&&x.length===0)report.summary.errors.push('articles/index.json is empty');
+              report.summary.articleIndex=Array.isArray(x)?x:[];
             }
           }catch(e){report.summary.errors.push('articles/index invalid JSON');}
+          try{
+            const topicText=report.http['topics-index']?.head||'';
+            const topicProbe=await fetch(publicUrl+'topics/index.json?qa='+Date.now(),{cache:'no-store'});
+            const topicList=await topicProbe.json();
+            report.summary.topicCount=Array.isArray(topicList)?topicList.length:null;
+            if(!Array.isArray(topicList)||topicList.length===0)report.summary.errors.push('topics/index.json is empty');
+          }catch(e){report.summary.errors.push('topics/index invalid JSON');}
 
           const browser=await chromium.launch({headless:true});
           async function runPage(label,url,viewport){
@@ -252,6 +260,36 @@ jobs:
           }catch(e){report.summary.warnings.push('public nav walk failed: '+String(e));}
           report.browser.publicNavigation=navInfo;
           await context.close();
+
+          // Open actual published article routes from the live article index.
+          const articleChecks=[];
+          const articleIndex=Array.isArray(report.summary.articleIndex)?report.summary.articleIndex.slice(0,5):[];
+          for(const meta of articleIndex){
+            const ctx=await browser.newContext({viewport:{width:1280,height:900}});
+            const p=await ctx.newPage();
+            const item={slug:String(meta?.slug||''),expectedTitle:String(meta?.title||''),errors:[],httpErrors:[]};
+            p.on('pageerror',e=>item.errors.push(String(e)));
+            p.on('response',r=>{if(r.status()>=400)item.httpErrors.push({url:r.url(),status:r.status()})});
+            try{
+              const articleJson=await fetch(publicUrl+'articles/'+encodeURIComponent(item.slug)+'.json?qa='+Date.now(),{cache:'no-store'});
+              item.jsonStatus=articleJson.status;
+              if(!articleJson.ok)throw new Error('article JSON HTTP '+articleJson.status);
+              const article=await articleJson.json();
+              item.jsonTitle=String(article?.title||'');
+              item.contentLength=String(article?.content||'').length;
+              if(!item.contentLength)throw new Error('article content is empty');
+              await p.goto(publicUrl+'index.html?article='+encodeURIComponent(item.slug)+'&qa='+Date.now(),{waitUntil:'domcontentloaded',timeout:45000});
+              await p.waitForSelector('.article-head h1',{timeout:15000});
+              item.renderedTitle=await p.locator('.article-head h1').innerText();
+              item.renderedBodyLength=(await p.locator('.article-body').innerText().catch(()=> '')).trim().length;
+              if(item.expectedTitle && item.renderedTitle.trim()!==item.expectedTitle.trim())item.errors.push('rendered title mismatch');
+              if(item.renderedBodyLength<50)item.errors.push('rendered article body too short');
+            }catch(e){item.errors.push(String(e));}
+            if(item.errors.length||item.httpErrors.length)report.summary.errors.push('article route failed: '+item.slug);
+            articleChecks.push(item);
+            await ctx.close();
+          }
+          report.browser.articleChecks=articleChecks;
           await browser.close();
 
           for(const [label,info] of Object.entries(report.browser)){
@@ -281,6 +319,7 @@ jobs:
             'Warnings: '+report.summary.warnings.length,
             ...report.summary.warnings.map(x=>'WARN: '+x),
             'Article count: '+String(report.summary.articleCount),
+            'Topic count: '+String(report.summary.topicCount),
             'Public revision: '+String(report.summary.publicRevision)
           ].join('\n'));
           console.log(fs.readFileSync('live-qa-summary.txt','utf8'));
