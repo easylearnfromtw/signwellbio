@@ -54,6 +54,7 @@ jobs:
           expected_data="$(sha256sum public-data.json | awk '{print $1}')"
           expected_articles="$(sha256sum articles/index.json | awk '{print $1}')"
           expected_topics="$(sha256sum topics/index.json | awk '{print $1}')"
+          expected_cms_app="$(sha256sum cms/assets/bundles/cms-app.js | awk '{print $1}')"
           matched=0
           for i in $(seq 1 45); do
             nonce="$GITHUB_SHA-$i-$(date +%s)"
@@ -62,18 +63,21 @@ jobs:
             curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/public-data.json?qa=$nonce" -o /tmp/live-public-data.json || true
             curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/articles/index.json?qa=$nonce" -o /tmp/live-articles.json || true
             curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/topics/index.json?qa=$nonce" -o /tmp/live-topics.json || true
+            curl -fsSL --retry 3 --retry-all-errors --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/cms/assets/bundles/cms-app.js?qa=$nonce" -o /tmp/live-cms-app.js || true
 
             live_public="$(sha256sum /tmp/live-public.html 2>/dev/null | awk '{print $1}' || true)"
             live_cms="$(sha256sum /tmp/live-cms.html 2>/dev/null | awk '{print $1}' || true)"
             live_data="$(sha256sum /tmp/live-public-data.json 2>/dev/null | awk '{print $1}' || true)"
             live_articles="$(sha256sum /tmp/live-articles.json 2>/dev/null | awk '{print $1}' || true)"
             live_topics="$(sha256sum /tmp/live-topics.json 2>/dev/null | awk '{print $1}' || true)"
+            live_cms_app="$(sha256sum /tmp/live-cms-app.js 2>/dev/null | awk '{print $1}' || true)"
 
             if [ "$live_public" = "$expected_public" ] && \
                [ "$live_cms" = "$expected_cms" ] && \
                [ "$live_data" = "$expected_data" ] && \
                [ "$live_articles" = "$expected_articles" ] && \
-               [ "$live_topics" = "$expected_topics" ]; then
+               [ "$live_topics" = "$expected_topics" ] && \
+               [ "$live_cms_app" = "$expected_cms_app" ]; then
               echo "GitHub Pages content now matches main at $GITHUB_SHA"
               matched=1
               break
@@ -101,17 +105,30 @@ jobs:
           const gasUrl=process.env.GAS_URL;
           const report={startedAt:new Date().toISOString(),http:{},browser:{},summary:{errors:[],warnings:[]}};
           async function probe(name,url){
-            try{
-              const r=await fetch(url,{redirect:'follow'});
-              const text=await r.text();
-              report.http[name]={url:r.url,status:r.status,ok:r.ok,contentType:r.headers.get('content-type')||'',length:text.length,head:text.slice(0,1000)};
-              if(!r.ok)report.summary.errors.push(name+' HTTP '+r.status);
-              return {r,text};
-            }catch(e){
-              report.http[name]={url,error:String(e)};
-              report.summary.errors.push(name+' fetch failed: '+String(e));
-              return null;
+            let lastErr=null,last=null;
+            for(let attempt=1;attempt<=4;attempt++){
+              try{
+                const r=await fetch(url+(url.includes('?')?'&':'?')+'probe='+Date.now()+'-'+attempt,{redirect:'follow',cache:'no-store'});
+                const text=await r.text();
+                last={r,text};
+                if(r.ok || ![429,500,502,503,504].includes(r.status)){
+                  report.http[name]={url:r.url,status:r.status,ok:r.ok,contentType:r.headers.get('content-type')||'',length:text.length,head:text.slice(0,1000),attempts:attempt};
+                  if(!r.ok)report.summary.errors.push(name+' HTTP '+r.status);
+                  return {r,text};
+                }
+                lastErr=new Error('HTTP '+r.status);
+              }catch(e){lastErr=e}
+              await new Promise(res=>setTimeout(res,1000*attempt));
             }
+            if(last){
+              const {r,text}=last;
+              report.http[name]={url:r.url,status:r.status,ok:r.ok,contentType:r.headers.get('content-type')||'',length:text.length,head:text.slice(0,1000),attempts:4};
+              report.summary.errors.push(name+' HTTP '+r.status);
+              return {r,text};
+            }
+            report.http[name]={url,error:String(lastErr||'unknown')};
+            report.summary.errors.push(name+' fetch failed: '+String(lastErr||'unknown'));
+            return null;
           }
 
           await probe('public',publicUrl);
@@ -332,6 +349,7 @@ jobs:
             'Public revision: '+String(report.summary.publicRevision)
           ].join('\n'));
           console.log(fs.readFileSync('live-qa-summary.txt','utf8'));
+          if(!report.summary.ok)process.exitCode=1;
           EOF
           node live-qa.mjs
 
