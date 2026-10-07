@@ -476,45 +476,94 @@ async function verifySecond(){
   }
   await completeCmsLogin('legacy');
 }
+async function swFetchCurrentPublicStaticSnapshot(){
+  const base=new URL('../',location.href);
+  const getJson=async(path)=>{
+    const u=new URL(String(path||''),base);
+    u.searchParams.set('sw',String(Date.now()));
+    const r=await fetch(u.href,{cache:'no-store',credentials:'omit'});
+    if(!r.ok)throw new Error('CURRENT_PUBLIC_HTTP_'+r.status+': '+String(path||''));
+    return r.json();
+  };
+  const [bundle,index,topicIndex]=await Promise.all([
+    getJson('public-data.json'),
+    getJson('articles/index.json'),
+    getJson('topics/index.json')
+  ]);
+  const metas=Array.isArray(index)?index:[];
+  const articles=(await Promise.all(metas.map(async meta=>{
+    const file=String(meta?.file||(`articles/${meta?.slug||''}.json`));
+    if(!file||file==='articles/.json')return null;
+    try{return await getJson(file)}catch(err){console.warn('Current Public article fetch skipped',file,err);return null}
+  }))).filter(Boolean);
+  return {
+    articles:sanitizeRemoteArticles(articles),
+    topics:Array.isArray(bundle?.topics)?bundle.topics:(Array.isArray(topicIndex)?topicIndex:[]),
+    people:Array.isArray(bundle?.people)?bundle.people:[],
+    glossary:Array.isArray(bundle?.glossary)?bundle.glossary:[],
+    siteText:bundle?.siteText&&typeof bundle.siteText==='object'?bundle.siteText:{},
+    heroConfig:bundle?.heroConfig&&typeof bundle.heroConfig==='object'?bundle.heroConfig:null,
+    revision:Number(bundle?.revision||0),
+    publishedAt:String(bundle?.publishedAt||'')
+  };
+}
+function swCurrentPublicAuthoritativeArticles(localArticles,publicArticles){
+  const drafts=(Array.isArray(localArticles)?localArticles:[]).filter(a=>a?.status!=='Published').map(clone);
+  const draftKeys=new Set(drafts.map(swArticleSyncKey));
+  const published=(Array.isArray(publicArticles)?publicArticles:[])
+    .filter(a=>a&&String(a.status||'Published')==='Published')
+    .filter(a=>!draftKeys.has(swArticleSyncKey(a)))
+    .map(a=>({...clone(a),status:'Published'}));
+  return [...drafts,...published];
+}
 async function swHydrateCurrentPublicAfterLogin(){
   if(!cmsSessionToken)return {ok:false,skipped:true,reason:'no-session'};
   try{
-    await ensureGithubRuntimeTarget(true);
-    const remote=await v10LoadRemoteArticles('server-managed');
-    const remoteArticles=Array.isArray(remote?.articles)?remote.articles:[];
-    if(!remoteArticles.length)return {ok:true,changed:false,count:0};
-
-    const beforeKeys=new Set((data.articles||[]).map(swArticleSyncKey));
-    const missing=remoteArticles.filter(a=>!beforeKeys.has(swArticleSyncKey(a)));
-    if(!missing.length){
-      try{localStorage.setItem(SYNC_KEY,'1')}catch(_){}
-      return {ok:true,changed:false,count:remoteArticles.length};
+    let snapshot=null;
+    try{
+      snapshot=await swFetchCurrentPublicStaticSnapshot();
+    }catch(staticErr){
+      console.warn('Current Public static hydration failed; falling back to current GitHub repo.',staticErr);
+      await ensureGithubRuntimeTarget(true);
+      const remote=await v10LoadRemoteArticles('server-managed');
+      let bundle=null;try{bundle=await fetchRemotePublicBundle('server-managed')}catch(_){}
+      let topicSource=Array.isArray(bundle?.topics)?bundle.topics:[];
+      if(!topicSource.length){try{topicSource=await v11FetchTopicsRaw()}catch(_){}}
+      snapshot={
+        articles:Array.isArray(remote?.articles)?remote.articles:[],
+        topics:topicSource,
+        people:Array.isArray(bundle?.people)?bundle.people:[],
+        glossary:Array.isArray(bundle?.glossary)?bundle.glossary:[],
+        siteText:bundle?.siteText&&typeof bundle.siteText==='object'?bundle.siteText:{},
+        heroConfig:bundle?.heroConfig&&typeof bundle.heroConfig==='object'?bundle.heroConfig:null,
+        revision:Number(bundle?.revision||0),
+        publishedAt:String(bundle?.publishedAt||'')
+      };
     }
 
-    let bundle=null;
-    try{bundle=await fetchRemotePublicBundle('server-managed')}catch(_){}
-    let topicSource=Array.isArray(bundle?.topics)?bundle.topics:[];
-    if(!topicSource.length){try{topicSource=await v11FetchTopicsRaw()}catch(_){}}
-
+    const beforePublished=(data.articles||[]).filter(a=>a?.status==='Published').length;
+    const drafts=(data.articles||[]).filter(a=>a?.status!=='Published').length;
     data={
       ...data,
-      articles:swMergeArticlesLossless(data.articles,remoteArticles),
-      topics:swMergeEntityListLossless(data.topics,topicSource,['id','slug','key','name','title'],{sourceWins:false}),
-      people:swMergeEntityListLossless(data.people,Array.isArray(bundle?.people)?bundle.people:[],['id','slug','name'],{sourceWins:false}),
-      glossary:swMergeEntityListLossless(data.glossary,Array.isArray(bundle?.glossary)?bundle.glossary:[],['id','term','name','title'],{sourceWins:false}),
-      siteText:{...DEFAULT_SITE_TEXT,...(bundle?.siteText||{}),...(data.siteText||{})},
-      heroConfig:normalizeHeroConfig(data.heroConfig||bundle?.heroConfig)
+      articles:swCurrentPublicAuthoritativeArticles(data.articles,snapshot.articles),
+      topics:clone(Array.isArray(snapshot.topics)?snapshot.topics:[]),
+      people:clone(Array.isArray(snapshot.people)?snapshot.people:[]),
+      glossary:clone(Array.isArray(snapshot.glossary)?snapshot.glossary:[]),
+      siteText:{...DEFAULT_SITE_TEXT,...(snapshot.siteText||{})},
+      heroConfig:normalizeHeroConfig(snapshot.heroConfig||DEFAULT_HERO_CONFIG)
     };
-
+    reconcilePublishedReceipts();
     persist(true);
     syncPublicSnapshot();
     try{localStorage.setItem(SYNC_KEY,'1')}catch(_){}
-    try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(_){}
+    try{localStorage.setItem('signwell-current-public-authority-v1',String(snapshot.revision||Date.now()))}catch(_){}
+    try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(err){console.warn('Canonical CMS cloud rewrite pending',err)}
     renderView();
-    showToast(`已自動補回 Public 內容 · ${missing.length} 篇文章`);
-    return {ok:true,changed:true,count:remoteArticles.length,added:missing.length};
+    const nowPublished=(data.articles||[]).filter(a=>a?.status==='Published').length;
+    if(beforePublished!==nowPublished)showToast(`CMS 已校正為目前網站內容 · Published ${nowPublished} · Draft ${drafts}`);
+    return {ok:true,changed:true,count:nowPublished,drafts,revision:snapshot.revision||0};
   }catch(err){
-    console.warn('Post-login Public hydration skipped',err);
+    console.warn('Post-login current Public hydration failed',err);
     return {ok:false,changed:false,error:String(err?.message||err)};
   }
 }
@@ -8081,39 +8130,50 @@ async function swApplyLegacySnapshot(snapshot,{confirm=true}={}){
 async function syncFromGitHubLossless(){
   const status=$('#ghStatus'),token=currentTokenInput();
   if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return}
-  githubToken=token;if(status)status.textContent='正在核對新站與 CMS 雲端資料…';
+  githubToken=token;if(status)status.textContent='正在同步目前 signwellbio 與 CMS…';
   try{
     await ensureGithubRuntimeTarget(true);
-    let remote={articles:[],sha:null,mode:'v10'},remoteSite={siteText:{...DEFAULT_SITE_TEXT},sha:null},bundle=null,recovery=null;
+    assertSignwellMigrationTarget(PUBLIC_GITHUB);
+    let remote={articles:[],sha:null,mode:'v10'},remoteSite={siteText:{...DEFAULT_SITE_TEXT},sha:null},bundle=null;
     try{
       const current=await v10LoadRemoteArticles(token);
       remote={articles:current.articles||[],sha:null,mode:current.mode||'v10'};
     }catch(e){if(!/Not Found|404/i.test(String(e?.message||e)))throw e}
     try{remoteSite=await fetchRemoteSiteText(token)}catch(e){if(!/Not Found|404/i.test(String(e?.message||e)))throw e}
     try{bundle=await fetchRemotePublicBundle(token)}catch(e){if(!/Not Found|404/i.test(String(e?.message||e)))throw e}
-    const localPublished=(data.articles||[]).filter(a=>a?.status==='Published').length;
-    const currentLooksEmpty=!remote.articles.length&&!(bundle?.topics||[]).length;
-    if(currentLooksEmpty){
-      recovery=await swLegacyRecoverySnapshot().catch(()=>null);
-      if(recovery&&!recovery.empty&&localPublished===0){await swApplyLegacySnapshot(recovery,{confirm:false});}
-    }
-    const recoveredArticles=(recovery&&!recovery.empty)?(recovery.articles||[]):[];
-    const sourceArticles=remote.articles.length?remote.articles:recoveredArticles;
-    if(data.articles.length&&!(await swConfirm(`新站找到 ${remote.articles.length} 篇公開文章${recovery&&!recovery.empty?`；舊站可回復 ${recovery.counts?.articles||0} 篇`:''}。\n同步採「只補不刪」合併，現有草稿與新站缺少的本機文章都會保留。`,{title:'安全同步 GitHub？',kicker:'LOSSLESS SYNC',confirmText:'開始同步'}))){if(status)status.textContent='已取消同步。';return}
-    const topicSource=(bundle&&Array.isArray(bundle.topics)&&bundle.topics.length)?bundle.topics:((recovery&&recovery.topics?.length)?recovery.topics:[]);
-    const peopleSource=(bundle&&Array.isArray(bundle.people)&&bundle.people.length)?bundle.people:((recovery&&recovery.people?.length)?recovery.people:[]);
-    const glossarySource=(bundle&&Array.isArray(bundle.glossary)&&bundle.glossary.length)?bundle.glossary:((recovery&&recovery.glossary?.length)?recovery.glossary:[]);
-    const topics=swMergeEntityListLossless(data.topics,topicSource,['id','slug','key','name','title'],{sourceWins:true});
-    const people=swMergeEntityListLossless(data.people,peopleSource,['id','slug','name'],{sourceWins:true});
-    const glossary=swMergeEntityListLossless(data.glossary,glossarySource,['id','term','name','title'],{sourceWins:true});
-    const siteText={...DEFAULT_SITE_TEXT,...((recovery&&recovery.siteText)||{}),...(bundle?.siteText||{}),...(remoteSite.siteText||{})};
-    const heroConfig=normalizeHeroConfig(bundle?.heroConfig||data.heroConfig);
-    data={...data,articles:swMergeArticlesLossless(data.articles,sourceArticles),topics:clone(topics||[]),people:clone(people||[]),glossary:clone(glossary||[]),siteText,heroConfig};
-    persist(true);syncPublicSnapshot();try{localStorage.setItem(SYNC_KEY,'1')}catch(_){};await maybeRememberToken(token);try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(_){}
-    if(status)status.textContent=`✓ 安全同步完成：新站 ${remote.articles.length} 篇${recovery&&!recovery.empty?` · 舊站救援 ${recovery.counts?.articles||0} 篇`:''} · CMS 現有 ${data.articles.length} 篇；未做刪除。`;
-    showToast('GitHub / CMS 安全同步完成');renderExport();
+
+    if(data.articles.length&&!(await swConfirm(
+      `目前網站找到 ${remote.articles.length} 篇公開文章。\n同步後 Published 內容、主題與網站設定以 easylearnfromtw/signwellbio 為準；本機 Draft 會保留。舊網站不會自動載入。`,
+      {title:'同步目前網站？',kicker:'CURRENT REPO ONLY',confirmText:'開始同步'}
+    ))){if(status)status.textContent='已取消同步。';return}
+
+    let topicSource=(bundle&&Array.isArray(bundle.topics))?bundle.topics:[];
+    if(!topicSource.length){try{topicSource=await v11FetchTopicsRaw()}catch(_){}}
+    const siteText={
+      ...DEFAULT_SITE_TEXT,
+      ...(bundle?.siteText||{}),
+      ...(remoteSite?.siteText||{})
+    };
+    data={
+      ...data,
+      articles:swCurrentPublicAuthoritativeArticles(data.articles,remote.articles),
+      topics:clone(Array.isArray(topicSource)?topicSource:[]),
+      people:clone(Array.isArray(bundle?.people)?bundle.people:[]),
+      glossary:clone(Array.isArray(bundle?.glossary)?bundle.glossary:[]),
+      siteText,
+      heroConfig:normalizeHeroConfig(bundle?.heroConfig||DEFAULT_HERO_CONFIG)
+    };
+    reconcilePublishedReceipts();
+    persist(true);syncPublicSnapshot();
+    try{localStorage.setItem(SYNC_KEY,'1')}catch(_){}
+    await maybeRememberToken(token);
+    try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(err){console.warn('Current repo CMS cloud sync pending',err)}
+    if(status)status.textContent=`✓ 同步完成：easylearnfromtw/signwellbio · ${remote.articles.length} 篇 Published · ${(data.articles||[]).filter(a=>a?.status!=='Published').length} 篇 Draft；未讀取舊網站。`;
+    showToast('目前網站 / CMS 同步完成');
+    renderExport();
   }catch(e){if(status)status.textContent='同步失敗：'+String(e?.message||e);swShowOperationalError?.(e,{module:'github-sync',action:'syncFromGitHub'})}
 }
+
 async function publishGitHubLegacy(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return false}githubToken=token;if(status)status.textContent='正在核對遠端文章與網站文字…';let remoteArticles=[],articleSha=null,siteSha=null;try{const existing=await fetchRemoteArticles(token);articleSha=existing.sha;remoteArticles=existing.articles}catch(e){if(!/Not Found|404/i.test(e.message))throw e}try{const rs=await fetchRemoteSiteText(token);siteSha=rs.sha}catch(e){if(!/Not Found|404/i.test(e.message))throw e}
   const alreadySynced=localStorage.getItem(SYNC_KEY)==='1',localIds=new Set(data.articles.map(a=>a.id)),missing=remoteArticles.filter(a=>!localIds.has(a.id));if(!alreadySynced&&missing.length){throw new Error(`安全阻擋：公開站有 ${missing.length} 篇文章不在這台裝置。請先按「從 GitHub 同步」，避免覆蓋遺失。`)}
   if(status)status.textContent='正在提交文章資料…';const articlePayload={message:'Publish SIGN WELL articles '+new Date().toISOString().slice(0,19).replace('T',' '),content:utf8Base64(publishedJSText()),branch:PUBLIC_GITHUB.branch};if(articleSha)articlePayload.sha=articleSha;await githubRequest(githubContentURL(PUBLIC_GITHUB.path),token,{method:'PUT',body:JSON.stringify(articlePayload)});
@@ -8138,7 +8198,7 @@ function swMountSystemRecoveryPanel(){
   if(!swBackendSupportsAction('admin.returnCheck.qa'))return;
   const grid=document.querySelector('.publish-grid');if(!grid||document.getElementById('swSystemRecoveryCard'))return;
   const card=document.createElement('section');card.className='publish-card';card.id='swSystemRecoveryCard';
-  card.innerHTML=`<h3>System Recovery · v${SW_CMS_RELEASE}</h3><p>GitHub 換站後的一致性控制台：檢查 Public / CMS / Backend / Repo / Cloud State / AI models，並可從舊站安全回復文章與主題。</p><div class="connection-summary"><div class="connection-row"><span>Public</span><code>${escapeHTML(SW_CMS_PUBLIC_BASE)}</code></div><div class="connection-row"><span>同步策略</span><strong>Lossless · 只補不刪</strong></div><div class="connection-row"><span>AI baseline</span><strong>Gemini 3.5 Flash-Lite Fast · Gemini 3.8 Quality · GPT-6 Astra Medical · GPT-6 Astra Deep</strong></div><div class="connection-row"><span>文字對比</span><strong>WCAG AA Contrast Guard · 安全介面高對比</strong></div></div><div class="publish-actions"><button class="top-action primary" id="swReturnCheckBtn" type="button">Return Check QA</button><button class="top-action" id="swLegacyRecoveryBtn" type="button">掃描舊站並回復</button><button class="top-action" id="swModelMigrateBtn" type="button">校正 AI Model</button></div><div class="publish-status" id="swRecoveryStatus">尚未執行完整檢查。</div>`;
+  card.innerHTML=`<h3>System Recovery · v${SW_CMS_RELEASE}</h3><p>GitHub 換站後的一致性控制台：檢查 Public / CMS / Backend / Repo / Cloud State / AI models，舊站只保留手動救援，不會在登入或一般同步時自動載入。</p><div class="connection-summary"><div class="connection-row"><span>Public</span><code>${escapeHTML(SW_CMS_PUBLIC_BASE)}</code></div><div class="connection-row"><span>同步策略</span><strong>Lossless · 只補不刪</strong></div><div class="connection-row"><span>AI baseline</span><strong>Gemini 3.5 Flash-Lite Fast · Gemini 3.8 Quality · GPT-6 Astra Medical · GPT-6 Astra Deep</strong></div><div class="connection-row"><span>文字對比</span><strong>WCAG AA Contrast Guard · 安全介面高對比</strong></div></div><div class="publish-actions"><button class="top-action primary" id="swReturnCheckBtn" type="button">Return Check QA</button><button class="top-action" id="swLegacyRecoveryBtn" type="button">手動舊站救援</button><button class="top-action" id="swModelMigrateBtn" type="button">校正 AI Model</button></div><div class="publish-status" id="swRecoveryStatus">尚未執行完整檢查。</div>`;
   grid.appendChild(card);
   const status=card.querySelector('#swRecoveryStatus');
   card.querySelector('#swReturnCheckBtn')?.addEventListener('click',async()=>{const local=swRuntimeDriftSnapshot_();status.textContent=local.ok?'正在執行 Return Check…':'先偵測到前端漂移：'+local.issues.join('、')+'；仍繼續檢查後端…';try{const q=await signwellGasBridge('admin.returnCheck.qa',{}, {adminKey:newsletterAdminKey(),timeoutMs:60000});const remote=swRecoveryStatusText(q);status.textContent=(local.ok?'':('⚠ 前端漂移：'+local.issues.join('、')+'\n'))+remote;if(!q?.ok||!local.ok)console.warn('SIGN WELL Return Check',{local,q});else showToast('Return Check 全部通過')}catch(e){status.textContent='Return Check 失敗：'+String(e?.message||e)}});
