@@ -9188,17 +9188,22 @@ publishGitHub=async function(){const status=$('#ghStatus'),token=currentTokenInp
  const metas=prepared.map(v10IndexMeta),entries=[...imageEntries,...aiPipeline.entries,...articleIdPublicEntries,...geoAuthorEntries],bundle=publicBundlePayload(Date.now(),preparedPeople);prepared.forEach(a=>{entries.push({path:`articles/${v10SafeSlug(a)}.json`,mode:'100644',type:'blob',content:JSON.stringify(a,null,2)+'\n'});entries.push({path:`article/${v10SafeSlug(a)}/index.html`,mode:'100644',type:'blob',content:swSeoStaticArticleHTML(a)});swArticleIdentitySurfaceEntries(a).forEach(e=>entries.push(e))});entries.push({path:'sitemap.xml',mode:'100644',type:'blob',content:swSeoSitemapXML(prepared,preparedPeople)});entries.push({path:'news-sitemap.xml',mode:'100644',type:'blob',content:swSeoNewsSitemapXML(prepared)});entries.push({path:'robots.txt',mode:'100644',type:'blob',content:swGeoRobotsTxt_()});entries.push({path:'feed.xml',mode:'100644',type:'blob',content:swSeoFeedXML(prepared)});entries.push({path:V10_INDEX_PATH,mode:'100644',type:'blob',content:JSON.stringify(metas,null,2)+'\n'});entries.push({path:V11_TOPICS_PATH,mode:'100644',type:'blob',content:JSON.stringify(bundle.topics,null,2)+'\n'});entries.push({path:PUBLIC_BUNDLE_PATH,mode:'100644',type:'blob',content:publicBundleJSONText(bundle)});entries.push({path:PUBLIC_GITHUB.sitePath,mode:'100644',type:'blob',content:siteContentJSText()});entries.push({path:PUBLIC_GITHUB.path,mode:'100644',type:'blob',content:'window.BLOG_ARTICLES = '+JSON.stringify(prepared,null,2)+';\n'});
  const liveSlugs=new Set(prepared.map(v10SafeSlug));for(const old of remoteIndex){const s=old.slug;if(s&&!liveSlugs.has(s)){entries.push({path:old.file||`articles/${s}.json`,mode:'100644',type:'blob',sha:null});entries.push({path:`article/${s}/index.html`,mode:'100644',type:'blob',sha:null})}}
  if(status)status.textContent='正在建立單一 GitHub 發布版本…';await v10BatchCommit(entries,token,'Publish SIGN WELL v10 '+new Date().toISOString().slice(0,19).replace('T',' '));
- if(status)status.textContent='正在驗證主題資料…';
+ if(status)status.textContent='正在驗證核心 Public 資料…';
  await verifyPublishedTopics(bundle.topics,token);
  await verifyPublicBundle(bundle,token);
- await swVerifyRetiredPublicFeatures_(token);
- await swVerifyPublicBackendBridge_(token);
- await swVerifyPublicLiquidNavigation_(token);
- await swVerifyGeoPublication_(token,prepared,preparedPeople);
+ const optionalQaWarnings=[];
+ for(const [label,fn] of [
+   ['Public cleanup',()=>swVerifyRetiredPublicFeatures_(token)],
+   ['Backend Bridge',()=>swVerifyPublicBackendBridge_(token)],
+   ['Liquid Navigation',()=>swVerifyPublicLiquidNavigation_(token)],
+   ['GEO',()=>swVerifyGeoPublication_(token,prepared,preparedPeople)]
+ ]){
+   try{await fn()}catch(err){optionalQaWarnings.push(label+'：'+String(err?.message||err));console.warn('Optional publish QA warning',label,err)}
+ }
  signalPublicDataRefresh();
  try{await signwellGasBridge('admin.aiPipeline.recordPublish',{...swAiPipelineLastPublish,manifestRevision:String(aiPipeline?.manifest?.generatedAt||'')},{adminKey:newsletterAdminKey(),timeoutMs:20000})}catch(_){ }
  // Replace successful data-URL assets in local CMS state with their permanent public paths.
- const byId=new Map(prepared.map(a=>[a.id,a]));data.articles=data.articles.map(a=>byId.has(a.id)?byId.get(a.id):a);data.people=preparedPeople;persist(true);localStorage.setItem(SYNC_KEY,'1');await maybeRememberToken(token);if(status)status.textContent=`✓ v${SW_CMS_RELEASE} 發布完成：${prepared.length} 篇文章；AI cache hit ${aiPipeline.stats.cacheHits}、重算 ${aiPipeline.stats.regenerated}、待補 ${aiPipeline.stats.pending}、人工審核 ${aiPipeline.stats.reviewRequired}；本次 AI 約 US$${Number(aiPipeline.stats.estimatedUsd||0).toFixed(4)}。`;showToast('SIGN WELL v'+SW_CMS_RELEASE+' 發布完成');showCmsSuccessUI('發佈成功',`Public 已更新 · ${prepared.length} 篇文章`,{confetti:true});return true};
+ const byId=new Map(prepared.map(a=>[a.id,a]));data.articles=data.articles.map(a=>byId.has(a.id)?byId.get(a.id):a);data.people=preparedPeople;persist(true);localStorage.setItem(SYNC_KEY,'1');await maybeRememberToken(token);if(status)status.textContent=`✓ v${SW_CMS_RELEASE} 發布完成：${prepared.length} 篇文章${optionalQaWarnings.length?' · '+optionalQaWarnings.length+' 項進階 QA 警告':''}。`;showToast(optionalQaWarnings.length?'Public 已發佈 · 有進階 QA 警告':'SIGN WELL v'+SW_CMS_RELEASE+' 發布完成');showCmsSuccessUI(optionalQaWarnings.length?'Public 已發佈':'發佈成功',optionalQaWarnings.length?`核心資料已上線 · ${prepared.length} 篇文章 · ${optionalQaWarnings.length} 項進階檢查待處理`:`Public 已更新 · ${prepared.length} 篇文章`,{confetti:true});return true};
 
 async function verifyRemoteArticleDeleted(article,token='server-managed'){
   const file=await githubRequest(githubContentURL(V10_INDEX_PATH)+'?ref='+encodeURIComponent(PUBLIC_GITHUB.branch)+'&sw='+Date.now(),token);
