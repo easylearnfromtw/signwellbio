@@ -139,18 +139,44 @@ jobs:
               const safe=label.replace(/[^a-z0-9_-]/gi,'_');
               await page.screenshot({path:'qa-'+safe+'.png',fullPage:true});
               if(label.startsWith('public')){
+                await page.waitForTimeout(900);
                 const hrefs=await page.locator('a[href]').evaluateAll(as=>as.map(a=>a.getAttribute('href')).filter(Boolean));
                 info.internalLinks=[...new Set(hrefs.filter(h=>!h.startsWith('mailto:')&&!h.startsWith('tel:')&&!h.startsWith('#')).slice(0,30))];
+                info.articleCards=await page.locator('[data-article]').count();
+                info.topicCards=await page.locator('[data-topic]').count();
+                if(info.articleCards<1)report.summary.errors.push(label+' has no rendered article cards');
+                if(label==='public-desktop'&&info.articleCards>0){
+                  const first=page.locator('[data-article]').first();
+                  const slug=await first.getAttribute('data-article');
+                  await first.click();
+                  await page.waitForFunction(()=>document.querySelector('.article-view .article-body')?.textContent?.trim().length>300,{timeout:15000});
+                  info.articleOpen={
+                    slug,
+                    title:await page.locator('.article-head h1').innerText().catch(()=> ''),
+                    bodyLength:await page.locator('.article-body').innerText().then(x=>x.trim().length).catch(()=>0),
+                    url:page.url()
+                  };
+                  if(info.articleOpen.bodyLength<300)report.summary.errors.push('public article body did not load');
+                }
               }
               if(label.startsWith('cms')){
+                await page.waitForFunction(()=>{
+                  const s=window.SignWellGasBridgeDiagnostics?.snapshot?.();
+                  return s && (Number(s.completed||0)+Number(s.failed||0))>=1;
+                },{timeout:12000}).catch(()=>{});
+                info.bridgeDiagnostics=await page.evaluate(()=>window.SignWellGasBridgeDiagnostics?.snapshot?.()||null).catch(()=>null);
                 info.login={
                   lockVisible:await page.locator('#lockScreen').isVisible().catch(()=>false),
                   passwordVisible:await page.locator('#pinInput').isVisible().catch(()=>false),
                   loginButtonVisible:await page.locator('#unlockBtn').isVisible().catch(()=>false),
                   backendEndpoint:await page.evaluate(()=>window.SIGNWELL_BACKEND?.endpoint||'').catch(()=> ''),
                   cardRect:await page.locator('#lockScreen .lock-card').evaluate(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom}}).catch(()=>null),
-                  lockBackground:await page.locator('#lockScreen').evaluate(el=>getComputedStyle(el).backgroundImage+' | '+getComputedStyle(el).backgroundColor).catch(()=> '')
+                  lockBackground:await page.locator('#lockScreen').evaluate(el=>getComputedStyle(el).backgroundImage+' | '+getComputedStyle(el).backgroundColor).catch(()=> ''),
+                  hintText:await page.locator('#lockHint').innerText().catch(()=> '')
                 };
+                if(!info.bridgeDiagnostics||Number(info.bridgeDiagnostics.completed||0)<1||Number(info.bridgeDiagnostics.failed||0)>0){
+                  report.summary.errors.push(label+' CMS→Apps Script bridge handshake failed');
+                }
                 info.shellVisual=await page.evaluate(()=>{
                   const lock=document.querySelector('#lockScreen'),cms=document.querySelector('#cms');
                   lock?.classList.add('hidden'); cms?.classList.remove('hidden');
