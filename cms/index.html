@@ -1203,6 +1203,63 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
     }
   }
 </style>
+
+<style id="swCmsShellPolishV2">
+  /* One navigation group at a time, even before the CMS view JS finishes booting. */
+  body.aw-aurora .sidebar [data-nav-section-panel]{
+    display:none!important;
+  }
+  body.aw-aurora:not([data-sw-section]) .sidebar [data-nav-section-panel="workspace"],
+  body.aw-aurora[data-sw-section="workspace"] .sidebar [data-nav-section-panel="workspace"],
+  body.aw-aurora[data-sw-section="content"] .sidebar [data-nav-section-panel="content"],
+  body.aw-aurora[data-sw-section="publish"] .sidebar [data-nav-section-panel="publish"],
+  body.aw-aurora[data-sw-section="settings"] .sidebar [data-nav-section-panel="settings"]{
+    display:grid!important;
+  }
+
+  @media(max-width:699px){
+    body.aw-aurora .topbar{
+      display:flex!important;
+      grid-template-columns:none!important;
+      align-items:center!important;
+      flex-wrap:nowrap!important;
+      gap:7px!important;
+      min-height:calc(56px + env(safe-area-inset-top))!important;
+      padding:env(safe-area-inset-top) 10px 0 10px!important;
+      border-radius:0!important;
+    }
+    body.aw-aurora .topbar .aw-menu-btn{
+      order:0!important;
+      flex:0 0 40px!important;
+      margin:0!important;
+    }
+    body.aw-aurora .topbar .topbar-title{
+      order:1!important;
+      flex:1 1 auto!important;
+      min-width:0!important;
+      text-align:center!important;
+      align-items:center!important;
+    }
+    body.aw-aurora .topbar #saveState{
+      display:none!important;
+    }
+    body.aw-aurora .topbar #cmsCommandBtn{
+      order:3!important;
+      display:inline-grid!important;
+      flex:0 0 40px!important;
+      width:40px!important;
+      height:40px!important;
+      margin:0!important;
+    }
+    body.aw-aurora .topbar > .hidden{
+      display:none!important;
+    }
+    body.aw-aurora .sw-context-tabs{
+      top:calc(56px + env(safe-area-inset-top))!important;
+      margin-top:8px!important;
+    }
+  }
+</style>
 </head>
 <body class="light sw-ux-r2 aw-aurora">
 <svg class="aw-svg-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
