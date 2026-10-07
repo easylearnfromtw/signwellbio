@@ -9154,7 +9154,7 @@ async function publishTopicsOnly(){
   return true;
 }
 
-syncFromGitHub=syncFromGitHubLossless;
+async function syncFromGitHub(){return syncFromGitHubLossless()}
 
 async function swPublishPreflight(status){
   if(status)status.textContent='正在檢查 Backend / GitHub 發布鏈…';
