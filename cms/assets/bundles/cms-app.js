@@ -3321,7 +3321,7 @@ async function sendNewsletterTest(){
     }
 
     completeNewsletterSendOverlay('Glass Letter 測試信已寄至 signwell.com@gmail.com','TEST DELIVERY');
-    showToast('測試信發送成功 ✓');
+    showToast('測試信發送成功 ✓');showCmsSuccessUI('測試信已送出','Glass Letter 測試信已成功寄出',{duration:2200});
 
     await sleep(1250);
     hideNewsletterSendOverlay();
@@ -3434,7 +3434,7 @@ async function sendNewsletterAll(){
       'SIGN WELL Letter · Gmail'
     );
 
-    showToast(`電子報已成功送出 · ${delivered.toLocaleString()} 位`);
+    showToast(`電子報已成功送出 · ${delivered.toLocaleString()} 位`);showCmsSuccessUI('傳送成功',`電子報已成功寄送給 ${delivered.toLocaleString()} 位訂閱者`,{confetti:true,duration:2600});
 
     await sleep(1350);
     hideNewsletterSendOverlay();
@@ -4964,6 +4964,25 @@ function returnToArticlesWithResult(kind,title,copy,{confetti=false}={}){
     });
   });
 }
+
+function showCmsSuccessUI(title='傳送成功',copy='資料已成功送出。',{confetti=false,duration=2200}={}){
+  const wrap=$('#articleResultOverlay');
+  if(!wrap)return showToast(title);
+  clearTimeout(articleResultTimer);
+  wrap.dataset.kind='publish';
+  const icon=$('#articleResultIcon'),titleEl=$('#articleResultTitle'),copyEl=$('#articleResultCopy');
+  if(icon)icon.textContent='✓';
+  if(titleEl)titleEl.textContent=title;
+  if(copyEl)copyEl.textContent=copy;
+  wrap.classList.add('show');
+  wrap.setAttribute('aria-hidden','false');
+  if(confetti)showConfetti(wrap.querySelector('.article-result-card'));
+  articleResultTimer=setTimeout(()=>{
+    wrap.classList.remove('show');
+    wrap.setAttribute('aria-hidden','true');
+  },Math.max(1400,Number(duration)||2200));
+}
+window.showCmsSuccessUI=showCmsSuccessUI;
 
 function toolbarButtonEffect(button,event=null){
   if(!button||button.disabled)return;
@@ -9097,7 +9116,7 @@ async function publishTopicsOnly(){
 
 syncFromGitHub=async function(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){status.textContent='請先到「設定」完成 GitHub PAT 設定。';return}githubToken=token;status.textContent='正在讀取 GitHub 正式文章與主題…';try{const remote=await v10LoadRemoteArticles(token),remoteSite=await fetchRemoteSiteText(token);let remoteTopics=[],bundle=null;try{bundle=await fetchRemotePublicBundle(token)}catch(_){}
 if(bundle&&Array.isArray(bundle.topics)){remoteTopics=clone(bundle.topics);remoteSite.siteText={...DEFAULT_SITE_TEXT,...(bundle.siteText||{})};remoteSite.people=Array.isArray(bundle.people)?clone(bundle.people):[];remoteSite.heroConfig=normalizeHeroConfig(bundle.heroConfig)}
-else try{remoteTopics=await v11FetchTopicsRaw()}catch(_){const names=[...new Set(remote.articles.map(a=>a.category).filter(Boolean))];remoteTopics=names.map((name,i)=>({id:'topic-remote-'+i,name,slug:slugify(name),description:'瀏覽 '+name+' 相關文章與延伸整理。',order:i,active:true}))}const localDrafts=data.articles.filter(a=>a.status!=='Published'),draftIds=new Set(localDrafts.map(a=>a.id)),merged=[...localDrafts,...clone(remote.articles).filter(a=>!draftIds.has(a.id))];if(data.articles.length&&!(await swConfirm(`將同步 GitHub 上的 ${remote.articles.length} 篇公開文章與 ${remoteTopics.length} 個主題。\n目前 ${localDrafts.length} 篇本機草稿會保留。`,{title:'同步公開網站資料？',kicker:'GITHUB SYNC',confirmText:'開始同步'}))){status.textContent='已取消同步。';return}data={...data,articles:merged,topics:clone(remoteTopics),people:Array.isArray(remoteSite.people)?clone(remoteSite.people):(data.people||[]),glossary:Array.isArray(bundle?.glossary)?clone(bundle.glossary):(data.glossary||[]),siteText:{...DEFAULT_SITE_TEXT,...remoteSite.siteText},heroConfig:normalizeHeroConfig(remoteSite.heroConfig||data.heroConfig)};persist(true);localStorage.setItem(SYNC_KEY,'1');await maybeRememberToken(token);status.textContent=`✓ 已同步 ${remote.articles.length} 篇文章、${remoteTopics.length} 個主題與網站文字；保留草稿 ${localDrafts.length} 篇。`;showToast('GitHub 同步完成');renderExport()}catch(e){status.textContent='同步失敗：'+e.message}};
+else try{remoteTopics=await v11FetchTopicsRaw()}catch(_){const names=[...new Set(remote.articles.map(a=>a.category).filter(Boolean))];remoteTopics=names.map((name,i)=>({id:'topic-remote-'+i,name,slug:slugify(name),description:'瀏覽 '+name+' 相關文章與延伸整理。',order:i,active:true}))}const localDrafts=data.articles.filter(a=>a.status!=='Published'),draftIds=new Set(localDrafts.map(a=>a.id)),merged=[...localDrafts,...clone(remote.articles).filter(a=>!draftIds.has(a.id))];if(data.articles.length&&!(await swConfirm(`將同步 GitHub 上的 ${remote.articles.length} 篇公開文章與 ${remoteTopics.length} 個主題。\n目前 ${localDrafts.length} 篇本機草稿會保留。`,{title:'同步公開網站資料？',kicker:'GITHUB SYNC',confirmText:'開始同步'}))){status.textContent='已取消同步。';return}data={...data,articles:merged,topics:clone(remoteTopics),people:Array.isArray(remoteSite.people)?clone(remoteSite.people):(data.people||[]),glossary:Array.isArray(bundle?.glossary)?clone(bundle.glossary):(data.glossary||[]),siteText:{...DEFAULT_SITE_TEXT,...remoteSite.siteText},heroConfig:normalizeHeroConfig(remoteSite.heroConfig||data.heroConfig)};persist(true);localStorage.setItem(SYNC_KEY,'1');await maybeRememberToken(token);status.textContent=`✓ 已同步 ${remote.articles.length} 篇文章、${remoteTopics.length} 個主題與網站文字；保留草稿 ${localDrafts.length} 篇。`;showToast('GitHub 同步完成');showCmsSuccessUI('同步成功',`已同步 ${remote.articles.length} 篇文章與 ${remoteTopics.length} 個主題`);renderExport()}catch(e){status.textContent='同步失敗：'+e.message}};
 publishGitHub=async function(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return false}githubToken=token;if(status)status.textContent='正在檢查 GitHub 寫入權限與發布目標…';await ensureGithubWritable(false);if(status)status.textContent='正在準備 v10 發布資料…';let remoteIndex=[];try{remoteIndex=await v10FetchIndexRaw()}catch(err){if(err.status!==404)throw err;}const alreadySynced=localStorage.getItem(SYNC_KEY)==='1';if(!alreadySynced&&remoteIndex.length){const localIds=new Set(data.articles.map(a=>a.id)),missing=remoteIndex.filter(a=>!localIds.has(a.id));if(missing.length)throw new Error(`安全阻擋：公開站有 ${missing.length} 篇文章不在這台裝置。請先按「從 GitHub 同步」。`)}
  const published=data.articles.filter(a=>a.status==='Published'),imageEntries=[],imageCache=new Map(),prepared=[];for(let i=0;i<published.length;i++){if(status)status.textContent=`正在處理文章與圖片 ${i+1}/${published.length}…`;prepared.push(await v10PrepareArticle(published[i],token,imageEntries,imageCache))}
  if(status)status.textContent='正在處理 About 人物圖片…';
@@ -9120,7 +9139,7 @@ publishGitHub=async function(){const status=$('#ghStatus'),token=currentTokenInp
  signalPublicDataRefresh();
  try{await signwellGasBridge('admin.aiPipeline.recordPublish',{...swAiPipelineLastPublish,manifestRevision:String(aiPipeline?.manifest?.generatedAt||'')},{adminKey:newsletterAdminKey(),timeoutMs:20000})}catch(_){ }
  // Replace successful data-URL assets in local CMS state with their permanent public paths.
- const byId=new Map(prepared.map(a=>[a.id,a]));data.articles=data.articles.map(a=>byId.has(a.id)?byId.get(a.id):a);data.people=preparedPeople;persist(true);localStorage.setItem(SYNC_KEY,'1');await maybeRememberToken(token);if(status)status.textContent=`✓ v${SW_CMS_RELEASE} 發布完成：${prepared.length} 篇文章；AI cache hit ${aiPipeline.stats.cacheHits}、重算 ${aiPipeline.stats.regenerated}、待補 ${aiPipeline.stats.pending}、人工審核 ${aiPipeline.stats.reviewRequired}；本次 AI 約 US$${Number(aiPipeline.stats.estimatedUsd||0).toFixed(4)}。`;showToast('SIGN WELL v'+SW_CMS_RELEASE+' 發布完成');return true};
+ const byId=new Map(prepared.map(a=>[a.id,a]));data.articles=data.articles.map(a=>byId.has(a.id)?byId.get(a.id):a);data.people=preparedPeople;persist(true);localStorage.setItem(SYNC_KEY,'1');await maybeRememberToken(token);if(status)status.textContent=`✓ v${SW_CMS_RELEASE} 發布完成：${prepared.length} 篇文章；AI cache hit ${aiPipeline.stats.cacheHits}、重算 ${aiPipeline.stats.regenerated}、待補 ${aiPipeline.stats.pending}、人工審核 ${aiPipeline.stats.reviewRequired}；本次 AI 約 US$${Number(aiPipeline.stats.estimatedUsd||0).toFixed(4)}。`;showToast('SIGN WELL v'+SW_CMS_RELEASE+' 發布完成');showCmsSuccessUI('發佈成功',`Public 已更新 · ${prepared.length} 篇文章`,{confetti:true});return true};
 
 async function verifyRemoteArticleDeleted(article,token='server-managed'){
   const file=await githubRequest(githubContentURL(V10_INDEX_PATH)+'?ref='+encodeURIComponent(PUBLIC_GITHUB.branch)+'&sw='+Date.now(),token);
