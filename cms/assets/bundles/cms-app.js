@@ -3981,39 +3981,34 @@ function swBindGeoDashboard(){if(!swBackendSupportsAction('admin.geo.status'))re
 
 function renderDashboard(){
   setTimeout(async()=>{
-    try{
-      await refreshRemoteAnalytics(false);
-    }finally{
-      refreshAnalyticsVisuals();
-    }
+    try{await refreshRemoteAnalytics(false)}
+    finally{refreshAnalyticsVisuals()}
   },0);
-
-  setTimeout(()=>refreshNewsletterData(),0);
-  setTimeout(()=>refreshMetaSocialStats(false),80);
   const published=data.articles.filter(articleHasPublishedReceipt).length,
         drafts=data.articles.filter(a=>!articleHasPublishedReceipt(a)).length,
-        cats=(data.topics||[]).filter(x=>x.active!==false).length;
-  $('#view').innerHTML=`<div class="page-head"><div><h1>總覽</h1><p>你的私人文章工作台。草稿會跨裝置同步；只有按「發佈到網頁」才會進入公開網站。</p></div><button class="top-action primary" id="dashNew">新增文章</button></div>
-  <div class="stats">
-    <div class="stat"><span>文章總數</span><strong>${data.articles.length}</strong></div>
-    <div class="stat"><span>已發布</span><strong>${published}</strong></div>
-    <div class="stat"><span>草稿</span><strong>${drafts}</strong></div>
-    <div class="stat"><span>主題分類</span><strong>${cats}</strong></div>
-  </div>
-  ${trendChartHTML()}
-  ${metaSocialPanelHTML()}
-  ${dashboardNewsletterHTML(newsletterCache.summary)}
-  ${swAiUsageDashboardHTML()}
-  ${swGeoDashboardHTML()}
-  ${swAiSuiteHealthHTML()}
-  <section class="panel"><div class="panel-head"><span>最近文章 · 含觀看次數</span><span>${data.articles.length} 篇</span></div>
-  ${data.articles.length?data.articles.slice().sort((a,b)=>String(b.updatedAt||'').localeCompare(String(a.updatedAt||''))).slice(0,8).map(rowHTML).join(''):'<div class="empty">尚未建立文章。</div>'}</section>`;
+        cats=(data.topics||[]).filter(x=>x.active!==false).length,
+        recent=data.articles.slice().sort((a,b)=>String(b.updatedAt||b.publishedAt||'').localeCompare(String(a.updatedAt||a.publishedAt||''))).slice(0,6);
+  $('#view').innerHTML=`
+    <div class="page-head sw-core-page-head">
+      <div><h1>首頁</h1><p>今天要處理的內容集中在這裡。其他整合、AI 與系統項目都收進設定。</p></div>
+      <button class="top-action primary" id="dashNew">＋ 新增文章</button>
+    </div>
+    <div class="stats sw-core-stats">
+      <div class="stat"><span>文章</span><strong>${data.articles.length}</strong><small>全部內容</small></div>
+      <div class="stat"><span>已發布</span><strong>${published}</strong><small>Public</small></div>
+      <div class="stat"><span>草稿</span><strong>${drafts}</strong><small>待完成</small></div>
+      <div class="stat"><span>主題</span><strong>${cats}</strong><small>分類</small></div>
+    </div>
+    <section class="panel sw-home-recent">
+      <div class="panel-head"><div><span>最近文章</span><small>最近更新的內容</small></div><button class="smallbtn" id="dashAllArticles" type="button">查看全部</button></div>
+      ${recent.length?recent.map(rowHTML).join(''):'<div class="empty">尚未建立文章。</div>'}
+    </section>
+    ${trendChartHTML()}
+  `;
   $('#dashNew').onclick=newArticle;
+  $('#dashAllArticles').onclick=()=>nav('articles');
   scheduleAnalyticsTrendCanvas();
   bindRows();
-  setTimeout(swRefreshAiUsageDashboard,45);
-  setTimeout(()=>{swBindGeoDashboard();swRefreshGeoDashboard();},65);
-  setTimeout(swRefreshAiSuiteHealth,95);
 }
 function rowHTML(a){
   const views=articleViewCount(a),draft=!articleHasPublishedReceipt(a);
@@ -4139,15 +4134,6 @@ function renderArticles(){
       <span class="article-create-key">⌘ N</span>
     </button>
 
-    <section class="panel sw-glossary-panel" id="glossaryPanel">
-      <div class="panel-head">
-        <div class="article-panel-meta"><span>醫學名詞詞庫</span><b>${swGlossaryEntries().length}</b><span>· 全站共用</span></div>
-        <div class="article-hub-tools sw-glossary-tools"><input class="searchbar" id="glossarySearch" placeholder="搜尋名詞、翻譯或解釋…"><button class="top-action" id="glossaryAdd">＋ 新增詞條</button><button class="top-action" id="glossaryRescan">AI 掃描全部文章</button><button class="top-action online" id="glossaryPublish">同步詞庫到網站</button></div>
-      </div>
-      <div class="sw-glossary-note">文章儲存或發佈時會自動偵測艱難醫學名詞。AI 只負責第一次建立詞卡；之後同一詞條全站共用，你在這裡修改一次即可同步所有已發布文章。</div>
-      <div id="glossaryRows"></div>
-    </section>
-
     <section class="panel" id="articlePanel">
       <div class="panel-head">
         <div class="article-panel-meta">
@@ -4187,7 +4173,6 @@ function renderArticles(){
   $('#articleSearch').oninput=rerender;
   $('#articleFilter').onchange=rerender;
   bindRows();
-  swBindGlossaryPanel();
 }
 function filterRows(q){const s=q.toLowerCase().trim(),arr=data.articles.filter(a=>[a.title,a.category,(a.tags||[]).join(' ')].join(' ').toLowerCase().includes(s));$('#rows').innerHTML=arr.length?arr.map(rowHTML).join(''):'<div class="empty">沒有符合的文章。</div>';bindRows()}
 function bindRows(){
@@ -5207,6 +5192,22 @@ function renderTopicsManager(){
     $$('[data-topic-del]').forEach(b=>b.onclick=async()=>{const tp=data.topics.find(x=>x.id===b.dataset.topicDel);if(!tp)return;if(!(await swConfirm(`刪除主題「${tp.name}」？\n文章本身不會被刪除。`,{title:'刪除主題？',kicker:'DANGER ZONE',danger:true,confirmText:'確認刪除'})))return;data.topics=data.topics.filter(x=>x.id!==tp.id);persist(true);paint();showToast('主題已刪除')});
     const saveTopicLocal=()=>{const name=$('#topicName').value.trim(),slug=$('#topicSlug').value.trim()||slugify(name),description=$('#topicDesc').value.trim(),active=$('#topicActive').checked;if(!name){showToast('請輸入主題名稱');return null}let renamed=false;if(editId){const tp=data.topics.find(x=>x.id===editId);if(!tp)return null;const oldName=tp.name||'';renamed=Boolean(oldName&&oldName!==name);Object.assign(tp,{name,slug,description,active});if(renamed)data.articles.forEach(a=>{if(a.category===oldName)a.category=name})}else data.topics.push({id:'topic-'+Date.now(),name,slug,description,active,order:data.topics.length});persist(true);editId=null;return{renamed}};$('#saveTopic').onclick=()=>{if(!saveTopicLocal())return;paint();showToast('主題已儲存')};$('#saveTopicOnline').onclick=async()=>{const result=saveTopicLocal();if(!result)return;paint();try{if(result.renamed)await publishGitHub();else await publishTopicsOnly()}catch(e){showToast('主題同步失敗：'+e.message)}};
     $('#cancelTopic').onclick=clear;$('#newTopicBtn').onclick=clear;$('#syncTopicsBtn').onclick=async()=>{try{await publishTopicsOnly()}catch(e){showToast('主題同步失敗：'+e.message)}};
+
+    $('#view').insertAdjacentHTML('beforeend',`
+      <section class="panel sw-glossary-panel sw-settings-subsection" id="glossaryPanel">
+        <div class="panel-head">
+          <div class="article-panel-meta"><span>醫學名詞詞庫</span><b>${swGlossaryEntries().length}</b><span>· 全站共用</span></div>
+          <button class="smallbtn" id="glossaryAdd" type="button">＋ 新增詞條</button>
+        </div>
+        <div class="article-hub-tools sw-glossary-tools">
+          <input class="searchbar" id="glossarySearch" placeholder="搜尋名詞、翻譯或解釋…">
+          <button class="top-action" id="glossaryRescan">AI 掃描全部文章</button>
+          <button class="top-action online" id="glossaryPublish">同步詞庫到網站</button>
+        </div>
+        <div class="sw-glossary-note">詞庫屬於內容設定，不佔用日常文章工作區；修改一次即可供所有已發布文章共用。</div>
+        <div id="glossaryRows"></div>
+      </section>`);
+    swBindGlossaryPanel();
   };paint();
 }
 function renderSiteText(){
