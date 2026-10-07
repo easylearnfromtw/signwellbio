@@ -44,7 +44,7 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
 <link rel="preload" href="assets/aurora/fonts/InterVariable-latin.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="assets/aurora/aurora-icons.css?build=aurora-r10-1">
 <link rel="stylesheet" href="assets/aurora/aurora-core.css?build=aurora-r10-1">
-<link rel="stylesheet" href="assets/aurora/aurora-shell.css?build=aurora-r10-1">
+<link rel="stylesheet" href="assets/aurora/aurora-shell.css?build=aurora-r10-1-nav4-qa">
 <link rel="stylesheet" href="assets/aurora/aurora-views.css?build=aurora-r10-1">
 <link rel="preload" href="assets/bundles/cms-app.js?build=24.36.3-qa-hardening-20261007" as="script" fetchpriority="high">
 
@@ -585,6 +585,94 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
       max-width:358px!important;
       padding:26px 20px 22px!important;
       border-radius:20px!important;
+    }
+  }
+</style>
+
+<style id="swCmsNavFinalQaFix">
+  body.aw-aurora [data-nav-section-panel][hidden]{
+    display:none!important;
+  }
+
+  @media(min-width:700px){
+    body.aw-aurora .sw-nav-sections{
+      display:grid!important;
+      grid-template-columns:repeat(4,minmax(0,1fr))!important;
+      gap:4px!important;
+      padding:4px!important;
+      margin:0 0 10px!important;
+      border-radius:14px!important;
+      background:#f2f2f4!important;
+    }
+    body.aw-aurora .sw-nav-sections button{
+      min-width:0!important;
+      min-height:36px!important;
+      padding:0 4px!important;
+      border:0!important;
+      border-radius:10px!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      color:#6e6e73!important;
+      font-size:11px!important;
+    }
+    body.aw-aurora .sw-nav-sections button b{display:none!important}
+    body.aw-aurora .sw-nav-sections button.active{
+      background:#fff!important;
+      color:#111!important;
+      box-shadow:0 1px 3px rgba(0,0,0,.08)!important;
+    }
+    body.aw-aurora .aw-tabbar,
+    body.aw-aurora .aw-menu-btn,
+    body.aw-aurora .aw-scrim{
+      display:none!important;
+    }
+  }
+
+  @media(max-width:699px){
+    body.aw-aurora .sidebar{
+      position:fixed!important;
+      top:0!important;
+      left:0!important;
+      right:auto!important;
+      bottom:0!important;
+      z-index:120!important;
+      width:min(330px,88vw)!important;
+      height:auto!important;
+      min-height:100dvh!important;
+      padding:calc(18px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom))!important;
+      border-radius:0 24px 24px 0!important;
+      border:1px solid #d2d2d7!important;
+      border-left:0!important;
+      background:#fff!important;
+      transform:translate3d(-104%,0,0)!important;
+      visibility:hidden!important;
+      overflow:hidden!important;
+      transition:transform .35s ease,visibility 0s linear .35s!important;
+    }
+    body.aw-aurora.aw-drawer-open .sidebar{
+      transform:none!important;
+      visibility:visible!important;
+      transition:transform .35s ease,visibility 0s!important;
+    }
+    body.aw-aurora .sidebar > .brand{display:flex!important}
+    body.aw-aurora .sidebar > .nav{display:block!important;overflow-y:auto!important}
+    body.aw-aurora .sidebar > .sw-nav-sections{display:none!important}
+    body.aw-aurora .sidebar > .sidebar-command,
+    body.aw-aurora .sidebar > .sidebar-health,
+    body.aw-aurora .sidebar > .sidebar-foot{
+      display:none!important;
+    }
+    body.aw-aurora .aw-tabbar{
+      grid-template-columns:repeat(4,1fr)!important;
+      width:min(390px,calc(100vw - 24px))!important;
+    }
+    body.aw-aurora .aw-lens{
+      width:calc((100% - 12px) / 4)!important;
+    }
+    body.aw-aurora .aw-lens-track{
+      width:400%!important;
+      grid-template-columns:repeat(4,1fr)!important;
+      transform:translate3d(calc(var(--aw-lens-i,0) * -25%),0,0)!important;
     }
   }
 </style>
@@ -1146,7 +1234,7 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
 <script src="assets/bundles/cms-app.js?build=24.36.3-qa-hardening-20261007" data-sw-critical></script>
 <script src="assets/bundles/cms-contrast-guard.js?build=24.36.3" defer></script>
 <script src="assets/bundles/cms-ux-r2.js?build=24.36.3-uxr2-aurora-r10-1"></script>
-<script src="assets/aurora/aurora.js?build=aurora-r10-1"></script>
+<script src="assets/aurora/aurora.js?build=aurora-r10-1-nav4-qa"></script>
 
 <script src="assets/gpu-optimizer.js?build=r10-2-gpu" defer></script></body>
 </html>
