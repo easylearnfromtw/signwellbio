@@ -8575,7 +8575,7 @@ function swArticleIdCardLegacyShareRedirectHTML_(){
 }
 async function swArticleIdCardPublicShellEntries_(token){
   const backendCfg=await swPublicBackendRuntimeConfig_();
-  const [publicJs,publicCss,liquidJs,liquidCss,iosThemeCss,liquidHeroJs,liquidHeroCss,identityJs,retiredEntries]=await Promise.all([
+  const [publicJs,publicCss,liquidJs,liquidCss,iosThemeCss,liquidHeroJs,liquidHeroCss,retiredEntries]=await Promise.all([
     swArticleIdCardLocalAssetText_(SW_ARTICLE_ID_CARD.JS_PATH),
     swArticleIdCardLocalAssetText_(SW_ARTICLE_ID_CARD.CSS_PATH),
     swArticleIdCardLocalAssetText_(SW_PUBLIC_LIQUID_NAV.JS_PATH),
@@ -8583,7 +8583,6 @@ async function swArticleIdCardPublicShellEntries_(token){
     swArticleIdCardLocalAssetText_(SW_IOS_GLASS_THEME.CSS_PATH),
     swArticleIdCardLocalAssetText_(SW_PUBLIC_LIQUID_HERO.JS_PATH),
     swArticleIdCardLocalAssetText_(SW_PUBLIC_LIQUID_HERO.CSS_PATH),
-    swArticleIdCardLocalAssetText_(SW_ARTICLE_IDENTITY_ASSET),
     swPublicRetiredPortfolioAssetEntries_(token)
   ]);
   const entries=[
@@ -8594,7 +8593,6 @@ async function swArticleIdCardPublicShellEntries_(token){
     {path:SW_IOS_GLASS_THEME.CSS_PATH,mode:'100644',type:'blob',content:iosThemeCss},
     {path:SW_PUBLIC_LIQUID_HERO.JS_PATH,mode:'100644',type:'blob',content:liquidHeroJs},
     {path:SW_PUBLIC_LIQUID_HERO.CSS_PATH,mode:'100644',type:'blob',content:liquidHeroCss},
-    {path:SW_ARTICLE_IDENTITY_ASSET,mode:'100644',type:'blob',content:identityJs},
     {path:SW_PUBLIC_BACKEND_BRIDGE.CONFIG_PATH,mode:'100644',type:'blob',content:swPublicBackendConfigText_(backendCfg)},
     {path:'share.html',mode:'100644',type:'blob',content:swArticleIdCardLegacyShareRedirectHTML_()},
     ...retiredEntries
