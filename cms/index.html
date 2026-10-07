@@ -171,10 +171,148 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
 </div>
 <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
 <div class="field" aria-hidden="true"><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div></div><div class="grain"></div>
-<section class="lock-screen" id="lockScreen"><div class="aw-lock-hero-wrap" aria-hidden="true"><section class="sw-liquid-hero aw-lock-hero" data-liquid-hero data-liquid-tier="mid"><canvas></canvas><div class="liquid-caustic"></div><div class="liquid-grain"></div><div class="liquid-static-word">SIGN WELL</div><div class="liquid-hero-caption">Private Editorial Studio</div></section><div class="aw-lock-hero-meta"><span>SIGN WELL BIOMED · 欣緯生醫</span><strong>把臨床問題，<br>寫成值得留下的答案。</strong><em>Private editorial studio — clinical notes, written to last.</em></div></div><div class="lock-card"><h1 id="lockTitle">SIGN WELL CMS</h1><p id="lockDesc">欣緯生醫 · 私人文章工作台</p><div class="passkey-login-panel" id="passkeyLoginPanel" hidden><button class="passkey-primary" id="passkeyLoginBtn" type="button"><span class="passkey-glyph">⌁</span>使用 Face ID / Touch ID / Passkey</button><div class="passkey-caption"><b>生物資料留在你的裝置。</b> SIGN WELL 只接收 WebAuthn 公鑰驗證結果，不會取得臉部、指紋或系統解鎖資料。</div><div class="passkey-divider">或</div><button class="passkey-fallback" id="passkeyUseLegacyBtn" type="button">改用管理密碼＋安全問題</button></div><div id="legacyLoginPanel"><div class="auth-progress" id="authProgress" aria-label="兩階段登入進度"><span class="active" id="authDot1">1</span><i></i><span id="authDot2">2</span></div><div class="auth-error-box" id="authError" role="alert" aria-live="assertive"><div class="auth-error-icon">!</div><div><b id="authErrorTitle">驗證失敗</b><span id="authErrorText"></span></div></div><div class="auth-step" id="authStep1"><div class="auth-label">第一階段 · 伺服器端管理密碼</div><input class="pin sw-manual-password" id="pinInput" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" data-1p-ignore="true" data-lpignore="true" data-form-type="other" maxlength="64" placeholder="輸入管理密碼" aria-label="CMS 管理密碼"><button id="unlockBtn">繼續</button></div><div class="auth-step hidden" id="authStep2"><div class="auth-label">第二階段 · 安全問題</div><div class="security-question" id="securityQuestionText">安全問題會在第一階段通過後由伺服器載入</div><input class="pin answer-input" id="answerInput" type="text" lang="zh-Hant" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" placeholder="請輸入答案（可使用中文）"><button id="verifyBtn">驗證並進入</button><button class="auth-back" id="authBackBtn" type="button">返回第一階段</button></div><div class="auth-step hidden" id="authSetup"><div class="auth-label">首次安全升級 · 建立伺服器端登入</div><div class="auth-setup-note"><b>設定 1 題安全問題。</b><br>管理密碼通過後，每次登入只會要求這一題。題目與答案都可使用中文或英文；題目存在後端，答案只保存加鹽、迭代雜湊，不保存明文。</div><div class="auth-setup-scroll"><div class="auth-setup-grid"><label class="auth-setup-field"><span>後端初始化金鑰</span><input class="setup-secret" id="authBootstrapKey" type="password" autocomplete="off" placeholder="輸入 SW_ADMIN_KEY"></label><label class="auth-setup-field"><span>新的 CMS 管理密碼</span><input class="setup-secret sw-manual-password" id="authSetupPassword" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore="true" data-lpignore="true" data-form-type="other" minlength="6" maxlength="64" placeholder="至少 6 位數字" aria-label="新的 CMS 管理密碼"></label>
-<div class="auth-question-pool-title"><strong>單一安全問題</strong><small>請設定 1 個只有你容易回答的問題；中文／英文皆可</small></div>
-<label class="auth-setup-field"><span>安全問題</span><input class="auth-question-input" id="authSetupQuestion1" type="text" lang="zh-Hant" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="120" placeholder="例如：我第一所就讀的小學是？"></label><label class="auth-setup-field"><span>答案</span><input class="auth-answer-input" id="authSetupAnswer1" type="text" lang="zh-Hant" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" placeholder="可輸入中文或英文"></label>
-<div class="auth-zh-note">安全問題與答案都可使用中文或英文。首次設定時維持一般文字欄位、不遮罩，方便確認內容；送出後答案只在後端保存加鹽雜湊，不保存明文。建議不要使用公開社群上容易查到的資料。</div></div></div><button id="authSetupBtn" type="button">建立安全問題</button><div class="auth-setup-backup">後端初始化金鑰只用於建立或升級登入設定，不會儲存在瀏覽器。</div></div></div><div class="auth-server-badge" id="authServerBadge">SERVER AUTH · 已加密</div><small id="lockHint">登入驗證由 Google Apps Script 執行；真正密碼不會下載到這個 HTML。</small></div></section>
+<section class="lock-screen" id="lockScreen">
+<style>
+  #lockScreen{
+    min-height:100dvh;
+    display:grid;
+    place-items:center;
+    padding:24px;
+  }
+  #lockScreen .aw-lock-hero-wrap,
+  #lockScreen .auth-progress,
+  #lockScreen .auth-server-badge,
+  #lockScreen #lockHint,
+  #lockScreen .passkey-caption{
+    display:none !important;
+  }
+  #lockScreen .lock-card{
+    width:min(100%,380px);
+    margin:0;
+    padding:30px 28px 26px;
+    border-radius:22px;
+    text-align:left;
+  }
+  #lockScreen .lock-card h1{
+    margin:0 0 6px;
+    font-size:24px;
+    letter-spacing:-.02em;
+  }
+  #lockScreen .lock-card > p{
+    margin:0 0 24px;
+    opacity:.62;
+    font-size:14px;
+  }
+  #lockScreen .auth-label{
+    margin:0 0 10px;
+    font-size:12px;
+    opacity:.58;
+  }
+  #lockScreen .pin,
+  #lockScreen .setup-secret,
+  #lockScreen .auth-question-input,
+  #lockScreen .auth-answer-input{
+    width:100%;
+    box-sizing:border-box;
+  }
+  #lockScreen #unlockBtn,
+  #lockScreen #verifyBtn,
+  #lockScreen #authSetupBtn,
+  #lockScreen .passkey-primary{
+    width:100%;
+    margin-top:12px;
+  }
+  #lockScreen .passkey-divider{
+    margin:14px 0 10px;
+    font-size:11px;
+    opacity:.42;
+  }
+  #lockScreen .passkey-fallback,
+  #lockScreen .auth-back{
+    width:100%;
+    margin-top:8px;
+  }
+  #lockScreen .security-question{
+    margin:0 0 10px;
+    padding:0;
+    border:0;
+    background:none;
+    font-size:14px;
+  }
+  #lockScreen .auth-setup-note,
+  #lockScreen .auth-zh-note,
+  #lockScreen .auth-setup-backup,
+  #lockScreen .auth-question-pool-title small{
+    display:none !important;
+  }
+  #lockScreen .auth-setup-scroll{
+    max-height:none;
+    overflow:visible;
+  }
+  @media (max-width:560px){
+    #lockScreen{padding:16px}
+    #lockScreen .lock-card{padding:26px 20px 22px;border-radius:18px}
+  }
+</style>
+<div class="lock-card">
+  <h1 id="lockTitle">SIGN WELL CMS</h1>
+  <p id="lockDesc">管理登入</p>
+
+  <div class="passkey-login-panel" id="passkeyLoginPanel" hidden>
+    <button class="passkey-primary" id="passkeyLoginBtn" type="button">
+      <span class="passkey-glyph">⌁</span>使用 Passkey
+    </button>
+    <div class="passkey-caption"><b>生物資料留在你的裝置。</b> SIGN WELL 只接收 WebAuthn 公鑰驗證結果。</div>
+    <div class="passkey-divider">或</div>
+    <button class="passkey-fallback" id="passkeyUseLegacyBtn" type="button">使用管理密碼</button>
+  </div>
+
+  <div id="legacyLoginPanel">
+    <div class="auth-progress" id="authProgress" aria-label="兩階段登入進度">
+      <span class="active" id="authDot1">1</span><i></i><span id="authDot2">2</span>
+    </div>
+
+    <div class="auth-error-box" id="authError" role="alert" aria-live="assertive">
+      <div class="auth-error-icon">!</div>
+      <div><b id="authErrorTitle">驗證失敗</b><span id="authErrorText"></span></div>
+    </div>
+
+    <div class="auth-step" id="authStep1">
+      <div class="auth-label">管理密碼</div>
+      <input class="pin sw-manual-password" id="pinInput" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" data-1p-ignore="true" data-lpignore="true" data-form-type="other" maxlength="64" placeholder="輸入管理密碼" aria-label="CMS 管理密碼">
+      <button id="unlockBtn">登入</button>
+    </div>
+
+    <div class="auth-step hidden" id="authStep2">
+      <div class="auth-label">安全驗證</div>
+      <div class="security-question" id="securityQuestionText">安全問題載入中</div>
+      <input class="pin answer-input" id="answerInput" type="text" lang="zh-Hant" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" placeholder="輸入答案">
+      <button id="verifyBtn">進入 CMS</button>
+      <button class="auth-back" id="authBackBtn" type="button">返回</button>
+    </div>
+
+    <div class="auth-step hidden" id="authSetup">
+      <div class="auth-label">首次設定</div>
+      <div class="auth-setup-note"><b>建立伺服器端登入。</b></div>
+      <div class="auth-setup-scroll">
+        <div class="auth-setup-grid">
+          <label class="auth-setup-field"><span>初始化金鑰</span><input class="setup-secret" id="authBootstrapKey" type="password" autocomplete="off" placeholder="SW_ADMIN_KEY"></label>
+          <label class="auth-setup-field"><span>CMS 管理密碼</span><input class="setup-secret sw-manual-password" id="authSetupPassword" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" data-1p-ignore="true" data-lpignore="true" data-form-type="other" minlength="6" maxlength="64" placeholder="至少 6 位數字" aria-label="新的 CMS 管理密碼"></label>
+          <div class="auth-question-pool-title"><strong>安全問題</strong><small>設定一題安全問題</small></div>
+          <label class="auth-setup-field"><span>問題</span><input class="auth-question-input" id="authSetupQuestion1" type="text" lang="zh-Hant" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="120" placeholder="輸入安全問題"></label>
+          <label class="auth-setup-field"><span>答案</span><input class="auth-answer-input" id="authSetupAnswer1" type="text" lang="zh-Hant" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" placeholder="輸入答案"></label>
+          <div class="auth-zh-note">答案只在後端保存雜湊。</div>
+        </div>
+      </div>
+      <button id="authSetupBtn" type="button">完成設定</button>
+      <div class="auth-setup-backup">初始化金鑰不會儲存在瀏覽器。</div>
+    </div>
+  </div>
+
+  <div class="auth-server-badge" id="authServerBadge">SERVER AUTH · 已加密</div>
+  <small id="lockHint">登入驗證由 Google Apps Script 執行。</small>
+</div>
+</section>
 <section class="cms hidden" id="cms">
 <aside class="sidebar glass">
   <div class="brand"><div class="brand-mark">SW</div><div><strong>SIGN WELL CMS</strong><span>欣緯生醫 · v24.36.3 · R10.1</span></div></div>
