@@ -188,6 +188,38 @@ function swBuildInfo_() {
   };
 }
 
+
+/**
+ * One-time migration for the current SIGN WELL GitHub Pages deployment.
+ * Run this once after pasting this Code.gs into Apps Script.
+ * Existing secrets (PAT, API keys, admin key) are preserved.
+ */
+function migrateSignwellToSignwellBio() {
+  const props = PropertiesService.getScriptProperties();
+  props.setProperties({
+    SW_ENV: 'production',
+    SW_PUBLIC_URL: 'https://easylearnfromtw.github.io/signwellbio/',
+    SW_CMS_ORIGIN: 'https://easylearnfromtw.github.io',
+    SW_CMS_ORIGINS: 'https://easylearnfromtw.github.io',
+    SW_GITHUB_OWNER: 'easylearnfromtw',
+    SW_GITHUB_REPO: 'signwellbio',
+    SW_GITHUB_BRANCH: 'main'
+  }, false);
+  const result = {
+    ok: true,
+    publicUrl: props.getProperty('SW_PUBLIC_URL'),
+    cmsOrigin: props.getProperty('SW_CMS_ORIGIN'),
+    cmsOrigins: props.getProperty('SW_CMS_ORIGINS'),
+    github: {
+      owner: props.getProperty('SW_GITHUB_OWNER'),
+      repo: props.getProperty('SW_GITHUB_REPO'),
+      branch: props.getProperty('SW_GITHUB_BRANCH')
+    }
+  };
+  Logger.log(JSON.stringify(result, null, 2));
+  return result;
+}
+
 function validateRuntimeEnvironment() {
   const env = swEnvironment_();
   const cfg = {
