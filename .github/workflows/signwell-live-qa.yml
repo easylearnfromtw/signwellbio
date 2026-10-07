@@ -56,7 +56,7 @@ jobs:
           expected_topics="$(sha256sum topics/index.json | awk '{print $1}')"
           expected_cms_app="$(sha256sum cms/assets/bundles/cms-app.js | awk '{print $1}')"
           matched=0
-          for i in $(seq 1 45); do
+          for i in $(seq 1 90); do
             nonce="$GITHUB_SHA-$i-$(date +%s)"
             curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/?qa=$nonce" -o /tmp/live-public.html || true
             curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/cms/?qa=$nonce" -o /tmp/live-cms.html || true
@@ -82,7 +82,7 @@ jobs:
               matched=1
               break
             fi
-            echo "Waiting for full Pages deployment ($i/45)..."
+            echo "Waiting for full Pages deployment ($i/90)..."
             sleep 4
           done
           if [ "$matched" != "1" ]; then
