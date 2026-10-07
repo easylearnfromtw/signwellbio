@@ -7485,7 +7485,8 @@ function optimize(){
 
 let PUBLIC_GITHUB={owner:'easylearnfromtw',repo:'signwellbio',branch:'main',path:'articles.js',sitePath:'site-content.js',site:SW_CMS_PUBLIC_BASE};const TOKEN_STORE_KEY='signwell-github-token-v2',SYNC_KEY='signwell-github-synced-v2';let githubToken='server-managed',githubRuntimeSyncedAt=0,githubLastDiagnosis=null;
 /* SIGN WELL v24.23.2 · Article Identity CMS integration + operational health */
-const swArticleIdentityState={lastPrepare:null,migrationDone:false};
+const SW_ARTICLE_IDENTITY_BACKEND_ENABLED=false; // Legacy backend v24.0.27 has no Article Identity actions.
+const swArticleIdentityState={lastPrepare:null,migrationDone:!SW_ARTICLE_IDENTITY_BACKEND_ENABLED};
 function swArticleIdentityValidId(id){return /^SW-A-(?:\d{4}-\d{6}|\d{3}-\d{3}-\d{3})$/.test(String(id||''));}
 function swArticleIdentityReadPublishOptions(){return {changeClass:'AUTO',reviewType:''};}
 function swArticleIdentityApply(article,identity){
@@ -7517,6 +7518,7 @@ function swArticleIdentityApplyMigrationResult(result){
   return result;
 }
 async function swArticleIdentityEnsureMigration(excludeLegacyId=''){
+  if(!SW_ARTICLE_IDENTITY_BACKEND_ENABLED)return {ok:false,skipped:true,reason:'backend-capability-disabled'};
   if(swArticleIdentityState.migrationDone)return null;
   excludeLegacyId=String(excludeLegacyId||'');
   const published=(data.articles||[]).filter(a=>a.status==='Published'&&String(a.id||'')!==excludeLegacyId);
@@ -7533,6 +7535,7 @@ async function swArticleIdentityEnsureMigration(excludeLegacyId=''){
 }
 async function swArticleIdentityPrepareForPublish(article){
   if(!article)throw new Error('找不到待發布文章');
+  if(!SW_ARTICLE_IDENTITY_BACKEND_ENABLED)return {ok:false,skipped:true,reason:'backend-capability-disabled'};
   const options=swArticleIdentityReadPublishOptions();
   try{
     const r=await signwellGasBridge('admin.articleIdentity.prepare',{article:article,changeClass:options.changeClass},{adminKey:newsletterAdminKey(),timeoutMs:60000});
@@ -7559,6 +7562,7 @@ async function swArticleIdentityVerifyRemote(article,token){
   return {ok:true,articleId:article.article_id,contentHash:article.content_hash};
 }
 async function swArticleIdentityCommitAfterPublish(article){
+  if(!SW_ARTICLE_IDENTITY_BACKEND_ENABLED)return null;
   if(!article?.article_id)return null;
   try{
     const r=await signwellGasBridge('admin.articleIdentity.commit',{articleId:article.article_id,contentHash:article.content_hash},{adminKey:newsletterAdminKey(),timeoutMs:60000});
@@ -7602,6 +7606,7 @@ function swArticleIdentityHealthPaint(r,extra=null){
   if(note){const base=`Public base：${escapeHTML(r?.publicBase||SW_CMS_PUBLIC_BASE)} · Custom domain：${r?.customDomainEnabled?'ON':'OFF'}`;note.innerHTML=base+(extra?.details?.length?`<br>${extra.details.map(escapeHTML).join('<br>')}`:'');}
 }
 async function swArticleIdentityQuickHealth(){
+  if(!SW_ARTICLE_IDENTITY_BACKEND_ENABLED){const note=document.getElementById('swArticleIdentityHealthNote');if(note)note.textContent='目前 Backend 為相容模式：Article Identity 暫停，不影響 Public 發佈。';return null;}
   if(swArticleIdentityHealthBusy||!cmsSessionToken)return null;swArticleIdentityHealthBusy=true;
   const note=document.getElementById('swArticleIdentityHealthNote');if(note)note.textContent='正在核對 Backend registry、版本 ledger、fingerprint 與 CMS Published articles…';
   try{const r=await signwellGasBridge('admin.articleIdentity.health',{articles:swArticleIdentityPublishedSummary()},{adminKey:newsletterAdminKey(),timeoutMs:45000});swArticleIdentityHealthPaint(r);return r;}
