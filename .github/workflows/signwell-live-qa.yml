@@ -34,7 +34,7 @@ jobs:
           CMS_URL: https://easylearnfromtw.github.io/signwellbio/cms/
           GAS_URL: https://script.google.com/macros/s/AKfycbzmZXZSepxCD1jbfpjMxsnvn0nRl-xEpeXdJoTO-TZL6Z5Zk7T-OsVGpTkIxWaCh-Y/exec
         run: |
-          cat > /tmp/live-qa.mjs <<'EOF'
+          cat > live-qa.mjs <<'EOF'
           import { chromium } from 'playwright';
           import fs from 'fs';
 
@@ -179,7 +179,7 @@ jobs:
           ].join('\n'));
           console.log(fs.readFileSync('live-qa-summary.txt','utf8'));
           EOF
-          node /tmp/live-qa.mjs
+          node live-qa.mjs
 
       - name: Upload QA artifact
         if: always()
