@@ -96,14 +96,26 @@ function findPublishedMedicalNewsMatch(article){
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 async function playOpeningWelcome(){
-  const splash=$('#cmsOpening');
-  if(!splash)return;
+  const splash=$('#cmsOpening'),word=$('#openingWord');
+  if(!splash||!word)return;
   if(matchMedia('(prefers-reduced-motion:reduce)').matches){
     splash.remove();return;
   }
-  await sleep(120);
+  const words=['哈囉','Hello'];
+  for(let i=0;i<words.length;i++){
+    word.classList.remove('show');
+    await sleep(i===0?45:55);
+    word.textContent=words[i];
+    word.classList.add('show');
+    await sleep(220);
+    if(i<words.length-1){
+      word.classList.remove('show');
+      await sleep(70);
+    }
+  }
+  await sleep(40);
   splash.classList.add('out');
-  setTimeout(()=>splash.remove(),160);
+  setTimeout(()=>splash.remove(),180);
 }
 
 async function playLoginGreeting(){
