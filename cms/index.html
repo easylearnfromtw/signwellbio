@@ -1522,6 +1522,24 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
     }
   }
 </style>
+
+<style id="swCmsDesktopRailFinal">
+  @media(min-width:1100px){
+    body.aw-aurora .cms{
+      grid-template-columns:220px minmax(0,1fr)!important;
+    }
+    body.aw-aurora .sidebar{
+      width:220px!important;
+    }
+    body.aw-aurora .brand strong{
+      font-size:12px!important;
+      letter-spacing:.03em!important;
+    }
+    body.aw-aurora .brand span{
+      font-size:9px!important;
+    }
+  }
+</style>
 </head>
 <body class="light sw-ux-r2 aw-aurora">
 <svg class="aw-svg-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -1899,18 +1917,18 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
     <button type="button" role="tab" aria-selected="false" data-nav-section="settings"><b>⚙</b><span>設定</span></button>
   </div>
   <nav class="nav sw-nav-optimized" aria-label="CMS 導覽">
-    <div class="nav-group" data-nav-section-panel="workspace"><span class="nav-label">首頁</span>
+    <div class="nav-group" data-nav-section-panel="workspace" style="display:grid"><span class="nav-label">首頁</span>
       <button class="active" data-view="dashboard" data-icon="⌂"><span>總覽</span><small>近期內容與工作狀態</small></button>
     </div>
-    <div class="nav-group" data-nav-section-panel="content" hidden><span class="nav-label">內容</span>
+    <div class="nav-group" data-nav-section-panel="content" hidden style="display:none!important"><span class="nav-label">內容</span>
       <button data-view="articles" data-icon="▤"><span>文章</span><small>撰寫 · 審稿 · 發佈</small></button>
       <button data-view="medicalnews" data-icon="◉"><span>選題</span><small>醫療時事與內容靈感</small></button>
     </div>
-    <div class="nav-group" data-nav-section-panel="publish" hidden><span class="nav-label">發佈</span>
+    <div class="nav-group" data-nav-section-panel="publish" hidden style="display:none!important"><span class="nav-label">發佈</span>
       <button data-view="canva" data-icon="✦"><span>Social Studio</span><small>Canva · Meta 圖文</small></button>
       <button data-view="newsletter" data-icon="✉"><span>電子報</span><small>訂閱者 · Campaign</small></button>
     </div>
-    <div class="nav-group" data-nav-section-panel="settings" hidden><span class="nav-label">設定</span>
+    <div class="nav-group" data-nav-section-panel="settings" hidden style="display:none!important"><span class="nav-label">設定</span>
       <button data-view="export" data-icon="⚙"><span>系統設定</span><small>連線 · Security · QA</small></button>
       <button data-view="topics" data-icon="#"><span>內容設定</span><small>主題 · Glossary</small></button>
       <button data-view="site" data-icon="⌘"><span>網站設定</span><small>首頁文字與導覽</small></button>
