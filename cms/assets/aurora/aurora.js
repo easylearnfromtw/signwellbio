@@ -173,11 +173,10 @@
      3 · Phone: liquid-glass tab bar with draggable magnifying lens
      ------------------------------------------------------------------ */
   const SECTIONS = [
-    ['workspace', '工作台', 'dashboard'],
+    ['workspace', '首頁', 'dashboard'],
     ['content', '內容', 'articles'],
     ['publish', '發佈', 'send'],
-    ['ai', 'AI', 'aiopenai'],
-    ['site', '網站', 'globe']
+    ['settings', '設定', 'globe']
   ];
   let tabbar = null, lens = null, lensMapKey = '';
   function buildTabbar() {
