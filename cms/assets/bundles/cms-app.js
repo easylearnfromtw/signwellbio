@@ -96,49 +96,22 @@ function findPublishedMedicalNewsMatch(article){
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 async function playOpeningWelcome(){
-  const splash=$('#cmsOpening'),word=$('#openingWord');
-  if(!splash||!word)return;
+  const splash=$('#cmsOpening');
+  if(!splash)return;
   if(matchMedia('(prefers-reduced-motion:reduce)').matches){
     splash.remove();return;
   }
-  const words=['哈囉','Hello'];
-  for(let i=0;i<words.length;i++){
-    word.classList.remove('show');
-    await sleep(i===0?80:90);
-    word.textContent=words[i];
-    word.classList.add('show');
-    await sleep(430);
-    if(i<words.length-1){
-      word.classList.remove('show');
-      await sleep(120);
-    }
-  }
-  await sleep(80);
+  await sleep(120);
   splash.classList.add('out');
-  setTimeout(()=>splash.remove(),420);
+  setTimeout(()=>splash.remove(),160);
 }
 
 async function playLoginGreeting(){
-  const wrap=$('#loginGreeting'),word=$('#loginGreetingWord');
-  if(!wrap||!word)return;
+  const wrap=$('#loginGreeting');
+  if(!wrap)return;
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const words=['你好，主人','Hello, Master'];
   wrap.classList.add('show');
-
-  word.classList.remove('show');
-  await sleep(90);
-  word.textContent=words[0];
-  word.classList.add('show');
-  await sleep(520);
-
-  word.classList.remove('show');
-  await sleep(150);
-  word.textContent=words[1];
-  word.classList.add('show');
-  await sleep(590);
-
-  word.classList.remove('show');
-  await sleep(170);
+  await sleep(220);
   wrap.classList.remove('show');
 }
 
@@ -200,9 +173,6 @@ function hideLoginSyncOverlay(){
 }
 
 async function playLoginSuccessSequence(){
-  /* Confetti first, then the short bilingual welcome. */
-  showConfetti();
-  await sleep(280);
   await playLoginGreeting();
 }
 
