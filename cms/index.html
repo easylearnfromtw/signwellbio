@@ -46,7 +46,7 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
 <link rel="stylesheet" href="assets/aurora/aurora-core.css?build=aurora-r10-1">
 <link rel="stylesheet" href="assets/aurora/aurora-shell.css?build=aurora-r10-1-nav4-qa">
 <link rel="stylesheet" href="assets/aurora/aurora-views.css?build=aurora-r10-1">
-<link rel="preload" href="assets/bundles/cms-app.js?build=24.36.3-ios-workbench-v2-20261008" as="script" fetchpriority="high">
+<link rel="preload" href="assets/bundles/cms-app.js?build=24.36.3-settings-hub-v2-20261008" as="script" fetchpriority="high">
 
 
 <script src="assets/cms-compat.js?build=24.36.3"></script>
@@ -1260,6 +1260,130 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
     }
   }
 </style>
+
+<style id="swCmsSettingsHubV2">
+  body.aw-aurora[data-sw-view="export"] #view > .stats{
+    display:none!important;
+  }
+  body.aw-aurora .sw-settings-hub-shell{
+    display:grid;
+    grid-template-columns:190px minmax(0,1fr);
+    gap:14px;
+    align-items:start;
+  }
+  body.aw-aurora .sw-settings-hub-nav{
+    position:sticky;
+    top:88px;
+    display:grid;
+    gap:3px;
+    padding:7px;
+    border-radius:16px;
+    background:#fff;
+  }
+  body.aw-aurora .sw-settings-hub-nav button{
+    min-height:54px!important;
+    padding:9px 10px!important;
+    border:0!important;
+    border-radius:11px!important;
+    background:transparent!important;
+    color:#111!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:2px 8px!important;
+    text-align:left!important;
+    box-shadow:none!important;
+  }
+  body.aw-aurora .sw-settings-hub-nav button:hover{
+    background:rgba(118,118,128,.08)!important;
+  }
+  body.aw-aurora .sw-settings-hub-nav button.active{
+    background:#111!important;
+    color:#fff!important;
+  }
+  body.aw-aurora .sw-settings-hub-nav button span{
+    grid-column:1;
+    font-size:12px;
+    font-weight:680;
+  }
+  body.aw-aurora .sw-settings-hub-nav button small{
+    grid-column:1;
+    color:#8e8e93!important;
+    font-size:9.5px!important;
+    font-weight:450!important;
+  }
+  body.aw-aurora .sw-settings-hub-nav button.active small{
+    color:rgba(255,255,255,.55)!important;
+  }
+  body.aw-aurora .sw-settings-hub-nav button b{
+    grid-column:2;
+    grid-row:1/3;
+    min-width:22px;
+    height:22px;
+    display:grid;
+    place-items:center;
+    border-radius:999px;
+    background:rgba(118,118,128,.12);
+    color:#6e6e73;
+    font-size:10px;
+  }
+  body.aw-aurora .sw-settings-hub-nav button.active b{
+    background:rgba(255,255,255,.14);
+    color:#fff;
+  }
+  body.aw-aurora .sw-settings-hub-shell > .publish-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:10px!important;
+    min-width:0;
+  }
+  body.aw-aurora .sw-settings-hub-shell > .publish-grid > [hidden]{
+    display:none!important;
+  }
+  body.aw-aurora .sw-settings-hub-shell .publish-card{
+    width:100%!important;
+    margin:0!important;
+    grid-column:1!important;
+  }
+  @media(max-width:899px){
+    body.aw-aurora .sw-settings-hub-shell{
+      display:block;
+    }
+    body.aw-aurora .sw-settings-hub-nav{
+      position:sticky;
+      top:56px;
+      z-index:34;
+      display:flex;
+      gap:5px;
+      width:calc(100vw - 24px);
+      margin:0 0 10px;
+      padding:5px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      border-radius:14px;
+      background:rgba(245,245,247,.96);
+      -webkit-backdrop-filter:blur(18px);
+      backdrop-filter:blur(18px);
+    }
+    body.aw-aurora .sw-settings-hub-nav::-webkit-scrollbar{display:none}
+    body.aw-aurora .sw-settings-hub-nav button{
+      flex:0 0 auto!important;
+      min-height:36px!important;
+      padding:0 12px!important;
+      display:flex!important;
+      align-items:center!important;
+      gap:7px!important;
+      white-space:nowrap!important;
+      border-radius:10px!important;
+    }
+    body.aw-aurora .sw-settings-hub-nav button small{
+      display:none!important;
+    }
+    body.aw-aurora .sw-settings-hub-nav button b{
+      display:none!important;
+    }
+  }
+</style>
 </head>
 <body class="light sw-ux-r2 aw-aurora">
 <svg class="aw-svg-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -1815,7 +1939,7 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
 <script src="assets/bundles/article-identity.js?build=24.36.3"></script>
 <script src="assets/bundles/error-experience.js?build=24.36.3"></script>
 <script src="assets/signwell-liquid-hero.js?build=r9-3-adaptive-hero-r10-1"></script>
-<script src="assets/bundles/cms-app.js?build=24.36.3-ios-workbench-v2-20261008" data-sw-critical></script>
+<script src="assets/bundles/cms-app.js?build=24.36.3-settings-hub-v2-20261008" data-sw-critical></script>
 <script src="assets/bundles/cms-contrast-guard.js?build=24.36.3" defer></script>
 <script src="assets/bundles/cms-ux-r2.js?build=24.36.3-uxr2-aurora-r10-1"></script>
 <script src="assets/aurora/aurora.js?build=aurora-r10-1-nav4-qa"></script>
