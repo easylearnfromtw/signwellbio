@@ -8033,6 +8033,7 @@ async function publishOnlineFromEditor(){
    - Full article: articles/<slug>.json
    - Legacy articles.js: compatibility fallback only
    ========================================================= */
+const SW_AI_PIPELINE_BACKEND_ENABLED=false; // Legacy backend compatibility: AI pipeline must not block Public publishing.
 const SW_AI_MANIFEST_PATH='ai/ai-manifest.json',SW_AI_ARTICLE_DIR='ai/articles',SW_AI_PIPELINE_SCHEMA='sw-ai-pipeline-v1',SW_AI_PROMPT_VERSION='2026-09-24-p1',SW_AI_MODEL_POLICY='2026-09-24-v2';
 let swAiPipelineLastPublish={cacheHits:0,regenerated:0,pending:0,reviewRequired:0,estimatedUsd:0};
 function swAiManifestBlank(){return {schemaVersion:SW_AI_PIPELINE_SCHEMA,promptVersion:SW_AI_PROMPT_VERSION,modelPolicyVersion:SW_AI_MODEL_POLICY,generatedAt:'',articles:{}}}
@@ -8053,6 +8054,11 @@ function swAiRelatedForArticle(article,all){
 function swAiManifestReusable(entry,hash){return Boolean(entry&&String(entry.contentHash||'')===String(hash||'')&&String(entry.schemaVersion||'')===SW_AI_PIPELINE_SCHEMA&&String(entry.promptVersion||'')===SW_AI_PROMPT_VERSION&&String(entry.modelPolicyVersion||'')===SW_AI_MODEL_POLICY&&entry.artifactPath)}
 function swAiApplyPreview(article,entry){if(!article||!entry)return article;const p=entry.preview||{};article.ai_enrichment={artifact:String(entry.artifactPath||''),contentHash:String(entry.contentHash||''),schemaVersion:String(entry.schemaVersion||''),promptVersion:String(entry.promptVersion||''),generatedAt:String(entry.generatedAt||''),reviewRequired:Boolean(entry.reviewRequired),estimatedUsd:Number(entry.estimatedUsd||0)};article.ai_summary10s=String(p.summary10s||'');article.ai_meta_description=String(p.metaDescription||'');article.ai_seo_title=String(p.seoTitle||'');article.ai_tags=Array.isArray(p.tags)?p.tags.slice(0,8):[];article.ai_related=Array.isArray(p.related)?clone(p.related):[];return article}
 async function swAiEnrichPreparedForPublish(prepared,token,status){
+  if(!SW_AI_PIPELINE_BACKEND_ENABLED){
+    const stats={cacheHits:0,regenerated:0,pending:Array.isArray(prepared)?prepared.length:0,reviewRequired:0,estimatedUsd:0};
+    swAiPipelineLastPublish={...stats};
+    return {manifest:swAiManifestBlank(),entries:[],stats};
+  }
   const remote=await swAiFetchManifest(token),next={...swAiManifestBlank(),modelPolicyVersion:SW_AI_MODEL_POLICY,generatedAt:new Date().toISOString(),articles:{...(remote.articles||{})}},entries=[],live=new Set(),stats={cacheHits:0,regenerated:0,pending:0,reviewRequired:0,estimatedUsd:0};
   const targetLegacyId=String(swArticleIdentityState?.lastPrepare?.legacyId||'');
   for(let i=0;i<prepared.length;i++){
