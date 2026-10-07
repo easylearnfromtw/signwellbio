@@ -532,6 +532,62 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
     text-transform:uppercase!important;
   }
 </style>
+
+<style id="swCmsLoginFinalQaFix">
+  body.aw-aurora,
+  body.aw-aurora #lockScreen,
+  body.aw-aurora #lockScreen::before,
+  body.aw-aurora #lockScreen::after{
+    background:#f5f5f7!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  body.aw-aurora > .field,
+  body.aw-aurora > .grain,
+  body.aw-aurora #lockScreen .field,
+  body.aw-aurora #lockScreen .grain{
+    display:none!important;
+  }
+  body.aw-aurora #lockScreen{
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    padding:16px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+  }
+  body.aw-aurora #lockScreen .lock-card{
+    position:relative!important;
+    inset:auto!important;
+    top:auto!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    animation:none!important;
+    width:min(360px,calc(100vw - 32px))!important;
+    max-width:360px!important;
+    min-width:0!important;
+    margin:0 auto!important;
+    padding:28px 24px 24px!important;
+    border-radius:22px!important;
+    background:#fff!important;
+    border:1px solid #d2d2d7!important;
+    box-shadow:0 12px 34px rgba(0,0,0,.06)!important;
+  }
+  @media(max-width:560px){
+    body.aw-aurora #lockScreen .lock-card{
+      width:calc(100vw - 32px)!important;
+      max-width:358px!important;
+      padding:26px 20px 22px!important;
+      border-radius:20px!important;
+    }
+  }
+</style>
 </head>
 <body class="light sw-ux-r2 aw-aurora">
 <svg class="aw-svg-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
