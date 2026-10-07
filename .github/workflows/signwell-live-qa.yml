@@ -284,6 +284,15 @@ jobs:
               item.renderedBodyLength=(await p.locator('.article-body').innerText().catch(()=> '')).trim().length;
               if(item.expectedTitle && item.renderedTitle.trim()!==item.expectedTitle.trim())item.errors.push('rendered title mismatch');
               if(item.renderedBodyLength<50)item.errors.push('rendered article body too short');
+
+              const directUrl=publicUrl+'article/'+encodeURIComponent(item.slug)+'/';
+              const directResponse=await p.goto(directUrl,{waitUntil:'domcontentloaded',timeout:45000});
+              item.directStatus=directResponse?.status()||0;
+              item.directTitle=await p.locator('h1').first().innerText().catch(()=> '');
+              item.directBodyLength=(await p.locator('.article-body').innerText().catch(()=> '')).trim().length;
+              if(item.directStatus!==200)item.errors.push('direct article route HTTP '+item.directStatus);
+              if(item.expectedTitle && item.directTitle.trim()!==item.expectedTitle.trim())item.errors.push('direct article title mismatch');
+              if(item.directBodyLength<50)item.errors.push('direct article body too short');
             }catch(e){item.errors.push(String(e));}
             if(item.errors.length||item.httpErrors.length)report.summary.errors.push('article route failed: '+item.slug);
             articleChecks.push(item);
