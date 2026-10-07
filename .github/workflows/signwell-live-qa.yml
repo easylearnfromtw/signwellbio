@@ -4,6 +4,15 @@ on:
   push:
     paths:
       - '.github/workflows/signwell-live-qa.yml'
+      - 'cms/**'
+      - 'assets/**'
+      - 'index.html'
+      - 'topics.html'
+      - 'about.html'
+      - 'newsletter.html'
+      - 'public-data.json'
+      - 'articles/**'
+      - 'topics/**'
   workflow_dispatch:
 
 permissions:
@@ -65,6 +74,7 @@ jobs:
           await probe('cms-config',cmsUrl+'analytics-config.js');
           await probe('cms-app',cmsUrl+'assets/bundles/cms-app.js');
           await probe('gas-health',gasUrl+'?action=health&qa='+Date.now());
+          await probe('cms-auth-status',gasUrl+'?action=cms.auth.status&qa='+Date.now());
 
           try{
             if(pubData?.text){
@@ -113,8 +123,19 @@ jobs:
                   lockVisible:await page.locator('#lockScreen').isVisible().catch(()=>false),
                   passwordVisible:await page.locator('#pinInput').isVisible().catch(()=>false),
                   loginButtonVisible:await page.locator('#unlockBtn').isVisible().catch(()=>false),
-                  backendEndpoint:await page.evaluate(()=>window.SIGNWELL_BACKEND?.endpoint||'').catch(()=> '')
+                  backendEndpoint:await page.evaluate(()=>window.SIGNWELL_BACKEND?.endpoint||'').catch(()=> ''),
+                  cardRect:await page.locator('#lockScreen .lock-card').evaluate(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom}}).catch(()=>null),
+                  lockBackground:await page.locator('#lockScreen').evaluate(el=>getComputedStyle(el).backgroundImage+' | '+getComputedStyle(el).backgroundColor).catch(()=> '')
                 };
+                info.shellVisual=await page.evaluate(()=>{
+                  const lock=document.querySelector('#lockScreen'),cms=document.querySelector('#cms');
+                  lock?.classList.add('hidden'); cms?.classList.remove('hidden');
+                  const rect=document.documentElement.getBoundingClientRect();
+                  return {bodyWidth:rect.width,scrollWidth:document.documentElement.scrollWidth};
+                }).catch(()=>null);
+                await page.waitForTimeout(250);
+                const shellSafe=label.replace(/[^a-z0-9_-]/gi,'_')+'-shell';
+                await page.screenshot({path:'qa-'+shellSafe+'.png',fullPage:true}).catch(()=>{});
               }
             }catch(e){info.fatal=String(e);report.summary.errors.push(label+' browser fatal: '+String(e));}
             report.browser[label]=info;
