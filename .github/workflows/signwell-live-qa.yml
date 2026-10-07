@@ -55,27 +55,34 @@ jobs:
           expected_articles="$(sha256sum articles/index.json | awk '{print $1}')"
           expected_topics="$(sha256sum topics/index.json | awk '{print $1}')"
           matched=0
-          for i in $(seq 1 75); do
-            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/?qa=$GITHUB_SHA-$i" -o /tmp/live-public.html || true
-            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/cms/?qa=$GITHUB_SHA-$i" -o /tmp/live-cms.html || true
-            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/public-data.json?qa=$GITHUB_SHA-$i" -o /tmp/live-public-data.json || true
-            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/articles/index.json?qa=$GITHUB_SHA-$i" -o /tmp/live-articles.json || true
-            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/topics/index.json?qa=$GITHUB_SHA-$i" -o /tmp/live-topics.json || true
+          for i in $(seq 1 45); do
+            nonce="$GITHUB_SHA-$i-$(date +%s)"
+            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/?qa=$nonce" -o /tmp/live-public.html || true
+            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/cms/?qa=$nonce" -o /tmp/live-cms.html || true
+            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/public-data.json?qa=$nonce" -o /tmp/live-public-data.json || true
+            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/articles/index.json?qa=$nonce" -o /tmp/live-articles.json || true
+            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/topics/index.json?qa=$nonce" -o /tmp/live-topics.json || true
+
             live_public="$(sha256sum /tmp/live-public.html 2>/dev/null | awk '{print $1}' || true)"
             live_cms="$(sha256sum /tmp/live-cms.html 2>/dev/null | awk '{print $1}' || true)"
             live_data="$(sha256sum /tmp/live-public-data.json 2>/dev/null | awk '{print $1}' || true)"
             live_articles="$(sha256sum /tmp/live-articles.json 2>/dev/null | awk '{print $1}' || true)"
             live_topics="$(sha256sum /tmp/live-topics.json 2>/dev/null | awk '{print $1}' || true)"
-            if [ "$live_public" = "$expected_public" ] && [ "$live_cms" = "$expected_cms" ] && [ "$live_data" = "$expected_data" ] && [ "$live_articles" = "$expected_articles" ] && [ "$live_topics" = "$expected_topics" ]; then
-              echo "GitHub Pages now matches commit $GITHUB_SHA"
+
+            if [ "$live_public" = "$expected_public" ] && \
+               [ "$live_cms" = "$expected_cms" ] && \
+               [ "$live_data" = "$expected_data" ] && \
+               [ "$live_articles" = "$expected_articles" ] && \
+               [ "$live_topics" = "$expected_topics" ]; then
+              echo "GitHub Pages content now matches main at $GITHUB_SHA"
               matched=1
               break
             fi
-            echo "Waiting for Pages deployment ($i/75)..."
+            echo "Waiting for full Pages deployment ($i/45)..."
             sleep 4
           done
           if [ "$matched" != "1" ]; then
-            echo "::error::Live GitHub Pages did not match the current commit within the QA window."
+            echo "::error::Live GitHub Pages data did not match the current main branch within the QA window."
             exit 1
           fi
 
