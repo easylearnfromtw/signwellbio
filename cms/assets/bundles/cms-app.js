@@ -516,7 +516,7 @@ function swCurrentPublicAuthoritativeArticles(localArticles,publicArticles){
     .map(a=>({...clone(a),status:'Published'}));
   return [...drafts,...published];
 }
-async function swHydrateCurrentPublicAfterLogin(){
+async function swHydrateCurrentPublicAfterLogin({pushCloud=true,render=true}={}){
   if(!cmsSessionToken)return {ok:false,skipped:true,reason:'no-session'};
   try{
     let snapshot=null;
@@ -557,10 +557,10 @@ async function swHydrateCurrentPublicAfterLogin(){
     syncPublicSnapshot();
     try{localStorage.setItem(SYNC_KEY,'1')}catch(_){}
     try{localStorage.setItem('signwell-current-public-authority-v1',String(snapshot.revision||Date.now()))}catch(_){}
-    try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(err){console.warn('Canonical CMS cloud rewrite pending',err)}
-    renderView();
+    if(pushCloud){try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(err){console.warn('Canonical CMS cloud rewrite pending',err)}}
+    if(render)renderView();
     const nowPublished=(data.articles||[]).filter(a=>a?.status==='Published').length;
-    if(beforePublished!==nowPublished)showToast(`CMS 已校正為目前網站內容 · Published ${nowPublished} · Draft ${drafts}`);
+    if(render&&beforePublished!==nowPublished)showToast(`CMS 已校正為目前網站內容 · Published ${nowPublished} · Draft ${drafts}`);
     return {ok:true,changed:true,count:nowPublished,drafts,revision:snapshot.revision||0};
   }catch(err){
     console.warn('Post-login current Public hydration failed',err);
@@ -573,6 +573,8 @@ async function completeCmsLogin(method='legacy'){
   $('#answerInput').value='';
   $('#lockHint').textContent=method==='passkey'?'Passkey 驗證完成，正在同步內容…':'驗證完成，正在同步內容…';
   try{await dataReady}catch(_){}
+  // Current Public is canonical. Reconcile it before Cloud State can paint stale legacy content.
+  try{await swHydrateCurrentPublicAfterLogin({pushCloud:false,render:false})}catch(_){}
   $('#lockScreen').classList.add('hidden');
   $('#cms').classList.remove('hidden');
   verifyButton?.classList.remove('auth-entering');if(verifyButton){verifyButton.disabled=false;verifyButton.textContent='驗證並進入'}
@@ -589,7 +591,7 @@ async function completeCmsLogin(method='legacy'){
   const cloudTask=cmsCloudInitialSyncAfterLogin()
     .then(ok=>{cloudFinished=true;cloudOK=Boolean(ok);cmsCloudSetStatus(ok?'雲端已同步 ✓':'本機模式',ok?undefined:'#9a7b45');return ok;})
     .catch(()=>{cloudFinished=true;cloudOK=false;cmsCloudSetStatus('雲端暫時離線 · 使用本機快取','#9a7b45');return false;});
-  const hydrateTask=cloudTask.then(()=>swHydrateCurrentPublicAfterLogin());
+  const hydrateTask=cloudTask.then(()=>swHydrateCurrentPublicAfterLogin({pushCloud:true,render:true}));
   await Promise.race([hydrateTask,sleep(6500)]);
   hideLoginSyncOverlay();
   if(!cloudFinished)showToast((method==='passkey'?'Passkey 登入完成':'已登入')+' · 雲端將在背景繼續同步');
@@ -2386,7 +2388,20 @@ async function cmsCloudApplyRemote(wrapper,{initial=false}={}){
   const scrollTop=$('#view')?.scrollTop||0;
   cmsCloudApplying=true;
   try{
-    data=normalizeState(clone(wrapper.data));
+    const incoming=normalizeState(clone(wrapper.data));
+    let canonical=false;try{canonical=Boolean(localStorage.getItem('signwell-current-public-authority-v1'))}catch(_){}
+    if(canonical){
+      const currentPublished=(data.articles||[]).filter(a=>a?.status==='Published').map(clone);
+      const incomingDrafts=(incoming.articles||[]).filter(a=>a?.status!=='Published').map(clone);
+      const publishedKeys=new Set(currentPublished.map(swArticleSyncKey));
+      const safeDrafts=incomingDrafts.filter(a=>!publishedKeys.has(swArticleSyncKey(a)));
+      data=normalizeState({
+        ...data,
+        articles:[...safeDrafts,...currentPublished]
+      });
+    }else{
+      data=incoming;
+    }
     reconcilePublishedReceipts();
     cmsCloudRevision=Number(wrapper.revision||0);
     cmsCloudDirty=false;
