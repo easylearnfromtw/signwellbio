@@ -588,11 +588,10 @@ function swCmsExperienceEnhance({restoreScroll=true}={}){
 const SW_CMS_NAV_SECTION_KEY='sw-cms-nav-section-v1';
 const SW_CMS_NAV_LAST_KEY='sw-cms-nav-last-v1';
 const SW_CMS_NAV_SECTIONS=Object.freeze({
-  workspace:Object.freeze({label:'工作台',views:Object.freeze(['dashboard','commandcenter'])}),
-  content:Object.freeze({label:'內容',views:Object.freeze(['articles','medicalnews','topics','aiinstructions'])}),
+  workspace:Object.freeze({label:'首頁',views:Object.freeze(['dashboard'])}),
+  content:Object.freeze({label:'內容',views:Object.freeze(['articles','medicalnews'])}),
   publish:Object.freeze({label:'發佈',views:Object.freeze(['canva','newsletter'])}),
-  ai:Object.freeze({label:'AI',views:Object.freeze(['aiopenai','deepresearch'])}),
-  site:Object.freeze({label:'網站',views:Object.freeze(['site','aboutpage','export'])})
+  settings:Object.freeze({label:'設定',views:Object.freeze(['export','topics','site','aboutpage','commandcenter','aiopenai','deepresearch','aiinstructions'])})
 });
 const SW_CMS_VIEW_COPY=Object.freeze({
   dashboard:'網站健康、內容進度與近期文章，一眼掌握本週工作。',
