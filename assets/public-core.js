@@ -373,7 +373,7 @@
     const gx = 12 + (h % 50),
       gy = 4 + ((h >> 6) % 30);
     const cat = String(a.category || "SIGN WELL");
-    return `<div class="gen-cover" aria-hidden="true" style="--g0:${set[0]};--g1:${set[1]};--g2:${set[2]};--g3:${set[3]};--gx:${gx}%;--gy:${gy}%"><svg viewBox="0 0 400 100" preserveAspectRatio="none"><path d="${ECG[(h >> 3) % ECG.length]}"/></svg>${label ? `<b>${esc(Array.from(cat).slice(0, 5).join(""))}</b>` : ""}</div>`;
+    return `<div class="gen-cover" aria-hidden="true" style="--g0:${set[0]};--g1:${set[1]};--g2:${set[2]};--g3:${set[3]};--gx:${gx}%;--gy:${gy}%"><svg viewBox="0 0 400 100" preserveAspectRatio="none"><path d="${ECG[((h >> 3) % ECG.length + ECG.length) % ECG.length]}"/></svg>${label ? `<b>${esc(Array.from(cat).slice(0, 5).join(""))}</b>` : ""}</div>`;
   }
   function coverMedia(a, { label = true, eager = false } = {}) {
     const cover = safeUrl(a.cover);
