@@ -1334,10 +1334,77 @@ function renderView(){
   else if(viewName==='canva')renderCanvaSocial();
   else if(viewName==='aiopenai')renderOpenAISettings();
   else if(viewName==='deepresearch')renderDeepResearchWorkspace();
-  else if(viewName==='export'){renderExport();setTimeout(swMountBackendConnectionCard,0);setTimeout(swInitPasskeySettings,0);setTimeout(initPublishAIProviderSettings,0);setTimeout(initPublishGptSettings,12);setTimeout(initPublishComplianceSettings,28);setTimeout(initMetaProviderSettings,64);setTimeout(()=>window.swServiceHealthMountSettings?.(),82);setTimeout(()=>window.swArticleIdentityMountSettings?.(),104);setTimeout(initSecurityAuditPanel,140)}
+  else if(viewName==='export'){renderExport();setTimeout(swMountBackendConnectionCard,0);setTimeout(swInitPasskeySettings,0);setTimeout(initPublishAIProviderSettings,0);setTimeout(initPublishGptSettings,12);setTimeout(initPublishComplianceSettings,28);setTimeout(initMetaProviderSettings,64);setTimeout(()=>window.swServiceHealthMountSettings?.(),82);setTimeout(()=>window.swArticleIdentityMountSettings?.(),104);setTimeout(initSecurityAuditPanel,140);setTimeout(swSettingsHubEnhance,180)}
   else renderDashboard();
   swCmsSyncNavUX();
   swCmsExperienceEnhance();
+}
+
+
+let swSettingsHubObserver=null;
+const SW_SETTINGS_GROUPS=Object.freeze({
+  publish:Object.freeze({label:'發佈與 GitHub',hint:'Public、Backend、Repository'}),
+  security:Object.freeze({label:'帳號與安全',hint:'登入、Passkey、稽核'}),
+  integrations:Object.freeze({label:'整合服務',hint:'Notion、Meta、Canva、圖片'}),
+  ai:Object.freeze({label:'AI',hint:'Provider、寫作、用量'}),
+  advanced:Object.freeze({label:'進階',hint:'Recovery、Automation、Diagnostics'})
+});
+function swSettingsCardGroup_(el){
+  const id=String(el?.id||'');
+  if(['settingsGithubCard','swBackendConnectionCard'].includes(id))return'publish';
+  if(['settingsPasskeyCard','securityAuditPanel','publishComplianceCard'].includes(id))return'security';
+  if(['notionSettingsCard','publishMetaProviderCard','canvaSettingsPublishCard','googleMediaCard','metaGraphAccountCard','metaThreadsAccountCard'].includes(id))return'integrations';
+  if(['publishAIProviderCard','publishGptProviderCard','swEditorialLearningSettingsCard','swTokenSettings','swAiPipelineSettingsCard','swArticleIdentityHealthCard'].includes(id))return'ai';
+  return'advanced';
+}
+function swSettingsHubEnhance(){
+  if(viewName!=='export')return;
+  const grid=document.querySelector('#view .publish-grid');
+  if(!grid)return;
+  let shell=document.getElementById('swSettingsHubShell');
+  if(!shell){
+    shell=document.createElement('div');shell.id='swSettingsHubShell';shell.className='sw-settings-hub-shell';
+    const nav=document.createElement('nav');nav.className='sw-settings-hub-nav';nav.id='swSettingsHubNav';nav.setAttribute('aria-label','設定分類');
+    nav.innerHTML=Object.entries(SW_SETTINGS_GROUPS).map(([key,g])=>`<button type="button" data-settings-tab="${key}"><span>${g.label}</span><small>${g.hint}</small><b data-settings-count="${key}">0</b></button>`).join('');
+    grid.parentNode.insertBefore(shell,grid);shell.append(nav,grid);
+    nav.querySelectorAll('[data-settings-tab]').forEach(btn=>btn.onclick=()=>{
+      try{sessionStorage.setItem('sw-settings-group',btn.dataset.settingsTab)}catch(_){}
+      swSettingsHubApply_(btn.dataset.settingsTab);
+    });
+  }else if(grid.parentNode!==shell){
+    shell.appendChild(grid);
+  }
+  const classify=()=>{
+    [...grid.children].forEach(card=>{
+      if(!(card instanceof HTMLElement))return;
+      if(card.id==='settingsDataCard'){card.hidden=true;return}
+      card.dataset.settingsGroup=swSettingsCardGroup_(card);
+    });
+    Object.keys(SW_SETTINGS_GROUPS).forEach(key=>{
+      const n=[...grid.children].filter(x=>x instanceof HTMLElement&&!x.hidden&&x.dataset.settingsGroup===key).length;
+      const count=shell.querySelector(`[data-settings-count="${key}"]`);if(count)count.textContent=String(n);
+    });
+    let selected='publish';try{selected=sessionStorage.getItem('sw-settings-group')||selected}catch(_){}
+    if(!SW_SETTINGS_GROUPS[selected])selected='publish';
+    swSettingsHubApply_(selected);
+  };
+  swSettingsHubObserver?.disconnect();
+  swSettingsHubObserver=new MutationObserver(()=>classify());
+  swSettingsHubObserver.observe(grid,{childList:true});
+  classify();
+}
+function swSettingsHubApply_(group){
+  if(viewName!=='export')return;
+  const shell=document.getElementById('swSettingsHubShell'),grid=shell?.querySelector('.publish-grid');if(!shell||!grid)return;
+  const selected=SW_SETTINGS_GROUPS[group]?group:'publish';
+  shell.dataset.settingsGroup=selected;
+  shell.querySelectorAll('[data-settings-tab]').forEach(btn=>{
+    const on=btn.dataset.settingsTab===selected;btn.classList.toggle('active',on);btn.setAttribute('aria-current',on?'page':'false');
+  });
+  [...grid.children].forEach(card=>{
+    if(!(card instanceof HTMLElement)||card.id==='settingsDataCard')return;
+    card.hidden=card.dataset.settingsGroup!==selected;
+  });
 }
 
 const ANALYTICS_KEY='signwell-analytics-v1';
