@@ -7606,8 +7606,18 @@ function optimize(){
 
 let PUBLIC_GITHUB={owner:'easylearnfromtw',repo:'signwellbio',branch:'main',path:'articles.js',sitePath:'site-content.js',site:SW_CMS_PUBLIC_BASE};const TOKEN_STORE_KEY='signwell-github-token-v2',SYNC_KEY='signwell-github-synced-v2';let githubToken='server-managed',githubRuntimeSyncedAt=0,githubLastDiagnosis=null;
 /* SIGN WELL v24.23.2 · Article Identity CMS integration + operational health */
-const SW_ARTICLE_IDENTITY_BACKEND_ENABLED=false; // Legacy backend v24.0.27 has no Article Identity actions.
-const swArticleIdentityState={lastPrepare:null,migrationDone:!SW_ARTICLE_IDENTITY_BACKEND_ENABLED};
+let SW_ARTICLE_IDENTITY_BACKEND_ENABLED=true; // Probe current backend; degrade only when the action is genuinely unsupported.
+const swArticleIdentityState={lastPrepare:null,migrationDone:false};
+function swArticleIdentityDisableIfUnsupported(err){
+  const msg=String(err?.message||err||'');
+  if(/Unknown action\s*:\s*admin\.article(?:I|l)dentity\./i.test(msg)||/ARTICLE_IDENTITY_UNSUPPORTED/i.test(msg)){
+    SW_ARTICLE_IDENTITY_BACKEND_ENABLED=false;
+    swArticleIdentityState.migrationDone=true;
+    console.warn('Article Identity capability disabled for this session:',msg);
+    return true;
+  }
+  return false;
+}
 function swArticleIdentityValidId(id){return /^SW-A-(?:\d{4}-\d{6}|\d{3}-\d{3}-\d{3})$/.test(String(id||''));}
 function swArticleIdentityReadPublishOptions(){return {changeClass:'AUTO',reviewType:''};}
 function swArticleIdentityApply(article,identity){
@@ -7649,6 +7659,7 @@ async function swArticleIdentityEnsureMigration(excludeLegacyId=''){
     swArticleIdentityApplyMigrationResult(r||{});
     return r;
   }catch(err){
+    swArticleIdentityDisableIfUnsupported(err);
     console.warn('Article Identity backend unavailable; migration skipped for Public publish.',err);
     swArticleIdentityState.migrationDone=true;
     return {ok:false,skipped:true,reason:'backend-unavailable'};
@@ -7670,6 +7681,7 @@ async function swArticleIdentityPrepareForPublish(article){
     persist(true);
     return r;
   }catch(err){
+    swArticleIdentityDisableIfUnsupported(err);
     console.warn('Article Identity backend unavailable; continuing Public publish without Identity.',err);
     swArticleIdentityState.lastPrepare=null;
     return {ok:false,skipped:true,reason:'backend-unavailable'};
@@ -7695,6 +7707,7 @@ async function swArticleIdentityCommitAfterPublish(article){
     swArticleIdentityState.lastPrepare=null;
     return r.identity;
   }catch(err){
+    swArticleIdentityDisableIfUnsupported(err);
     console.warn('Article Identity commit skipped; Public publish remains valid.',err);
     swArticleIdentityState.lastPrepare=null;
     return null;
@@ -7731,7 +7744,7 @@ async function swArticleIdentityQuickHealth(){
   if(swArticleIdentityHealthBusy||!cmsSessionToken)return null;swArticleIdentityHealthBusy=true;
   const note=document.getElementById('swArticleIdentityHealthNote');if(note)note.textContent='正在核對 Backend registry、版本 ledger、fingerprint 與 CMS Published articles…';
   try{const r=await signwellGasBridge('admin.articleIdentity.health',{articles:swArticleIdentityPublishedSummary()},{adminKey:newsletterAdminKey(),timeoutMs:45000});swArticleIdentityHealthPaint(r);return r;}
-  catch(err){if(note)note.textContent='Article Identity 健康檢查失敗：'+String(err?.message||err);return null;}
+  catch(err){swArticleIdentityDisableIfUnsupported(err);if(note)note.textContent=SW_ARTICLE_IDENTITY_BACKEND_ENABLED?'Article Identity 健康檢查失敗：'+String(err?.message||err):'目前 Backend 不支援 Article Identity；核心 Public 發佈仍可正常使用。';return null;}
   finally{swArticleIdentityHealthBusy=false;}
 }
 async function swArticleIdentityCheckOneSurface(a){
