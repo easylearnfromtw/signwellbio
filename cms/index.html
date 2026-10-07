@@ -277,6 +277,241 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
   }
 </style>
 
+
+<style id="swCmsResponsiveLayout">
+  /* Desktop: dense workspace */
+  @media (min-width: 1100px){
+    body.aw-aurora .cms{
+      display:grid!important;
+      grid-template-columns:248px minmax(0,1fr)!important;
+      min-height:100dvh!important;
+      gap:16px!important;
+      padding:16px!important;
+    }
+    body.aw-aurora .sidebar{
+      position:sticky!important;
+      top:16px!important;
+      height:calc(100dvh - 32px)!important;
+      overflow:auto!important;
+      padding:14px!important;
+    }
+    body.aw-aurora .workspace{
+      min-width:0!important;
+      display:flex!important;
+      flex-direction:column!important;
+      gap:14px!important;
+    }
+    body.aw-aurora .topbar{
+      position:sticky!important;
+      top:16px!important;
+      z-index:20!important;
+      min-height:72px!important;
+      padding:14px 18px!important;
+    }
+    body.aw-aurora #view{
+      width:100%!important;
+      max-width:1480px!important;
+      margin:0 auto!important;
+      padding:4px 0 40px!important;
+    }
+    body.aw-aurora #view .stats{
+      display:grid!important;
+      grid-template-columns:repeat(4,minmax(0,1fr))!important;
+      gap:12px!important;
+    }
+    body.aw-aurora #view .publish-grid,
+    body.aw-aurora #view .dashboard-grid,
+    body.aw-aurora #view .site-grid,
+    body.aw-aurora #view .people-admin-grid,
+    body.aw-aurora #view .newsletter-grid{
+      display:grid!important;
+      grid-template-columns:repeat(12,minmax(0,1fr))!important;
+      gap:14px!important;
+      align-items:start!important;
+    }
+    body.aw-aurora #view .publish-grid > *,
+    body.aw-aurora #view .dashboard-grid > *,
+    body.aw-aurora #view .site-grid > *,
+    body.aw-aurora #view .people-admin-grid > *,
+    body.aw-aurora #view .newsletter-grid > *{
+      grid-column:span 6!important;
+      min-width:0!important;
+    }
+    body.aw-aurora #view .publish-grid > .wide,
+    body.aw-aurora #view .dashboard-grid > .wide,
+    body.aw-aurora #view .site-grid > .wide,
+    body.aw-aurora #view .newsletter-grid > .wide{
+      grid-column:1/-1!important;
+    }
+    body.aw-aurora .page-head{
+      display:flex!important;
+      align-items:flex-end!important;
+      justify-content:space-between!important;
+      gap:20px!important;
+      margin-bottom:16px!important;
+    }
+    body.aw-aurora .page-head h1{font-size:32px!important;line-height:1.08!important}
+    body.aw-aurora .panel,
+    body.aw-aurora .publish-card,
+    body.aw-aurora .stat{padding:18px!important}
+  }
+
+  /* Tablet */
+  @media (min-width: 700px) and (max-width: 1099px){
+    body.aw-aurora .cms{
+      display:grid!important;
+      grid-template-columns:210px minmax(0,1fr)!important;
+      gap:12px!important;
+      padding:12px!important;
+    }
+    body.aw-aurora .sidebar{height:calc(100dvh - 24px)!important;position:sticky!important;top:12px!important;overflow:auto!important}
+    body.aw-aurora #view{padding:0 0 28px!important}
+    body.aw-aurora #view .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  }
+
+  /* Mobile: single-task flow */
+  @media (max-width:699px){
+    body.aw-aurora .cms{
+      display:block!important;
+      min-height:100dvh!important;
+      padding:0!important;
+      background:#f5f5f7!important;
+    }
+    body.aw-aurora .sidebar{
+      position:fixed!important;
+      left:0!important;
+      right:0!important;
+      bottom:0!important;
+      top:auto!important;
+      z-index:80!important;
+      height:auto!important;
+      min-height:0!important;
+      padding:7px 10px calc(7px + env(safe-area-inset-bottom))!important;
+      border:0!important;
+      border-top:1px solid #d2d2d7!important;
+      border-radius:0!important;
+      background:rgba(255,255,255,.96)!important;
+      overflow:visible!important;
+      backdrop-filter:blur(24px)!important;
+      -webkit-backdrop-filter:blur(24px)!important;
+    }
+    body.aw-aurora .sidebar > .brand,
+    body.aw-aurora .sidebar > .sidebar-command,
+    body.aw-aurora .sidebar > .nav,
+    body.aw-aurora .sidebar > .sidebar-health,
+    body.aw-aurora .sidebar > .sidebar-foot{
+      display:none!important;
+    }
+    body.aw-aurora .sw-nav-sections{
+      display:grid!important;
+      grid-template-columns:repeat(4,1fr)!important;
+      gap:4px!important;
+      margin:0!important;
+      padding:0!important;
+    }
+    body.aw-aurora .sw-nav-sections button{
+      min-width:0!important;
+      height:50px!important;
+      padding:5px 2px!important;
+      border:0!important;
+      background:transparent!important;
+      color:#6e6e73!important;
+      border-radius:10px!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:center!important;
+      justify-content:center!important;
+      gap:2px!important;
+      font-size:11px!important;
+    }
+    body.aw-aurora .sw-nav-sections button b{font-size:16px!important;line-height:1!important}
+    body.aw-aurora .sw-nav-sections button.active{background:#f2f2f4!important;color:#111!important}
+    body.aw-aurora .workspace{
+      min-height:100dvh!important;
+      padding-bottom:78px!important;
+      background:#f5f5f7!important;
+    }
+    body.aw-aurora .topbar{
+      position:sticky!important;
+      top:0!important;
+      z-index:60!important;
+      border:0!important;
+      border-bottom:1px solid #e5e5e7!important;
+      border-radius:0!important;
+      padding:12px 14px!important;
+      min-height:62px!important;
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) auto!important;
+      gap:8px!important;
+      background:rgba(255,255,255,.96)!important;
+    }
+    body.aw-aurora .topbar-title span{font-size:9px!important}
+    body.aw-aurora .topbar-title h2{font-size:20px!important}
+    body.aw-aurora .topbar .command-trigger,
+    body.aw-aurora .topbar .save-state{display:none!important}
+    body.aw-aurora #swMobileSections{display:none!important}
+    body.aw-aurora #swContextTabs{
+      position:sticky!important;
+      top:62px!important;
+      z-index:50!important;
+      display:flex!important;
+      gap:6px!important;
+      padding:8px 10px!important;
+      overflow-x:auto!important;
+      scrollbar-width:none!important;
+      background:rgba(245,245,247,.96)!important;
+      border-bottom:1px solid #e5e5e7!important;
+    }
+    body.aw-aurora #swContextTabs::-webkit-scrollbar{display:none!important}
+    body.aw-aurora #swContextTabs button{
+      flex:0 0 auto!important;
+      min-height:34px!important;
+      padding:7px 12px!important;
+      border-radius:999px!important;
+      font-size:13px!important;
+      white-space:nowrap!important;
+    }
+    body.aw-aurora #view{
+      width:100%!important;
+      padding:12px 10px 28px!important;
+      overflow-x:hidden!important;
+    }
+    body.aw-aurora .page-head{
+      display:block!important;
+      margin:2px 2px 12px!important;
+    }
+    body.aw-aurora .page-head h1{font-size:27px!important;line-height:1.1!important}
+    body.aw-aurora #view :where(.stats,.publish-grid,.dashboard-grid,.site-grid,.people-admin-grid,.newsletter-grid,.editor-grid){
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      gap:10px!important;
+    }
+    body.aw-aurora #view :where(.panel,.publish-card,.stat,.editor-main,.editor-side,.newsletter-panel,.notion-card){
+      grid-column:1!important;
+      width:100%!important;
+      min-width:0!important;
+      padding:14px!important;
+      border-radius:16px!important;
+    }
+    body.aw-aurora #view table{
+      display:block!important;
+      width:100%!important;
+      overflow-x:auto!important;
+      -webkit-overflow-scrolling:touch!important;
+    }
+    body.aw-aurora #view :where(input:not([type=checkbox]):not([type=radio]),select,textarea){
+      min-height:44px!important;
+      font-size:16px!important;
+    }
+    body.aw-aurora #view :where(button,.top-action,.smallbtn){
+      min-height:42px!important;
+    }
+    body.aw-aurora .article-row{
+      border-radius:14px!important;
+      padding:12px!important;
+    }
+  }
+</style>
 </head>
 <body class="light sw-ux-r2 aw-aurora">
 <svg class="aw-svg-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -648,34 +883,31 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
   <div class="brand"><div class="brand-mark">SW</div><div><strong>SIGN WELL CMS</strong><span>欣緯生醫 · v24.36.3 · R10.1</span></div></div>
   <button class="sidebar-command" id="sideCommandCenter" type="button"><span><b>Command Center</b><small>Notion · Gmail · Operations</small></span><em>⌘K</em></button>
   <div class="sw-nav-sections" id="swNavSections" role="tablist" aria-label="CMS 工作區">
-    <button class="active" type="button" role="tab" aria-selected="true" data-nav-section="workspace"><b>⌂</b><span>工作台</span></button>
+    <button class="active" type="button" role="tab" aria-selected="true" data-nav-section="workspace"><b>⌂</b><span>首頁</span></button>
     <button type="button" role="tab" aria-selected="false" data-nav-section="content"><b>▤</b><span>內容</span></button>
     <button type="button" role="tab" aria-selected="false" data-nav-section="publish"><b>↗</b><span>發佈</span></button>
-    <button type="button" role="tab" aria-selected="false" data-nav-section="ai"><b>AI</b><span>AI</span></button>
-    <button type="button" role="tab" aria-selected="false" data-nav-section="site"><b>⚙</b><span>網站</span></button>
+    <button type="button" role="tab" aria-selected="false" data-nav-section="settings"><b>⚙</b><span>設定</span></button>
   </div>
   <nav class="nav sw-nav-optimized" aria-label="CMS 導覽">
-    <div class="nav-group" data-nav-section-panel="workspace"><span class="nav-label">工作台</span>
-      <button class="active" data-view="dashboard" data-icon="⌂"><span>總覽</span><small>網站健康與近期內容</small></button>
-      <button data-view="commandcenter" data-icon="◆"><span>中控台</span><small>Notion · 每週迭代 · 營運</small></button>
+    <div class="nav-group" data-nav-section-panel="workspace"><span class="nav-label">首頁</span>
+      <button class="active" data-view="dashboard" data-icon="⌂"><span>總覽</span><small>近期內容與工作狀態</small></button>
     </div>
     <div class="nav-group" data-nav-section-panel="content" hidden><span class="nav-label">內容</span>
-      <button data-view="articles" data-icon="▤"><span>文章</span><small>撰寫 · 審稿 · 發布</small></button>
-      <button data-view="medicalnews" data-icon="◉"><span>新聞建議</span><small>時事掃描與選題</small></button>
-      <button data-view="topics" data-icon="#"><span>主題與詞庫</span><small>分類 · Glossary</small></button>
+      <button data-view="articles" data-icon="▤"><span>文章</span><small>撰寫 · 審稿 · 發佈</small></button>
+      <button data-view="medicalnews" data-icon="◉"><span>選題</span><small>醫療時事與內容靈感</small></button>
     </div>
     <div class="nav-group" data-nav-section-panel="publish" hidden><span class="nav-label">發佈</span>
       <button data-view="canva" data-icon="✦"><span>Social Studio</span><small>Canva · Meta 圖文</small></button>
       <button data-view="newsletter" data-icon="✉"><span>電子報</span><small>訂閱者 · Campaign</small></button>
     </div>
-    <div class="nav-group" data-nav-section-panel="ai" hidden><span class="nav-label">AI</span>
-      <button data-view="aiopenai" data-icon="AI"><span>AI Pipeline</span><small>模型 · Provider · 成本</small></button>
-      <button data-view="deepresearch" data-icon="DR"><span>深入研究</span><small>Evidence · Research</small></button>
-    </div>
-    <div class="nav-group" data-nav-section-panel="site" hidden><span class="nav-label">網站</span>
-      <button data-view="site" data-icon="⌘"><span>主頁設定</span><small>首頁文字與導覽</small></button>
-      <button data-view="aboutpage" data-icon="◎"><span>關於頁面</span><small>人物與品牌資訊</small></button>
+    <div class="nav-group" data-nav-section-panel="settings" hidden><span class="nav-label">設定</span>
       <button data-view="export" data-icon="⚙"><span>系統設定</span><small>連線 · Security · QA</small></button>
+      <button data-view="topics" data-icon="#"><span>內容設定</span><small>主題 · Glossary</small></button>
+      <button data-view="site" data-icon="⌘"><span>網站設定</span><small>首頁文字與導覽</small></button>
+      <button data-view="aboutpage" data-icon="◎"><span>品牌與人物</span><small>About · People</small></button>
+      <button data-view="commandcenter" data-icon="◆"><span>自動化</span><small>Notion · Weekly · Operations</small></button>
+      <button data-view="aiopenai" data-icon="AI"><span>AI 設定</span><small>Provider · Model · 成本</small></button>
+      <button data-view="deepresearch" data-icon="DR"><span>研究設定</span><small>Deep Research · Evidence</small></button>
     </div>
   </nav>
   <div class="sidebar-health" aria-label="系統狀態">
