@@ -476,6 +476,49 @@ async function verifySecond(){
   }
   await completeCmsLogin('legacy');
 }
+async function swHydrateCurrentPublicAfterLogin(){
+  if(!cmsSessionToken)return {ok:false,skipped:true,reason:'no-session'};
+  try{
+    await ensureGithubRuntimeTarget(true);
+    const remote=await v10LoadRemoteArticles('server-managed');
+    const remoteArticles=Array.isArray(remote?.articles)?remote.articles:[];
+    if(!remoteArticles.length)return {ok:true,changed:false,count:0};
+
+    const beforeKeys=new Set((data.articles||[]).map(swArticleSyncKey));
+    const missing=remoteArticles.filter(a=>!beforeKeys.has(swArticleSyncKey(a)));
+    if(!missing.length){
+      try{localStorage.setItem(SYNC_KEY,'1')}catch(_){}
+      return {ok:true,changed:false,count:remoteArticles.length};
+    }
+
+    let bundle=null;
+    try{bundle=await fetchRemotePublicBundle('server-managed')}catch(_){}
+    let topicSource=Array.isArray(bundle?.topics)?bundle.topics:[];
+    if(!topicSource.length){try{topicSource=await v11FetchTopicsRaw()}catch(_){}}
+
+    data={
+      ...data,
+      articles:swMergeArticlesLossless(data.articles,remoteArticles),
+      topics:swMergeEntityListLossless(data.topics,topicSource,['id','slug','key','name','title'],{sourceWins:false}),
+      people:swMergeEntityListLossless(data.people,Array.isArray(bundle?.people)?bundle.people:[],['id','slug','name'],{sourceWins:false}),
+      glossary:swMergeEntityListLossless(data.glossary,Array.isArray(bundle?.glossary)?bundle.glossary:[],['id','term','name','title'],{sourceWins:false}),
+      siteText:{...DEFAULT_SITE_TEXT,...(bundle?.siteText||{}),...(data.siteText||{})},
+      heroConfig:normalizeHeroConfig(data.heroConfig||bundle?.heroConfig)
+    };
+
+    persist(true);
+    syncPublicSnapshot();
+    try{localStorage.setItem(SYNC_KEY,'1')}catch(_){}
+    try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(_){}
+    renderView();
+    showToast(`已自動補回 Public 內容 · ${missing.length} 篇文章`);
+    return {ok:true,changed:true,count:remoteArticles.length,added:missing.length};
+  }catch(err){
+    console.warn('Post-login Public hydration skipped',err);
+    return {ok:false,changed:false,error:String(err?.message||err)};
+  }
+}
+
 async function completeCmsLogin(method='legacy'){
   const verifyButton=$('#verifyBtn');
   $('#answerInput').value='';
@@ -497,7 +540,8 @@ async function completeCmsLogin(method='legacy'){
   const cloudTask=cmsCloudInitialSyncAfterLogin()
     .then(ok=>{cloudFinished=true;cloudOK=Boolean(ok);cmsCloudSetStatus(ok?'雲端已同步 ✓':'本機模式',ok?undefined:'#9a7b45');return ok;})
     .catch(()=>{cloudFinished=true;cloudOK=false;cmsCloudSetStatus('雲端暫時離線 · 使用本機快取','#9a7b45');return false;});
-  await Promise.race([cloudTask,sleep(4500)]);
+  const hydrateTask=cloudTask.then(()=>swHydrateCurrentPublicAfterLogin());
+  await Promise.race([hydrateTask,sleep(6500)]);
   hideLoginSyncOverlay();
   if(!cloudFinished)showToast((method==='passkey'?'Passkey 登入完成':'已登入')+' · 雲端將在背景繼續同步');
   else if(cloudOK)showToast((method==='passkey'?'Passkey 登入完成':'登入完成')+' · 雲端資料已同步');
@@ -7928,8 +7972,11 @@ async function syncFromGitHubLossless(){
   githubToken=token;if(status)status.textContent='正在核對新站與 CMS 雲端資料…';
   try{
     await ensureGithubRuntimeTarget(true);
-    let remote={articles:[],sha:null},remoteSite={siteText:{...DEFAULT_SITE_TEXT},sha:null},bundle=null,recovery=null;
-    try{remote=await fetchRemoteArticles(token)}catch(e){if(!/Not Found|404/i.test(String(e?.message||e)))throw e}
+    let remote={articles:[],sha:null,mode:'v10'},remoteSite={siteText:{...DEFAULT_SITE_TEXT},sha:null},bundle=null,recovery=null;
+    try{
+      const current=await v10LoadRemoteArticles(token);
+      remote={articles:current.articles||[],sha:null,mode:current.mode||'v10'};
+    }catch(e){if(!/Not Found|404/i.test(String(e?.message||e)))throw e}
     try{remoteSite=await fetchRemoteSiteText(token)}catch(e){if(!/Not Found|404/i.test(String(e?.message||e)))throw e}
     try{bundle=await fetchRemotePublicBundle(token)}catch(e){if(!/Not Found|404/i.test(String(e?.message||e)))throw e}
     const localPublished=(data.articles||[]).filter(a=>a?.status==='Published').length;
