@@ -9302,15 +9302,20 @@ async function publishTopicsOnly(){
   await v10BatchCommit(entries,githubToken,'Update SIGN WELL topics '+new Date().toISOString().slice(0,19).replace('T',' '));
   await verifyPublishedTopics(bundle.topics,githubToken);
   await verifyPublicBundle(bundle,githubToken);
-  await swVerifyRetiredPublicFeatures_(githubToken);
-  await swVerifyPublicBackendBridge_(githubToken);
-  await swVerifyPublicLiquidNavigation_(githubToken);
+  const optionalQaWarnings=[];
+  for(const [label,fn] of [
+    ['Public cleanup',()=>swVerifyRetiredPublicFeatures_(githubToken)],
+    ['Backend Bridge',()=>swVerifyPublicBackendBridge_(githubToken)],
+    ['Liquid Navigation',()=>swVerifyPublicLiquidNavigation_(githubToken)]
+  ]){
+    try{await fn()}catch(err){optionalQaWarnings.push(label+'：'+String(err?.message||err));console.warn('Optional topics QA warning',label,err)}
+  }
 
   data.people=preparedPeople;
   persist(true);
   localStorage.setItem(SYNC_KEY,'1');
   signalPublicDataRefresh();
-  showToast(`主題、文字與人物圖片已同步並驗證：${bundle.topics.filter(x=>x.active!==false).length} 個公開主題`);
+  showToast(optionalQaWarnings.length?`主題已同步 · ${optionalQaWarnings.length} 項進階 QA 提示`:`主題、文字與人物圖片已同步並驗證：${bundle.topics.filter(x=>x.active!==false).length} 個公開主題`);
   return true;
 }
 
@@ -9376,7 +9381,26 @@ async function waitForLivePublicPublish(revision,expectedMetas,{timeoutMs=65000}
   }
   return {ok:false,...last,latencyMs:Date.now()-start};
 }
-async function publishGitHub(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return false}githubToken=token;await swPublishPreflight(status);if(status)status.textContent='正在準備 v10 發布資料…';let remoteIndex=[];try{remoteIndex=await v10FetchIndexRaw()}catch(err){if(err.status!==404)throw err;}const alreadySynced=localStorage.getItem(SYNC_KEY)==='1';if(!alreadySynced&&remoteIndex.length){const localIds=new Set(data.articles.map(a=>a.id)),missing=remoteIndex.filter(a=>!localIds.has(a.id));if(missing.length)throw new Error(`安全阻擋：公開站有 ${missing.length} 篇文章不在這台裝置。請先按「從 GitHub 同步」。`)}
+async function publishGitHub(){const status=$('#ghStatus'),token=currentTokenInput();if(!token){if(status)status.textContent='請先到「設定」完成 GitHub PAT 設定。';return false}githubToken=token;await swPublishPreflight(status);if(status)status.textContent='正在核對遠端內容，避免跨裝置覆蓋…';let remoteIndex=[];try{remoteIndex=await v10FetchIndexRaw()}catch(err){if(err.status!==404)throw err;}
+ // Always reconcile remote Public before a destructive publish. Never trust a per-device sync flag.
+ if(remoteIndex.length){
+   const localKeys=new Set((data.articles||[]).map(a=>swArticleSyncKey(a)));
+   const missingRemote=remoteIndex.filter(a=>!localKeys.has(swArticleSyncKey(a)));
+   if(missingRemote.length){
+     const remoteFull=await v10LoadRemoteArticles(token);
+     data.articles=swMergeArticlesLossless(data.articles,remoteFull.articles||[]);
+   }
+ }
+ try{
+   const remoteBundle=await fetchRemotePublicBundle(token);
+   if(remoteBundle){
+     data.topics=swMergeEntityListLossless(data.topics,remoteBundle.topics||[],['id','slug','key','name','title'],{sourceWins:false});
+     data.people=swMergeEntityListLossless(data.people,remoteBundle.people||[],['id','slug','name'],{sourceWins:false});
+     data.glossary=swMergeEntityListLossless(data.glossary,remoteBundle.glossary||[],['id','term','name','title'],{sourceWins:false});
+   }
+ }catch(err){if(!/Not Found|404/i.test(String(err?.message||err)))throw err}
+ persist(true);syncPublicSnapshot();try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(_){}
+ if(status)status.textContent='遠端內容已安全合併 · 正在準備 v10 發布資料…';
  const published=data.articles.filter(a=>a.status==='Published'),imageEntries=[],imageCache=new Map(),prepared=[];for(let i=0;i<published.length;i++){if(status)status.textContent=`正在處理文章與圖片 ${i+1}/${published.length}…`;prepared.push(await v10PrepareArticle(published[i],token,imageEntries,imageCache))}
  if(status)status.textContent='正在處理 About 人物圖片…';
  const preparedPeople=await v10PreparePeoplePhotos(data.people||[],token,imageEntries,imageCache);
