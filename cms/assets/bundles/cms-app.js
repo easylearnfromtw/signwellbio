@@ -7521,23 +7521,35 @@ async function swArticleIdentityEnsureMigration(excludeLegacyId=''){
   excludeLegacyId=String(excludeLegacyId||'');
   const published=(data.articles||[]).filter(a=>a.status==='Published'&&String(a.id||'')!==excludeLegacyId);
   if(!published.length){swArticleIdentityState.migrationDone=true;return null;}
-  const r=await signwellGasBridge('admin.articleIdentity.migrate',{articles:published,excludeLegacyIds:excludeLegacyId?[excludeLegacyId]:[]},{adminKey:newsletterAdminKey(),timeoutMs:120000});
-  swArticleIdentityApplyMigrationResult(r||{});
-  return r;
+  try{
+    const r=await signwellGasBridge('admin.articleIdentity.migrate',{articles:published,excludeLegacyIds:excludeLegacyId?[excludeLegacyId]:[]},{adminKey:newsletterAdminKey(),timeoutMs:120000});
+    swArticleIdentityApplyMigrationResult(r||{});
+    return r;
+  }catch(err){
+    console.warn('Article Identity backend unavailable; migration skipped for Public publish.',err);
+    swArticleIdentityState.migrationDone=true;
+    return {ok:false,skipped:true,reason:'backend-unavailable'};
+  }
 }
 async function swArticleIdentityPrepareForPublish(article){
   if(!article)throw new Error('找不到待發布文章');
   const options=swArticleIdentityReadPublishOptions();
-  const r=await signwellGasBridge('admin.articleIdentity.prepare',{article:article,changeClass:options.changeClass},{adminKey:newsletterAdminKey(),timeoutMs:60000});
-  if(!r?.identity?.article_id)throw new Error('Article Identity Backend 沒有核發 Article ID');
-  swArticleIdentityApply(article,r.identity);
-  swArticleIdentityState.lastPrepare={legacyId:String(article.id||''),changeClass:String(r.changeClass||''),identity:clone(r.identity)};
-  if(options.reviewType){
-    const rr=await signwellGasBridge('admin.articleIdentity.review',{articleId:article.article_id,version:article.current_version,revisionSeq:Number(article.revision_seq||0),reviewType:options.reviewType,reviewerId:String(article.publisherId||'cms-admin'),reviewerName:String(article.publisherName||'SIGN WELL Editor')},{adminKey:newsletterAdminKey(),timeoutMs:45000});
-    if(rr?.identity)swArticleIdentityApply(article,rr.identity);
+  try{
+    const r=await signwellGasBridge('admin.articleIdentity.prepare',{article:article,changeClass:options.changeClass},{adminKey:newsletterAdminKey(),timeoutMs:60000});
+    if(!r?.identity?.article_id)throw new Error('Article Identity Backend 沒有核發 Article ID');
+    swArticleIdentityApply(article,r.identity);
+    swArticleIdentityState.lastPrepare={legacyId:String(article.id||''),changeClass:String(r.changeClass||''),identity:clone(r.identity)};
+    if(options.reviewType){
+      const rr=await signwellGasBridge('admin.articleIdentity.review',{articleId:article.article_id,version:article.current_version,revisionSeq:Number(article.revision_seq||0),reviewType:options.reviewType,reviewerId:String(article.publisherId||'cms-admin'),reviewerName:String(article.publisherName||'SIGN WELL Editor')},{adminKey:newsletterAdminKey(),timeoutMs:45000});
+      if(rr?.identity)swArticleIdentityApply(article,rr.identity);
+    }
+    persist(true);
+    return r;
+  }catch(err){
+    console.warn('Article Identity backend unavailable; continuing Public publish without Identity.',err);
+    swArticleIdentityState.lastPrepare=null;
+    return {ok:false,skipped:true,reason:'backend-unavailable'};
   }
-  persist(true);
-  return r;
 }
 async function swArticleIdentityVerifyRemote(article,token){
   if(!article?.article_id||!article?.content_hash)return {ok:false,skipped:true};
@@ -7548,14 +7560,20 @@ async function swArticleIdentityVerifyRemote(article,token){
 }
 async function swArticleIdentityCommitAfterPublish(article){
   if(!article?.article_id)return null;
-  const r=await signwellGasBridge('admin.articleIdentity.commit',{articleId:article.article_id,contentHash:article.content_hash},{adminKey:newsletterAdminKey(),timeoutMs:60000});
-  if(!r?.identity)throw new Error('Article Identity commit 未完成');
-  swArticleIdentityApply(article,r.identity);
-  const canonical=(data.articles||[]).find(x=>String(x.id||'')===String(article.id||''));
-  if(canonical&&canonical!==article)swArticleIdentityApply(canonical,r.identity);
-  persist(true);
-  swArticleIdentityState.lastPrepare=null;
-  return r.identity;
+  try{
+    const r=await signwellGasBridge('admin.articleIdentity.commit',{articleId:article.article_id,contentHash:article.content_hash},{adminKey:newsletterAdminKey(),timeoutMs:60000});
+    if(!r?.identity)throw new Error('Article Identity commit 未完成');
+    swArticleIdentityApply(article,r.identity);
+    const canonical=(data.articles||[]).find(x=>String(x.id||'')===String(article.id||''));
+    if(canonical&&canonical!==article)swArticleIdentityApply(canonical,r.identity);
+    persist(true);
+    swArticleIdentityState.lastPrepare=null;
+    return r.identity;
+  }catch(err){
+    console.warn('Article Identity commit skipped; Public publish remains valid.',err);
+    swArticleIdentityState.lastPrepare=null;
+    return null;
+  }
 }
 
 
