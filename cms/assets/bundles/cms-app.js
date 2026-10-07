@@ -702,7 +702,13 @@ function swCmsRenderContextTabs(section){
 }
 function swCmsApplyNavSection(section,{persist=true}={}){
   const next=SW_CMS_NAV_SECTIONS[section]?section:'workspace';
-  document.querySelectorAll('[data-nav-section-panel]').forEach(panel=>{const active=panel.dataset.navSectionPanel===next;panel.hidden=!active;panel.setAttribute('aria-hidden',active?'false':'true')});
+  document.body.dataset.swSection=next;
+  document.querySelectorAll('[data-nav-section-panel]').forEach(panel=>{
+    const active=panel.dataset.navSectionPanel===next;
+    panel.hidden=!active;
+    panel.setAttribute('aria-hidden',active?'false':'true');
+    panel.style.display=active?'grid':'none';
+  });
   document.querySelectorAll('[data-nav-section]').forEach(btn=>{const active=btn.dataset.navSection===next;btn.classList.toggle('active',active);btn.setAttribute('aria-selected',active?'true':'false')});
   const mobile=swCmsEnsureMobileSectionTabs();mobile?.querySelectorAll('[data-mobile-section]').forEach(btn=>{const active=btn.dataset.mobileSection===next;btn.classList.toggle('active',active);btn.setAttribute('aria-selected',active?'true':'false')});
   if(persist){try{localStorage.setItem(SW_CMS_NAV_SECTION_KEY,next)}catch(_){}}
