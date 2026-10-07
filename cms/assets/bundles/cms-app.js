@@ -1290,7 +1290,7 @@ function renderView(){
   else if(viewName==='canva')renderCanvaSocial();
   else if(viewName==='aiopenai')renderOpenAISettings();
   else if(viewName==='deepresearch')renderDeepResearchWorkspace();
-  else if(viewName==='export'){renderExport();setTimeout(swInitPasskeySettings,0);setTimeout(initPublishAIProviderSettings,0);setTimeout(initPublishGptSettings,12);setTimeout(initPublishComplianceSettings,28);setTimeout(initMetaProviderSettings,64);setTimeout(()=>window.swServiceHealthMountSettings?.(),82);setTimeout(()=>window.swArticleIdentityMountSettings?.(),104);setTimeout(initSecurityAuditPanel,140)}
+  else if(viewName==='export'){renderExport();setTimeout(swMountBackendConnectionCard,0);setTimeout(swInitPasskeySettings,0);setTimeout(initPublishAIProviderSettings,0);setTimeout(initPublishGptSettings,12);setTimeout(initPublishComplianceSettings,28);setTimeout(initMetaProviderSettings,64);setTimeout(()=>window.swServiceHealthMountSettings?.(),82);setTimeout(()=>window.swArticleIdentityMountSettings?.(),104);setTimeout(initSecurityAuditPanel,140)}
   else renderDashboard();
   swCmsSyncNavUX();
   swCmsExperienceEnhance();
@@ -7394,6 +7394,65 @@ async function swDeletePasskeyFromSettings(id){
   try{await window.SignWellAuth.deletePasskey(id);showToast('Passkey 已刪除');await swLoadPasskeys()}catch(err){showToast('無法刪除：'+String(err?.message||err))}
 }
 
+
+function swBackendConnectionCard(){
+  const current=String(newsletterBase?.()||window.SIGNWELL_BACKEND?.endpoint||'').trim();
+  return `<section class="publish-card" id="swBackendConnectionCard">
+    <h3>Backend 連線</h3>
+    <p>如果你重新部署 Google Apps Script 後產生新的 Web App URL，直接貼在這裡。儲存後 CMS 會立刻改用新的 /exec。</p>
+    <div class="ai-provider-form">
+      <label class="wide"><span>Apps Script Web App /exec</span>
+        <input id="swBackendEndpointInput" type="url" inputmode="url" autocomplete="off" value="${escapeHTML(current)}" placeholder="https://script.google.com/macros/s/.../exec">
+      </label>
+    </div>
+    <div class="publish-actions">
+      <button class="top-action primary" id="swBackendEndpointSave" type="button">儲存並切換</button>
+      <button class="top-action" id="swBackendEndpointTest" type="button">測試連線</button>
+      <button class="top-action" id="swBackendEndpointReset" type="button">恢復預設</button>
+    </div>
+    <div class="publish-status" id="swBackendEndpointStatus">目前：${escapeHTML(current||'尚未設定')}</div>
+  </section>`;
+}
+function swMountBackendConnectionCard(){
+  const grid=document.querySelector('#view .publish-grid');
+  if(!grid||document.getElementById('swBackendConnectionCard'))return;
+  const wrap=document.createElement('div');wrap.innerHTML=swBackendConnectionCard();
+  const card=wrap.firstElementChild;grid.prepend(card);
+  const input=card.querySelector('#swBackendEndpointInput');
+  const status=card.querySelector('#swBackendEndpointStatus');
+  const valid=v=>/^https:\/\/script\.google\.com\/macros\/s\/[^\s?#]+\/exec(?:[?#].*)?$/i.test(String(v||'').trim());
+  card.querySelector('#swBackendEndpointSave').onclick=()=>{
+    const v=String(input.value||'').trim();
+    if(!valid(v)){showToast('請貼上完整的 Apps Script /exec 網址');input.focus();return;}
+    try{localStorage.setItem('signwell-backend-endpoint',v)}catch(_){}
+    status.textContent='已切換：'+v;
+    showCmsSuccessUI('Backend 已切換','重新載入後會使用新的 Apps Script deployment',{duration:2200});
+    setTimeout(()=>location.reload(),700);
+  };
+  card.querySelector('#swBackendEndpointTest').onclick=async()=>{
+    const v=String(input.value||'').trim();
+    if(!valid(v)){showToast('請先填入有效的 /exec 網址');return;}
+    status.textContent='正在測試 Backend…';
+    try{
+      const old=window.SIGNWELL_BACKEND?.endpoint;
+      window.SIGNWELL_BACKEND=Object.assign({},window.SIGNWELL_BACKEND||{},{enabled:true,endpoint:v});
+      window.SIGNWELL_ANALYTICS=Object.assign({},window.SIGNWELL_ANALYTICS||{},{enabled:true,endpoint:v});
+      window.SIGNWELL_NEWSLETTER=Object.assign({},window.SIGNWELL_NEWSLETTER||{},{enabled:true,endpoint:v});
+      const r=await signwellGasBridge('admin.release.status',{}, {adminKey:newsletterAdminKey(),timeoutMs:20000});
+      status.textContent='✓ 已連線 · '+String(r?.environment||'backend')+' · v'+String(r?.release||r?.version||'unknown');
+      showCmsSuccessUI('Backend 連線成功',status.textContent.replace(/^✓\s*/,''),{duration:2400});
+      if(old&&!valid(old)){}
+    }catch(err){
+      status.textContent='連線失敗：'+String(err?.message||err);
+      showToast('Backend 測試失敗');
+    }
+  };
+  card.querySelector('#swBackendEndpointReset').onclick=()=>{
+    try{localStorage.removeItem('signwell-backend-endpoint')}catch(_){}
+    showToast('已恢復預設 Backend；正在重新載入');
+    setTimeout(()=>location.reload(),500);
+  };
+}
 function renderExport(){const pub=data.articles.filter(a=>a.status==='Published'),drafts=data.articles.length-pub.length;$('#view').innerHTML=`<div class="page-head"><div><h1>設定</h1><p>所有 API、OAuth、Token、Endpoint 與第三方整合集中在這裡；其他工作頁只顯示連線狀態。</p></div></div><div class="stats"><div class="stat"><span>已發布</span><strong>${pub.length}</strong></div><div class="stat"><span>草稿</span><strong>${drafts}</strong></div><div class="stat"><span>發布目標</span><strong style="font-size:20px">Backend Runtime</strong></div><div class="stat"><span>憑證位置</span><strong style="font-size:16px">Server-side</strong></div></div><div class="publish-grid"><section class="publish-card" id="settingsGithubCard"><h3>GitHub 設定</h3><p>Fine-grained PAT 只在第一次設定或主動更換時輸入。平常發布、同步與測試都直接使用後端 Secret Vault。</p><div class="connection-summary"><div class="connection-row"><span>系統版本</span><strong>v${String(window.SIGNWELL_RELEASE?.version||SW_CMS_RELEASE).replace(/^v/,'')}</strong></div><div class="connection-row"><span>執行環境</span><strong id="runtimeEnv">檢查中…</strong></div><div class="connection-row"><span>公開網站</span><strong>由 Backend Runtime Config 決定</strong></div><div class="connection-row"><span>GitHub 發布目標</span><code id="runtimeGithubTarget">檢查中…</code></div><div class="connection-row"><span>GitHub 憑證</span><strong id="tokenState" class="token-state">檢查中…</strong></div></div><div class="sw-secret-summary github-secret-summary"><div><span>GitHub Fine-grained PAT</span><strong id="ghSecretState">檢查中…</strong><small id="ghSecretMeta">只保存在後端</small></div><button class="top-action" id="ghReplace" type="button">更換 PAT</button></div><div class="security-note"><b>Secret Vault：</b>瀏覽器永遠讀不到既有 PAT；同步與發布由 Apps Script 直接使用後端憑證。</div><div class="publish-actions"><button class="top-action" id="ghTest">測試連線</button><button class="top-action" id="ghSync">從 GitHub 同步</button><button class="top-action danger" id="ghForget">移除後端 PAT</button></div><div class="publish-status" id="ghStatus">正在讀取後端狀態…</div><div class="integrity-note"><b>Origin 提醒：</b>Token 已經不在瀏覽器，但如果 CMS 仍與 Public 共用 <code>easylearnfromtw.github.io</code> origin，Public XSS 仍可能在登入期間攻擊 CMS session。完整隔離需把 CMS 部署到另一個 origin。</div></section><aside class="publish-card" id="settingsDataCard"><h3>資料檢查</h3><p>CMS 只輸出已發布文章；草稿不會出現在公開網站。</p><div class="file-map"><div><code>本機文章</code><span class="file-ok">${data.articles.length}</span></div><div><code>已發布</code><span class="file-ok">${pub.length}</span></div><div><code>未公開草稿</code><span>${drafts}</span></div><div><code>公開主題</code><span class="file-ok">${(data.topics||[]).filter(x=>x.active!==false).length}</span></div><div><code>GitHub PAT</code><span class="file-ok">後端保存</span></div><div><code>CMS Session</code><span class="file-ok">登出可作廢</span></div></div></aside><section class="publish-card" id="swEditorialLearningSettingsCard"><h3>AI 寫作學習</h3><p>文章可以持續進步：人工定稿差異會形成風格記憶；發布滿 7 天後，文章卡 CTR 會以匿名聚合數據回傳 AI 評估下一輪標題、摘要、開場與結構。</p><div class="sw-editorial-learning-status"><div><strong data-editorial-learning-status>讀取中…</strong><small data-editorial-learning-meta>正在讀取 Editorial Learning Loop</small></div></div><div class="publish-actions"><button class="top-action" type="button" data-open-editorial-learning>管理 AI 寫作學習</button><button class="top-action" type="button" data-run-editorial-performance hidden>立即評估到期文章</button></div><div class="security-note"><b>判斷標準：</b>7 日 CTR = 合格文章卡點擊 ÷ 合格文章卡曝光。曝光需 ≥50% 可見且持續 ≥0.8 秒；低樣本不形成硬規則。<br><b>Evidence Lock 優先：</b>CTR 只優化內容包裝與可讀性，不會改寫醫療事實、證據、引用、法規邊界，也不會自動改掉已發布文章。</div></section></div>`;bindGithubPublisher();swMountSystemRecoveryPanel();swMountAiPipelinePanel();window.signwellEditorialLearningMountSettings?.();signwellGasBridge('admin.github.status',{}, {adminKey:newsletterAdminKey(),timeoutMs:15000}).then(s=>{const el=$('#tokenState'),st=$('#ghStatus');if(el){el.textContent=s?.configured?'後端已設定':'尚未設定';el.classList.toggle('ready',!!s?.configured)}const gs=$('#ghSecretState'),gm=$('#ghSecretMeta'),gr=$('#ghReplace');if(gs){gs.textContent=s?.configured?'已安全設定':'尚未設定';gs.classList.toggle('ready',!!s?.configured)}if(gm)gm.textContent=s?.configured?swFormatSecretUpdatedAt(s?.updatedAt):'尚未存入後端';if(gr)gr.textContent=s?.configured?'更換 PAT':'設定 PAT';if(st)st.textContent=s?.configured?'✓ GitHub PAT 已安全存於後端；發布時不用再輸入。':'請按「設定 PAT」完成第一次安全設定。'}).catch(e=>{$('#ghStatus').textContent='無法讀取 GitHub 狀態：'+String(e?.message||e)});signwellGasBridge('admin.release.status',{}, {adminKey:newsletterAdminKey(),timeoutMs:15000}).then(r=>{const env=$('#runtimeEnv'),gh=$('#runtimeGithubTarget');if(env)env.textContent=String(r?.environment||'unknown')+' · v'+String(r?.release||SW_CMS_RELEASE);if(gh){const g=r?.github||{};if(g.owner&&g.repo&&g.branch){PUBLIC_GITHUB={...PUBLIC_GITHUB,owner:String(g.owner),repo:String(g.repo),branch:String(g.branch),site:String(r?.publicUrl||PUBLIC_GITHUB.site)};githubRuntimeSyncedAt=Date.now()}gh.textContent=[g.owner,g.repo].filter(Boolean).join('/')+' · '+String(g.branch||'')}}).catch(()=>{const env=$('#runtimeEnv');if(env)env.textContent='無法取得'})}
 async function saveBlob(blob,name){const file=new File([blob],name,{type:blob.type||'application/octet-stream'});try{if(navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:name});return}}catch(e){if(e?.name==='AbortError')return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function exportJS(){const pub=data.articles.filter(a=>a.status==='Published');const text='window.BLOG_ARTICLES = '+JSON.stringify(pub,null,2)+';\n';saveBlob(new Blob([text],{type:'text/javascript;charset=utf-8'}),'articles.js');showToast(`已準備 ${pub.length} 篇文章`)}
