@@ -135,7 +135,7 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
       el.style.pointerEvents='none';
       el.style.opacity='0';
       el.style.visibility='hidden';
-      setTimeout(()=>{try{el.remove()}catch(_){}},260);
+      setTimeout(()=>{try{el.remove()}catch(_){}},120);
     }catch(_){}
   };
   window.__swCmsReleaseLoader=release;
@@ -148,10 +148,10 @@ if(window.top!==window.self){window.stop();document.documentElement.innerHTML=''
       if(stage)stage.textContent='正在開啟 CMS';
       if(pct)pct.textContent='100%';
     }
-  },520);
+  },140);
   // Absolute guardrail: CMS is never allowed to remain covered by the loader.
-  setTimeout(release,2200);
-  window.addEventListener('pageshow',()=>setTimeout(release,2200),{once:true});
+  setTimeout(release,650);
+  window.addEventListener('pageshow',()=>setTimeout(release,650),{once:true});
 })();
 </script>
 
