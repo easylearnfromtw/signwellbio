@@ -421,7 +421,7 @@ html.sw-lowfx .aw-aurora :where(.sidebar,.topbar,.aw-tabbar,.cms-command-card,.s
   }
   .aw-aurora.aw-drawer-open .sidebar{transform:none;visibility:visible;transition:transform .5s var(--aw-ease-out),visibility 0s}
   .aw-aurora .sw-nav-sections{
-    display:none;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin:0 0 8px;padding:4px;border-radius:16px;
+    display:none;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;margin:0 0 8px;padding:4px;border-radius:16px;
     background:rgba(20,36,76,.05);
   }
   .aw-aurora .sw-nav-sections button{
@@ -446,7 +446,7 @@ html.sw-lowfx .aw-aurora :where(.sidebar,.topbar,.aw-tabbar,.cms-command-card,.s
   /* Bottom tab bar */
   .aw-aurora .aw-tabbar{
     position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom));z-index:90;
-    display:grid;grid-template-columns:repeat(5,1fr);align-items:center;
+    display:grid;grid-template-columns:repeat(4,1fr);align-items:center;
     width:min(440px,calc(100vw - 24px));height:66px;padding:0 6px;border-radius:33px;
     transform:translate3d(-50%,0,0);
     transition:height .45s var(--aw-ease-out),width .45s var(--aw-ease-out),transform .45s var(--aw-ease-out),opacity .3s;
@@ -475,7 +475,7 @@ html.sw-lowfx .aw-aurora :where(.sidebar,.topbar,.aw-tabbar,.cms-command-card,.s
   /* Draggable lens capsule: magnifies the icon below it, refracts at the edges.
      Positioned by --aw-lens-i (column index, fractional while dragging). */
   .aw-aurora .aw-lens{
-    position:absolute;z-index:1;top:6px;bottom:6px;left:6px;width:calc((100% - 12px) / 5);pointer-events:none;
+    position:absolute;z-index:1;top:6px;bottom:6px;left:6px;width:calc((100% - 12px) / 4);pointer-events:none;
     border-radius:28px;overflow:hidden;
     background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.42));
     -webkit-backdrop-filter:blur(2px) saturate(170%) brightness(1.06);backdrop-filter:blur(2px) saturate(170%) brightness(1.06);
@@ -489,8 +489,8 @@ html.sw-lowfx .aw-aurora :where(.sidebar,.topbar,.aw-tabbar,.cms-command-card,.s
   }
   .aw-aurora .aw-tabbar.is-dragging .aw-lens{transition:none;--s:1.14}
   .aw-aurora .aw-lens-track{
-    position:absolute;top:-6px;bottom:-6px;left:0;width:500%;display:grid;grid-template-columns:repeat(5,1fr);
-    transform:translate3d(calc(var(--aw-lens-i,0) * -20%),0,0);transition:transform .55s var(--aw-spring);
+    position:absolute;top:-6px;bottom:-6px;left:0;width:400%;display:grid;grid-template-columns:repeat(4,1fr);
+    transform:translate3d(calc(var(--aw-lens-i,0) * -25%),0,0);transition:transform .55s var(--aw-spring);
   }
   .aw-aurora .aw-tabbar.is-dragging .aw-lens-track{transition:none}
   .aw-aurora .aw-lens-track > span{
