@@ -14,14 +14,14 @@ const SW_RELEASE = Object.freeze({
   // Product release and bridge protocol are intentionally separate.
   // CMS ↔ Apps Script compatibility continues on the proven 23.9.92 bridge,
   // while health/build endpoints expose the deployable product release.
-  VERSION: "24.0.27",
-  RELEASE_VERSION: "24.0.27",
+  VERSION: "24.25.3",
+  RELEASE_VERSION: "24.25.3",
   BRIDGE_PROTOCOL: "23.9.92",
   BUILD_DATE: "2026-09-23",
   BUILD_ID: "20260923.1",
   SCHEMA: "7",
   SCHEMA_VERSION: "7",
-  CACHE_NAMESPACE: "sw_24_0_27"
+  CACHE_NAMESPACE: "sw_24_25_3"
 });
 
 const SW = Object.freeze({
@@ -35,11 +35,11 @@ const SW = Object.freeze({
   PUBLIC_EMAIL: "signwell.com.tw@gmail.com",
   NEWSLETTER_TEST_EMAIL: "signwell.com@gmail.com",
   REPLY_TO: "signwell.com.tw@gmail.com",
-  DEFAULT_PUBLIC_URL: "https://980510linz.github.io/-/",
-  DEFAULT_CMS_URL: "https://980510linz.github.io/-/C-CMS/",
+  DEFAULT_PUBLIC_URL: "https://easylearnfromtw.github.io/signwellbio/",
+  DEFAULT_CMS_URL: "https://easylearnfromtw.github.io/signwellbio/cms/",
   FUTURE_CUSTOM_DOMAIN: "https://signwell.com.tw/",
   CUSTOM_DOMAIN_ENABLED: false,
-  DEFAULT_CMS_ORIGIN: "https://980510linz.github.io",
+  DEFAULT_CMS_ORIGIN: "https://easylearnfromtw.github.io",
   SUBSCRIBERS: "Subscribers",
   SUBSCRIPTION_OTP: "SubscriptionOTP",
   CAMPAIGNS: "Campaigns",
@@ -96,7 +96,7 @@ function swCmsOrigins_() {
   const primary = String(props.getProperty('SW_CMS_ORIGIN') || SW.DEFAULT_CMS_ORIGIN || '').trim().replace(/\/$/, '');
   const defaults = [
     primary,
-    'https://980510linz.github.io',
+    'https://easylearnfromtw.github.io',
     'https://signwell.com.tw',
     'https://www.signwell.com.tw'
   ];
@@ -8752,8 +8752,8 @@ function cmsAuthLogout_(p) {
 }
 
 const SW_GITHUB = Object.freeze({
-  DEFAULT_OWNER:'980510linz',
-  DEFAULT_REPO:'-',
+  DEFAULT_OWNER:'easylearnfromtw',
+  DEFAULT_REPO:'signwellbio',
   DEFAULT_BRANCH:'main',
   PROD_PROP:'SW_GITHUB_PAT',
   STAGING_PROP:'SW_GITHUB_PAT_STAGING'
