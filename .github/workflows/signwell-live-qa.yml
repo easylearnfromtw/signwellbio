@@ -37,6 +37,30 @@ jobs:
           npm install playwright@1.55.0 >/dev/null
           npx playwright install chromium
 
+      - name: Wait for current GitHub Pages deployment
+        run: |
+          set -euo pipefail
+          expected_public="$(sha256sum index.html | awk '{print $1}')"
+          expected_cms="$(sha256sum cms/index.html | awk '{print $1}')"
+          matched=0
+          for i in $(seq 1 30); do
+            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/?qa=$GITHUB_SHA-$i" -o /tmp/live-public.html || true
+            curl -fsSL --retry 2 --retry-delay 1 "https://easylearnfromtw.github.io/signwellbio/cms/?qa=$GITHUB_SHA-$i" -o /tmp/live-cms.html || true
+            live_public="$(sha256sum /tmp/live-public.html 2>/dev/null | awk '{print $1}' || true)"
+            live_cms="$(sha256sum /tmp/live-cms.html 2>/dev/null | awk '{print $1}' || true)"
+            if [ "$live_public" = "$expected_public" ] && [ "$live_cms" = "$expected_cms" ]; then
+              echo "GitHub Pages now matches commit $GITHUB_SHA"
+              matched=1
+              break
+            fi
+            echo "Waiting for Pages deployment ($i/30)..."
+            sleep 4
+          done
+          if [ "$matched" != "1" ]; then
+            echo "::error::Live GitHub Pages did not match the current commit within the QA window."
+            exit 1
+          fi
+
       - name: Run live QA
         env:
           PUBLIC_URL: https://easylearnfromtw.github.io/signwellbio/
