@@ -1,0 +1,8 @@
+QA R9.9
+[pass] Search focus no longer uses blue halo.
+[pass] Search input remains keyboard accessible with neutral focus cue.
+[pass] Brand capsule has increased padding and preserved pill geometry.
+[pass] Desktop/mobile brand proportions remain aligned.
+[pass] R9.8 social thumbnails preserved.
+[pass] R9.7 cubic ambient assets preserved.
+[pass] R9.6 mobile horizontal lock preserved.

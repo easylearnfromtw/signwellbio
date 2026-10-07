@@ -1,0 +1,19 @@
+SIGN WELL R10.2 · GPU OPTIMIZED
+
+Base: R10.1 Aurora × R9.11 functional ancestor.
+This patch preserves functional files while reducing GPU/compositor load.
+
+Key changes
+- WebGL hero: lower excessive pixel / AA / FPS ceilings; mobile and constrained devices enter lighter tiers earlier.
+- WebGL loop stops when the hero leaves the viewport or the document is hidden.
+- Non-home ambient background updates at a low visual frequency instead of a full 60 Hz RAF loop; lite devices keep a static field.
+- Liquid-glass SVG refraction is disabled on coarse-pointer / constrained devices.
+- Public and Aurora CMS use a shared high / balanced / lite compositor governor.
+- Backdrop blur, giant fixed blur layers, infinite decorative animation and shadow depth are capped by device profile.
+- Hidden tabs pause CSS decorative animations.
+- Long lists use content-visibility where supported.
+- Service worker cache key bumped and GPU governor assets are included.
+
+Deployment
+Use SAFE DEPLOY to update an existing production repository containing current article/topic/generated data.
+Use FULL only for a complete snapshot / clean environment.

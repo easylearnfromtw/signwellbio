@@ -1,0 +1,7 @@
+R9.8 Social Preview QA
+PASS  all_html_new_image
+PASS  no_html_old_image
+PASS  sw_new_wide
+PASS  sw_new_square
+PASS  wide_exists
+PASS  square_exists

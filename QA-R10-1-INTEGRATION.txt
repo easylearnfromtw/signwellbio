@@ -1,0 +1,27 @@
+SIGN WELL R10.1 · Integration QA
+==================================
+
+Verified in build container
+- Functional Public baseline is byte-preserved from the supplied R9.11 packages; only cms/, R10.1 docs and regenerated manifest are added.
+- Supplied FULL/SAFE source trees were re-extracted and matched the integration sources exactly (diff = 0).
+- CMS protocol preserved: release 24.36.3 / bridge 23.9.92; integration marker added separately as R10.1-Aurora-R9.11.
+- CMS -> Public base is derived from ../ at runtime, so preview/publish links are not locked to one GitHub Pages pathname.
+- Aurora CMS uses the R9.3 adaptive liquid hero and current R9.11 shared publisher/preview assets; stale R9.2.1/STAGING build markers removed.
+- cms/medical-daily-focus.html restored so the medical-news suggestion surface has a real local target.
+- Aurora DOM hook preservation: source 124 IDs / 169 classes / 13 data-* names; removed 0 IDs, 0 classes, 0 data-* names.
+- Local HTML references: 180 checked, 0 missing.
+- Local CSS references: 1 checked, 0 missing.
+- Inline scripts: 10 checked, 0 syntax errors.
+- Standalone JavaScript: 22 checked, 0 syntax errors.
+- Manifest/web JSON validation: PASS.
+- SHA-256 manifest verification: FULL 108 files OK; SAFE 102 files OK.
+- Local HTTP smoke: Public, core pages, C-CMS, medical focus and core JS/CSS targets returned HTTP 200.
+- SAFE DEPLOY omits the six generated snapshot/SEO files from the supplied FULL package (articles/index.json, topics/index.json, public-data.json, sitemap.xml, news-sitemap.xml, feed.xml) so overlay deployment does not overwrite live content snapshots.
+
+Deployment rule
+- Use SAFE DEPLOY for an existing live repository, as an overlay/update. Do not delete existing generated data files before copying it.
+- FULL is a clean snapshot only. The supplied ancestor has empty article/topic indexes, so FULL must not replace a content-bearing live repository unless that reset is intentional.
+
+Offline limitation
+- Live Apps Script authentication, GitHub write operations, email delivery, Notion delivery and WebAuthn require the deployed services and credentials; local bridge contracts/call sites were preserved but those remote actions cannot be proven offline.
+- Chromium rendering is blocked by this execution environment policy (ERR_BLOCKED_BY_ADMINISTRATOR), so no visual browser-E2E claim is made. Static DOM, syntax, local-reference and HTTP serving checks passed.

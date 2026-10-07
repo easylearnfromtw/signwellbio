@@ -1,0 +1,21 @@
+SIGN WELL R10.2 GPU OPTIMIZATION QA
+
+Completed checks
+- JavaScript: all .js files pass Node --check (0 syntax errors).
+- JSON: all .json files parse (0 errors).
+- HTML local references: 208 static href/src references checked, 0 missing.
+- New GPU governor CSS parses with PostCSS in both Public and C-CMS copies.
+- Existing legacy cms/assets/cms-core.css still has its pre-existing PostCSS warning near line 1977; source R10.1 has the same warning and this GPU patch does not edit that file.
+- Public and C-CMS WebGL hero copies both use R10.2 GPU tier limits.
+- Service worker cache key is canonical-r10-2-gpu and includes gpu-optimizer.css/js.
+- SHA-256 manifest regenerated and verified.
+
+Performance policy
+- High: WebGL ceiling 1.60 MP / 45 FPS / 3 AA (was 3.00 MP / 60 FPS / 5 AA).
+- Mid: 0.90 MP / 38 FPS / 2 AA.
+- Low: 0.38 MP / 30 FPS / 1 AA.
+- Safe: 0.22 MP / 20 FPS / 1 AA.
+- Hero RAF is cancelled when offscreen or when the tab is hidden.
+- Non-home ambient field updates ~20 FPS on desktop, ~11 FPS on balanced touch/high-DPR devices, and is static on lite devices.
+- SVG liquid-glass refraction is disabled on coarse-pointer, <=900 px, or low-end devices.
+- Runtime long-task pressure can escalate a page to lite mode once per load.

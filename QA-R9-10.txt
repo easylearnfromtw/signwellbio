@@ -1,0 +1,6 @@
+[pass] New versioned SVG favicon exists
+[pass] New 192/512 app icons exist
+[pass] New Apple touch icon exists
+[pass] HTML favicon links point to R9.10 filenames
+[pass] Manifest icons point to R9.10 filenames
+[pass] Existing R9.9 features preserved

@@ -1,0 +1,124 @@
+/* SIGN WELL R10.2 · GPU / compositor governor
+   Goal: preserve the Aurora / Clinical Glass visual language while reducing
+   off-screen raster work, oversized backdrop passes and decorative animation cost. */
+
+:root{
+  --sw-gpu-profile:high;
+}
+html.sw-gpu-high{
+  --sw-gpu-profile:high;
+  --lg-blur:6px;
+  --lg-sat:175%;
+  --lg-bright:1.04;
+  --aw-glass-blur:blur(20px) saturate(165%) brightness(1.025);
+}
+html.sw-gpu-balanced{
+  --sw-gpu-profile:balanced;
+  --lg-blur:5px;
+  --lg-sat:155%;
+  --lg-bright:1.025;
+  --lg-drop:0 10px 26px -12px rgba(22,44,70,.22),0 2px 6px rgba(22,44,70,.055);
+  --aw-glass-blur:blur(14px) saturate(150%) brightness(1.02);
+  --aw-glass-shadow:
+    inset 0 1px 0 rgba(255,255,255,.94),
+    inset 0 -1px 0 rgba(255,255,255,.30),
+    0 1px 1px rgba(16,24,48,.035),
+    0 9px 24px -12px rgba(38,58,128,.14);
+  --aw-shadow-pop:0 2px 4px rgba(16,24,48,.045),0 18px 48px -18px rgba(30,44,98,.24);
+}
+html.sw-gpu-lite{
+  --sw-gpu-profile:lite;
+  --lg-blur:0px;
+  --lg-sat:125%;
+  --lg-bright:1;
+  --lg-fill-top:rgba(255,255,255,.88);
+  --lg-fill-mid:rgba(255,255,255,.78);
+  --lg-fill-bot:rgba(255,255,255,.84);
+  --lg-drop:0 8px 20px -12px rgba(22,44,70,.18),0 1px 4px rgba(22,44,70,.05);
+  --aw-glass-blur:none;
+  --aw-glass-bg:linear-gradient(180deg,rgba(255,255,255,.94),rgba(247,249,254,.90));
+  --aw-glass-bg-strong:linear-gradient(180deg,rgba(255,255,255,.97),rgba(247,249,254,.94));
+  --aw-glass-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 8px 22px -14px rgba(38,58,128,.14);
+  --aw-shadow-pop:0 12px 34px -18px rgba(30,44,98,.20);
+}
+
+/* Freeze all purely decorative animation while the tab is backgrounded. */
+html.sw-page-hidden *,
+body.sw-page-hidden *{animation-play-state:paused!important}
+
+/* Public: keep the glass controls, but cap the compositor work. */
+html.sw-gpu-lite :is(.brand-top,.top-actions .iconbtn,.pager,.searchbox,.otp-card,.toast,.btn-glass,.sw-reader-panel,.sw-rail button,.sw-toc,.sw-sheet,.lg){
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+html.sw-gpu-balanced :is(.brand-top,.top-actions .iconbtn,.pager,.searchbox,.otp-card,.toast,.btn-glass,.sw-reader-panel,.sw-rail button,.sw-toc,.sw-sheet,.lg){
+  -webkit-backdrop-filter:blur(var(--lg-blur)) saturate(var(--lg-sat)) brightness(var(--lg-bright))!important;
+  backdrop-filter:blur(var(--lg-blur)) saturate(var(--lg-sat)) brightness(var(--lg-bright))!important;
+}
+html.sw-gpu-lite :is(.pager-thumb,.lg-seg-thumb,.lq-lens .lq-lens-inner){will-change:auto!important}
+html.sw-gpu-lite :is(.pager.is-pressed .lq-lens,.lg-seg.is-pressed .lq-lens){filter:none!important}
+
+/* Long feeds can skip paint/layout work until they approach the viewport. */
+@supports(content-visibility:auto){
+  :is(.article-card,.topic-card,.person-card,.share-card,.newsletter-card,.summary10s,.search-result,.swid-card){
+    content-visibility:auto;
+    contain-intrinsic-size:auto 320px;
+  }
+}
+
+/* Non-home ambient field: giant blurred layers are a frequent mobile GPU hotspot. */
+html.sw-gpu-high body.sw-ambient-enabled .sw-ambient-pages .blob{filter:blur(60px)}
+html.sw-gpu-high body.sw-ambient-enabled .sw-ambient-pages .blob.glow{filter:blur(74px)}
+html.sw-gpu-balanced body.sw-ambient-enabled .sw-ambient-pages .blob{
+  filter:blur(46px);
+  mix-blend-mode:normal;
+  will-change:auto;
+  opacity:.72;
+}
+html.sw-gpu-balanced body.sw-ambient-enabled .sw-ambient-pages .blob.glow{filter:blur(58px);opacity:.44}
+html.sw-gpu-balanced body.sw-ambient-enabled .sw-ambient-pages::after{filter:blur(12px);opacity:.20}
+html.sw-gpu-lite body.sw-ambient-enabled .sw-ambient-pages .blob,
+html.sw-gpu-lite body.sw-ambient-enabled .sw-ambient-pages::after{display:none!important}
+
+/* WebGL hero: CSS-side composition is kept lean; JS controls raster/FPS budget. */
+html.sw-gpu-balanced .sw-liquid-hero{box-shadow:0 24px 64px rgba(91,121,146,.07),inset 0 1px 0 rgba(255,255,255,.97)}
+html.sw-gpu-lite .sw-liquid-hero{box-shadow:0 16px 42px rgba(91,121,146,.055),inset 0 1px 0 rgba(255,255,255,.96)}
+html.sw-gpu-lite .sw-liquid-hero .liquid-hero-caption::after{animation:none!important}
+html.sw-gpu-lite .sw-liquid-hero.is-fallback canvas.liquid-hero-poster{animation:none!important}
+
+/* CMS Aurora: variables above lower blur globally without flattening the design. */
+html.sw-gpu-balanced .aw-aurora .field{filter:blur(38px) saturate(125%)!important;opacity:.60!important}
+html.sw-gpu-balanced .aw-aurora .orb{animation-duration:48s!important;will-change:auto!important}
+html.sw-gpu-balanced .aw-aurora .grain{opacity:.24!important;mix-blend-mode:normal!important}
+html.sw-gpu-lite .aw-aurora .field{display:none!important}
+html.sw-gpu-lite .aw-aurora .orb{animation:none!important;will-change:auto!important}
+html.sw-gpu-lite .aw-aurora .grain{opacity:.08!important;mix-blend-mode:normal!important}
+html.sw-gpu-lite .aw-aurora :is(.sidebar,.topbar,.aw-tabbar,.cms-command-card,.sw-context-tabs,.aw-jumpbar,.lock-card,.aw-glass,.login-sync-card,.login-greeting-card,.newsletter-send-card,.article-result-card,.preview-close){
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+html.sw-gpu-balanced .aw-aurora :is(.modal,.preview-overlay,.review-inbox-overlay,.newsletter-confirm-overlay,.newsletter-stepup-overlay,.article-publish-confirm,.sw-secret-vault-overlay,.sw-glossary-dialog,.sw-data-dialog,.about-person-dialog,.aiw-confirm-layer){
+  -webkit-backdrop-filter:blur(10px) saturate(135%)!important;
+  backdrop-filter:blur(10px) saturate(135%)!important;
+}
+html.sw-gpu-lite .aw-aurora :is(.modal,.preview-overlay,.review-inbox-overlay,.newsletter-confirm-overlay,.newsletter-stepup-overlay,.article-publish-confirm,.sw-secret-vault-overlay,.sw-glossary-dialog,.sw-data-dialog,.about-person-dialog,.aiw-confirm-layer){
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  background:rgba(238,242,250,.94)!important;
+}
+
+/* High-DPR touch devices pay heavily for fixed blur layers during scroll. */
+@media(max-width:900px),(pointer:coarse){
+  body::before{opacity:.32}
+  html.sw-gpu-balanced body.sw-ambient-enabled .sw-ambient-pages .blob,
+  html.sw-gpu-lite body.sw-ambient-enabled .sw-ambient-pages .blob{display:none!important}
+  html.sw-gpu-balanced .aw-aurora .field,
+  html.sw-gpu-lite .aw-aurora .field{display:none!important}
+  html.sw-gpu-balanced .aw-aurora .grain{opacity:.12!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .sw-liquid-hero .liquid-hero-caption::after,
+  .sw-liquid-hero.is-fallback canvas.liquid-hero-poster,
+  .aw-aurora .orb{animation:none!important}
+}

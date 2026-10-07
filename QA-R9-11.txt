@@ -1,0 +1,8 @@
+R9.11 Dock Stability QA
+[PASS] Dock outer bounding box unchanged during pointerdown at top of page.
+[PASS] Dock outer bounding box unchanged during pointerdown in sw-dock-mini state.
+[PASS] Outer pager transform remains translate3d(-50%,0,0).
+[PASS] Press animation restricted to active thumb body.
+[PASS] Thumb press scale reduced and clipped to true capsule radius.
+[PASS] R9.10/R9.9/R9.8/R9.7 assets remain present.
+[PASS] Mobile horizontal lock remains present.

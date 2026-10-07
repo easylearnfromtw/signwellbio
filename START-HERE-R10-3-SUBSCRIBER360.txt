@@ -1,0 +1,19 @@
+SIGN WELL R10.3 · Subscriber 360 Foundation · 2026-09-30
+
+基底：R10.2 GPU OPTIMIZED SAFE DEPLOY
+
+新增：
+1. profile.html 個人化與資料設定中心（預設 API disabled，不影響正式站）
+2. assets/subscriber360-config.js / subscriber360.js / subscriber360.css
+3. subscriber360/ TypeScript + Supabase/PostgreSQL 工程骨架
+4. OAuth：Google / YouTube / Threads / Instagram connector abstraction
+5. consent gate、provenance、interest vector、time decay、negative feedback、newsletter ranking
+6. sensitive_vault 與一般推薦模型隔離
+7. audit log / erasure workflow / legal-review matrix / threat model
+
+重要：
+- 未連結平台 = 不搜尋、不猜測、不用 Email 反查。
+- 不讀 Gmail 信件內容。
+- YouTube 只使用當下官方 API 實際回傳的授權物件，不把「完整觀看史」當成保證能力。
+- Meta connector 上線前必須重新核對官方 Graph/Threads API endpoint、scope 與 App Review。
+- profile UI 預設關閉；完成後端與律師審核後再將 assets/subscriber360-config.js enabled 改為 true。

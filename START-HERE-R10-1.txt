@@ -1,0 +1,20 @@
+SIGN WELL R10.1 · Aurora × R9.11 integration
+================================================
+
+Functional baseline
+- Public: R9.11 Dock Stability (including R9.10 favicon, R9.9 search/logo, R9.8 social preview, R9.7 ambient, R9.6 mobile cleanup, R9.3 adaptive hero).
+- CMS protocol: release 24.36.3 / bridge 23.9.92 (kept intentionally; not cosmetically bumped).
+- CMS visual shell: R10 Aurora Glass.
+
+Integration fixes
+1. C-CMS is bundled under the same Public root.
+2. CMS Public base is derived from ../ at runtime instead of being locked to one GitHub Pages path.
+3. Aurora CMS now uses the R9.3 adaptive liquid hero and the latest R9.11 shared publisher assets.
+4. Restored cms/medical-daily-focus.html so the 時事新聞建議 view no longer 404s.
+5. Replaced stale iframe build tag and clarified old v24.25.3 strings as minimum backend requirements, not the current UI release.
+6. Added explicit integration marker R10.1-Aurora-R9.11 while preserving actual API/bridge versions.
+
+Deployment
+- FULL package: snapshot/clean install. It includes articles/index.json, topics/index.json, public-data.json and SEO feeds from the supplied ancestor. In this supplied snapshot the article/topic indexes are empty, so do NOT use FULL to overwrite a live site with content.
+- SAFE DEPLOY package: preferred for the live site. It omits those generated data/SEO snapshot files, preserving current live article/topic/runtime data.
+- Upload the package contents to the Public repository root so /cms/ remains a sibling of index.html.
