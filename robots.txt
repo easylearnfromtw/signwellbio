@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /signwellbio/cms/
+Disallow: /cms/
+
+Sitemap: https://easylearnfromtw.github.io/signwellbio/sitemap.xml

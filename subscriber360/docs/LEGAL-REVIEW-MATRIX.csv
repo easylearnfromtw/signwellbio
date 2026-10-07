@@ -1,0 +1,11 @@
+data_category,source,purpose,required,consent,platform_basis,retention,recommendation_pipeline,lawyer_status
+Google subject/email,Google OIDC,identity,yes,login consent,openid email profile,account lifetime,no,PENDING
+SIGN WELL page views,first party,personalization,no,personalization consent,site event,90d raw then aggregate,yes,PENDING
+Newsletter opens/clicks,first party,personalization,no,personalization consent,email event,180d,yes,PENDING
+Threads authorized replies,Threads OAuth,personalization,no,social+AI consent,official API only,90d raw/365d aggregate,topic-only,PENDING
+Instagram authorized media/account,Instagram OAuth,personalization,no,social+AI consent,official API only,90d raw/365d aggregate,topic-only,PENDING
+YouTube account/playlists available via API,YouTube OAuth,personalization,no,social+AI consent,youtube.readonly,90d raw/365d aggregate,topic-only,PENDING
+Political affiliation inference,any,none,no,not accepted,blocked,n/a,no,BLOCK
+Disease/diagnosis inference,any,none,no,not accepted,blocked,n/a,no,BLOCK
+User-declared sensitive fact,user form,explicit narrow purpose,no,separate explicit consent,user supplied,shortest approved period,no,PENDING
+OAuth access/refresh token,provider OAuth,connection operation,yes,social connection consent,OAuth,until revoke/expiry,no,PENDING
