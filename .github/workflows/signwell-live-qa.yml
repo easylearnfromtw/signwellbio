@@ -3,6 +3,8 @@ name: SIGN WELL Live E2E QA
 
 on:
   push:
+    branches:
+      - main
     paths:
       - '.github/workflows/signwell-live-qa.yml'
       - 'cms/**'
