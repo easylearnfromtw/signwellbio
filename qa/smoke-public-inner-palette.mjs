@@ -69,7 +69,7 @@ await check("Homepage visual CSS remains opt-out even when palette is loaded",as
  await ctx.close()
 });
 for(const [pageName,selector,accent] of [
- ["topics.html",".page-hero","rgb(228, 238, 242)"],
+ ["topics.html",".sw-topic-sticky","rgb(228, 238, 242)"],
  ["about.html",".manifesto","rgb(245, 236, 205)"],
  ["share.html",".share-card","rgb(244, 228, 232)"],
  ["newsletter.html",".newsletter-card","rgb(244, 228, 232)"]
