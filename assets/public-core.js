@@ -691,9 +691,8 @@
   function renderTopics(){
     const list=topics.filter(t=>t.active!==false).sort((a,b)=>(a.order??999)-(b.order??999));
     const featured=list.filter(t=>t.tapeFeatured===true).slice(0,7);
-    app.innerHTML='<header class="page-hero"><div class="eyebrow">'+esc(site.topicsEyebrow||"知識地圖")+'</div>'+
+    app.innerHTML=renderTopicTape(featured)+'<header class="page-hero"><div class="eyebrow">'+esc(site.topicsEyebrow||"知識地圖")+'</div>'+
       '<h1>'+esc(site.topicsTitle||"主題分類")+'</h1><p>'+esc(site.topicsSubtitle||"循著紙張與觀點，探索醫學的七個切面。")+'</p></header>'+
-      renderTopicTape(featured)+
       '<section class="sw-topic-directory" id="topicDirectory" aria-label="所有主題分類">'+
       '<div class="sw-topic-directory-head"><div class="eyebrow">EDITORIAL INDEX / TOPICS</div><h2>'+esc(site.topicsDirectoryTitle||"選一個值得深入的問題。")+'</h2>'+
       '<p>'+esc(site.topicsDirectoryDescription||"選擇主題後，只顯示正式發布的相關文章；尚無文章的分類會如實顯示空白狀態。")+'</p></div>'+
