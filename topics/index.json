@@ -1,42 +1,124 @@
 [
   {
+    "id": "topic-column-research",
+    "name": "白話醫學論文專欄",
+    "slug": "medical-research",
+    "description": "把研究問題、研究方法與證據限制，寫成一般人也能理解的文字。",
+    "order": 0,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blue",
+    "cover": "assets/topic-art/research.svg"
+  },
+  {
+    "id": "topic-column-longevity",
+    "name": "抗衰老醫學專欄",
+    "slug": "longevity-medicine",
+    "description": "從老化生物學到健康功能維持，檢視抗衰老研究與證據。",
+    "order": 1,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "butter",
+    "cover": "assets/topic-art/longevity.svg"
+  },
+  {
+    "id": "topic-column-preventive",
+    "name": "預防醫學專欄",
+    "slug": "preventive-medicine",
+    "description": "從風險因子、篩檢與生活介入，理解疾病發生之前的選擇。",
+    "order": 2,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blue",
+    "cover": "assets/topic-art/preventive.svg"
+  },
+  {
+    "id": "topic-column-youth",
+    "name": "青少年專欄",
+    "slug": "adolescent-health",
+    "description": "理解青春期的身心變化、校園生活與成長議題。",
+    "order": 3,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blush",
+    "cover": "assets/topic-art/youth.svg"
+  },
+  {
+    "id": "topic-column-aesthetic",
+    "name": "美學醫學專欄",
+    "slug": "aesthetic-medicine",
+    "description": "以醫學證據和審美原則，討論自然且克制的外觀改善。",
+    "order": 4,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "linen",
+    "cover": "assets/topic-art/aesthetic.svg"
+  },
+  {
+    "id": "topic-column-mens-health",
+    "name": "男性醫學專欄",
+    "slug": "mens-health",
+    "description": "討論男性健康、代謝、外觀與生活型態之間的關係。",
+    "order": 5,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blue",
+    "cover": "assets/topic-art/mens-health.svg"
+  },
+  {
+    "id": "topic-column-current-affairs",
+    "name": "時事醫學專欄",
+    "slug": "medical-current-affairs",
+    "description": "以新聞為起點，回看原始研究、臨床脈絡與公共議題。",
+    "order": 6,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blush",
+    "cover": "assets/topic-art/current-affairs.svg"
+  },
+  {
     "id": "topic-1789132939821",
     "name": "營養品科普",
     "slug": "swmedical",
     "description": "",
-    "order": 0,
-    "active": true
+    "order": 7,
+    "active": true,
+    "tapeFeatured": false
   },
   {
     "id": "topic-1789132972590",
     "name": "減重醫學",
     "slug": "nonfat",
     "description": "",
-    "order": 1,
-    "active": true
+    "order": 8,
+    "active": true,
+    "tapeFeatured": false
   },
   {
     "id": "topic-1789133007315",
     "name": "抗衰老醫學",
     "slug": "抗衰老醫學",
     "description": "",
-    "order": 2,
-    "active": true
+    "order": 9,
+    "active": true,
+    "tapeFeatured": false
   },
   {
     "id": "topic-1789133021571",
     "name": "醫美科普",
     "slug": "醫美科普",
     "description": "",
-    "order": 3,
-    "active": true
+    "order": 10,
+    "active": true,
+    "tapeFeatured": false
   },
   {
     "id": "topic-1789204762177",
     "name": "時事探討",
     "slug": "signwellnownews",
     "description": "",
-    "order": 4,
-    "active": true
+    "order": 11,
+    "active": true,
+    "tapeFeatured": false
   }
 ]
