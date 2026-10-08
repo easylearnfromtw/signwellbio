@@ -592,17 +592,14 @@ async function completeCmsLogin(method='legacy'){
   // stale Published content from local/Cloud State to masquerade as current content.
   const authority=await swHydrateCurrentPublicAfterLogin({pushCloud:false,render:false});
   if(!authority?.ok){
-    data={
-      ...data,
-      articles:(data.articles||[]).filter(a=>a?.status!=='Published').map(clone),
-      topics:[],
-      people:[],
-      glossary:[],
-      siteText:clone(DEFAULT_SITE_TEXT),
-      heroConfig:clone(DEFAULT_HERO_CONFIG)
-    };
-    persist(true);
-    console.warn('Current Public authority unavailable; stale published content was suppressed.',authority?.error||'');
+    // E1.2 safety: a transient Public/API outage must never erase the local
+    // CMS article, topic, author or editorial state. Keep the snapshot intact;
+    // publishing is blocked below until the canonical Public can be verified.
+    swCurrentPublicAuthorityReady=false;
+    console.warn('Current Public unavailable; preserving the CMS cache. Publishing stays locked until verification succeeds.',authority?.error||'');
+    try{sessionStorage.setItem('signwell-cms-public-sync-warning',String(authority?.error||'Public unavailable'))}catch(_){}
+  }else{
+    try{sessionStorage.removeItem('signwell-cms-public-sync-warning')}catch(_){}
   }
   $('#lockScreen').classList.add('hidden');
   $('#cms').classList.remove('hidden');
@@ -9515,6 +9512,11 @@ async function publishTopicsOnly(){
 async function syncFromGitHub(){return syncFromGitHubLossless()}
 
 async function swPublishPreflight(status){
+  // Do not publish an unverified cache over the canonical Public after a
+  // failed login hydration. The operator may retry after the site is reachable.
+  if(!swCurrentPublicAuthorityReady){
+    throw new Error('公開站資料尚未完成驗證；已保留 CMS 資料，請確認網路及 Public 網址並重新登入後再發布。');
+  }
   if(status)status.textContent='正在檢查 Backend / GitHub 發布鏈…';
   if(!newsletterEnabled())throw new Error('SIGN WELL Backend 尚未啟用');
   const release=await signwellGasBridge('admin.release.status',{}, {adminKey:newsletterAdminKey(),timeoutMs:20000});
