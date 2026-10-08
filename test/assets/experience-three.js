@@ -93,7 +93,7 @@
         powerPreference: "high-performance",
         preserveDrawingBuffer: false
       });
-      if (!renderer.capabilities.isWebGL2) throw new Error("WebGL2 not supported");
+      // Three.js r180 already requires WebGL2; successful renderer creation is the capability check.
       renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile.matches ? 1.3 : 1.75));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -309,7 +309,10 @@
         if (!document.hidden && active) paint(lastProgress < 0 ? scrollProgress() : lastProgress);
       }, { passive: true });
 
-      window.addEventListener("pagehide", disposeAll, { once: true });
+      window.addEventListener("pagehide", (event) => {
+        // Back/forward cache may restore this document without rerunning scripts.
+        if (!event.persisted) disposeAll();
+      }, { once: true });
       reduced.addEventListener?.("change", () => {
         if (reduced.matches) {
           disposeAll();
