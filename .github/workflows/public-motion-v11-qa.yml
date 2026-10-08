@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - release/public-motion-v11-20261008
+      - release/public-v11-cross-page-20261008
   pull_request:
     paths:
       - "index.html"

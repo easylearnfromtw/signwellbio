@@ -561,6 +561,13 @@
     url.search = "";
     url.hash = "";
     if (params) Object.entries(params).forEach(([k, v]) => v != null && url.searchParams.set(k, v));
+    // Motion V11 is mounted by index.html only. On a secondary Public shell,
+    // a full home navigation is required to load the identical new homepage;
+    // otherwise SPA redraw would silently show the previous legacy cover.
+    if (page === "home" && pageFromFile(fileOf()) !== "home" && !document.getElementById("swMotionHomeHost")) {
+      location.assign(new URL("index.html", new URL("./", location.href)).href);
+      return;
+    }
     if (!replace && url.href === location.href) {
       window.scrollTo({ top: 0, behavior: reducedMQ.matches ? "auto" : "smooth" });
       return;
