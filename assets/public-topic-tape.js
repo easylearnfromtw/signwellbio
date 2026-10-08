@@ -19,7 +19,7 @@
     progressLabel.textContent=String(active+1).padStart(2,"0")+" / "+String(total).padStart(2,"0");
     rail.style.setProperty("--sw-topic-feed",Math.round(35+ease(position-active)*100)+"px");
     cards.forEach((card,i)=>{
-      const local=ease((position-i+.14)/.91);
+      const local=ease((position-i+.34)/.91);
       const depth=Math.max(0,active-i);
       const isLaid=local>.03;
       const angle=[-5.4,3.2,-2.5,4.2,-4,2.6,-1.6][i%7];
