@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var VERSION = "24.37.0-impact-r4";
+  var VERSION = "24.38.0-reader-ux1";
   var STYLE_ID = "swid-style-v2435";
   var OVERLAY_ID = "swArticleIdOverlay";
   var lastFocus = null;
@@ -382,6 +382,8 @@
     var old = q("#" + OVERLAY_ID);
     if (old) {
       if (old._swidOnKey) document.removeEventListener("keydown", old._swidOnKey);
+      if (old._swidOnResize) window.removeEventListener("resize",old._swidOnResize);
+      if (old._swidStopTilt)old._swidStopTilt();
       old.remove();
     }
     var sources = Array.isArray(payload.sources) ? payload.sources : [];
@@ -395,12 +397,12 @@
     overlay.className = "swid-overlay";
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
-    overlay.setAttribute("aria-label", "文章 ID 卡");
+    overlay.setAttribute("aria-labelledby", "swid-dialog-title");
     overlay.innerHTML =
       '<div class="swid-shell">' +
-      '<div class="swid-toolbar"><div class="swid-toolbar-left"><span class="swid-toolbar-kicker">ARTICLE ID CARD</span><span class="swid-toolbar-title">' +
+      '<div class="swid-toolbar"><div class="swid-toolbar-left"><span class="swid-toolbar-kicker">ARTICLE ID CARD</span><span class="swid-toolbar-title" id="swid-dialog-title">' +
       esc(payload.title || "SIGN WELL") +
-      '</span></div><div class="swid-toolbar-actions"><button class="swid-icon-btn" type="button" data-swid-flip aria-label="翻面">↻</button><button class="swid-icon-btn" type="button" data-swid-close aria-label="關閉">×</button></div></div>' +
+      '</span></div><div class="swid-toolbar-actions"><button class="swid-icon-btn" type="button" data-swid-flip aria-label="翻至品牌背面" aria-pressed="false">↻</button><button class="swid-icon-btn" type="button" data-swid-close aria-label="關閉">×</button></div></div>' +
       '<div class="swid-viewport"><div class="swid-ambient" aria-hidden="true"></div><div class="swid-shadow" aria-hidden="true"></div><div class="swid-stack" data-flipped="0" data-tray="closed">' +
       '<div class="swid-card-wrap">' +
       '<section class="swid-face swid-front"><div class="swid-front-main"><div class="swid-eyebrow">' +
@@ -425,26 +427,27 @@
       sources.length +
       ' SOURCES</span><span class="swid-chip swid-impact-chip" title="SIGN WELL 站內文章影響力指標；非 Journal Impact Factor"><small>SW IMPACT</small><b data-swid-impact-score>—</b></span></div></div><aside class="swid-qr-pane"><div class="swid-qr" data-swid-qr><span class="swid-qr-placeholder">QR 建立中…</span></div><div class="swid-id">' +
       esc(payload.articleId || "SIGN WELL") +
-      '</div><div class="swid-hint">掃描後直接開啟這篇文章</div></aside></section>' +
+      '</div><div class="swid-hint">掃描 QR Code 開啟文章</div></aside></section>' +
       '<section class="swid-face swid-back"><div class="swid-back-logo"><strong>SIGN WELL</strong><span>欣緯生醫</span></div></section>' +
       "</div>" +
-      '<section class="swid-tray"><button class="swid-tray-handle" type="button" data-swid-tray><span>上滑查看更多</span></button><div class="swid-tray-body">' +
+      '<section class="swid-tray"><button class="swid-tray-handle" type="button" data-swid-tray aria-controls="swid-tray-details" aria-expanded="false"><span>查看作者與引用來源</span></button><div class="swid-tray-body" id="swid-tray-details" aria-hidden="true" inert>' +
       quickMetricHtml(payload, sources) +
+      '<nav class="swid-section-nav" aria-label="詳細資訊捷徑"><button type="button" data-swid-jump="sources">引用來源 <b>' + sources.length + '</b></button><button type="button" data-swid-jump="author">關於作者</button><button type="button" data-swid-jump="version">版本紀錄</button></nav>' +
       '<section class="swid-tray-section"><h3>SW Impact · 文章影響力</h3>' +
       impactHtml() +
       "</section>" +
-      '<section class="swid-tray-section swid-author-section"><h3>Author · 作者介紹</h3>' +
+      '<section class="swid-tray-section swid-author-section" id="swid-author-section" tabindex="-1"><h3>作者介紹</h3>' +
       authorHtml(author) +
       "</section>" +
       '<section class="swid-tray-section"><h3>GEO · AI Discoverability</h3>' +
       geoHtml(geo) +
       "</section>" +
-      '<section class="swid-tray-section"><h3>References & Sources</h3><div class="swid-source-list">' +
+      '<section class="swid-tray-section" id="swid-sources-section" tabindex="-1"><h3>引用與資料來源</h3><div class="swid-source-list">' +
       (sources.length
         ? sources.map(sourceHtml).join("")
         : '<div class="swid-legal">這篇文章目前沒有可公開的外部引用來源。</div>') +
       "</div></section>" +
-      '<section class="swid-tray-section"><h3>Index & Version</h3><div class="swid-info-grid"><div class="swid-info"><span>最後索引</span><strong>' +
+      '<section class="swid-tray-section" id="swid-version-section" tabindex="-1"><h3>文章版本與更新</h3><div class="swid-info-grid"><div class="swid-info"><span>最後索引</span><strong>' +
       esc(fmtDate(payload.indexedAt)) +
       '</strong></div><div class="swid-info"><span>首次索引</span><strong>' +
       esc(fmtDate(payload.firstIndexedAt || payload.indexedAt)) +
@@ -467,7 +470,14 @@
         : "") +
       "</div></section>" +
       "</div></section>" +
-      "</div></div></div>";
+      "</div></div>" +
+      '<nav class="swid-quick-actions" aria-label="文章快捷操作"><button type="button" class="swid-quick-primary" data-swid-copy-primary>複製文章連結</button><button type="button" data-swid-sources-quick>查看引用來源</button><button type="button" data-swid-share-primary>分享</button></nav>' +
+      '<p class="swid-feedback" data-swid-feedback role="status" aria-live="polite" aria-atomic="true"></p>' +
+      "</div>";
+    var trayBody=q(".swid-tray-body",overlay);
+    var sourcesPanel=q("#swid-sources-section",overlay);
+    var firstSection=q(".swid-tray-section",trayBody);
+    if (trayBody && sourcesPanel && firstSection) trayBody.insertBefore(sourcesPanel,firstSection);
     overlay.dataset.key = payloadKey(payload);
     document.body.appendChild(overlay);
     bindOverlay(overlay, payload);
@@ -480,6 +490,9 @@
     if (!overlay || overlay.dataset.key !== payloadKey(payload)) overlay = renderOverlay(payload);
     lastFocus = document.activeElement;
     overlay.dataset.open = "1";
+    setTray(overlay,false);
+    setFlipped(overlay,false);
+    if(overlay._swidWakeTilt)overlay._swidWakeTilt();
     document.documentElement.classList.add("swid-lock");
     document.body.classList.add("swid-lock");
     setTimeout(function () {
@@ -502,7 +515,11 @@
   }
   function closeOverlay() {
     var overlay = q("#" + OVERLAY_ID);
-    if (overlay) overlay.dataset.open = "0";
+    if (overlay) {
+      overlay.dataset.open = "0";
+      if(overlay._swidStopTilt)overlay._swidStopTilt();
+      if(overlay._swidFeedbackTimer)clearTimeout(overlay._swidFeedbackTimer);
+    }
     document.documentElement.classList.remove("swid-lock");
     document.body.classList.remove("swid-lock");
     if (lastFocus && document.contains(lastFocus))
@@ -541,54 +558,107 @@
           '<span class="swid-qr-placeholder">QR 載入失敗<br>可使用「複製連結」</span>';
       });
   }
-  function bindOverlay(overlay, payload) {
-    var stack = q(".swid-stack", overlay);
-    q("[data-swid-close]", overlay).onclick = closeOverlay;
-    q("[data-swid-flip]", overlay).onclick = function () {
-      stack.dataset.flipped = stack.dataset.flipped === "1" ? "0" : "1";
-    };
-    q("[data-swid-tray]", overlay).onclick = function () {
-      stack.dataset.tray = stack.dataset.tray === "open" ? "closed" : "open";
-    };
-    q("[data-swid-copy]", overlay).onclick = function () {
-      copyText(payload.qrTarget || payload.url || location.href);
-    };
-    q("[data-swid-share]", overlay).onclick = function () {
-      sharePayload(payload);
-    };
-    overlay.addEventListener("click", function (e) {
-      if (e.target === overlay) closeOverlay();
+  function setTray(overlay,open){
+    var stack=q(".swid-stack",overlay),body=q(".swid-tray-body",overlay),handle=q("[data-swid-tray]",overlay);
+    if(!stack||!body||!handle)return;
+    stack.dataset.tray=open?"open":"closed";
+    body.inert=!open;
+    body.setAttribute("aria-hidden",open?"false":"true");
+    handle.setAttribute("aria-expanded",open?"true":"false");
+    var text=q("span",handle);
+    if(text)text.textContent=open?"收合詳細資料":"查看作者與引用來源";
+  }
+  function setFlipped(overlay,flipped){
+    var stack=q(".swid-stack",overlay),btn=q("[data-swid-flip]",overlay);
+    if(!stack)return;
+    stack.dataset.flipped=flipped?"1":"0";
+    if(btn){
+      btn.setAttribute("aria-pressed",flipped?"true":"false");
+      btn.setAttribute("aria-label",flipped?"翻回文章正面":"翻至品牌背面");
+    }
+    var front=q(".swid-front",overlay),back=q(".swid-back",overlay);
+    if(front)front.setAttribute("aria-hidden",flipped?"true":"false");
+    if(back)back.setAttribute("aria-hidden",flipped?"false":"true");
+  }
+  function notifyCard(overlay,message,error){
+    var note=q("[data-swid-feedback]",overlay);
+    if(!note)return;
+    if(overlay._swidFeedbackTimer)clearTimeout(overlay._swidFeedbackTimer);
+    note.textContent=message;
+    note.dataset.state=error?"error":"ok";
+    overlay._swidFeedbackTimer=setTimeout(function(){note.textContent="";delete note.dataset.state;},2600);
+  }
+  function jumpToCardSection(overlay,key){
+    var ids={sources:"swid-sources-section",author:"swid-author-section",version:"swid-version-section"};
+    var section=q("#"+ids[key],overlay),body=q(".swid-tray-body",overlay);
+    if(!section||!body)return;
+    setTray(overlay,true);
+    requestAnimationFrame(function(){
+      if(overlay.dataset.open!=="1")return;
+      var offset=section.getBoundingClientRect().top-body.getBoundingClientRect().top;
+      body.scrollTo({top:Math.max(0,body.scrollTop+offset-12),behavior:window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+      try{section.focus({preventScroll:true})}catch(_){}
     });
-    overlay._swidOnKey = function onKey(e) {
-      if (overlay.dataset.open !== "1") return;
-      if (e.key === "Escape") closeOverlay();
-      if (e.key === "ArrowUp") stack.dataset.tray = "open";
-      if (e.key === "ArrowDown") stack.dataset.tray = "closed";
-      if (e.key === "ArrowLeft" || e.key === "ArrowRight")
-        stack.dataset.flipped = stack.dataset.flipped === "1" ? "0" : "1";
-    };
-    document.addEventListener("keydown", overlay._swidOnKey);
-    bindTilt(overlay);
-    var start = null;
-    var target = q(".swid-card-wrap", overlay);
-    target.addEventListener("pointerdown", function (e) {
-      start = { x: e.clientX, y: e.clientY, id: e.pointerId };
-      try {
-        target.setPointerCapture(e.pointerId);
-      } catch (_) {}
+  }
+  function bindOverlay(overlay,payload){
+    var stack=q(".swid-stack",overlay);
+    q("[data-swid-close]",overlay).onclick=closeOverlay;
+    q("[data-swid-flip]",overlay).onclick=function(){setFlipped(overlay,stack.dataset.flipped!=="1")};
+    q("[data-swid-tray]",overlay).onclick=function(){setTray(overlay,stack.dataset.tray!=="open")};
+    qa("[data-swid-jump]",overlay).forEach(function(btn){
+      btn.onclick=function(){jumpToCardSection(overlay,btn.dataset.swidJump)};
     });
-    target.addEventListener("pointerup", function (e) {
-      if (!start) return;
-      var dx = e.clientX - start.x,
-        dy = e.clientY - start.y;
-      start = null;
-      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 42) {
-        stack.dataset.tray = dy < 0 ? "open" : "closed";
+    q("[data-swid-sources-quick]",overlay).onclick=function(){jumpToCardSection(overlay,"sources")};
+    qa("[data-swid-copy],[data-swid-copy-primary]",overlay).forEach(function(btn){
+      btn.onclick=function(){
+        copyText(safeHttps(payload.qrTarget||payload.url)||location.href)
+          .then(function(){notifyCard(overlay,"文章連結已複製")})
+          .catch(function(){notifyCard(overlay,"無法自動複製，請使用瀏覽器分享功能",true)});
+      };
+    });
+    qa("[data-swid-share],[data-swid-share-primary]",overlay).forEach(function(btn){
+      btn.onclick=function(){
+        sharePayload(payload).then(function(result){
+          if(result==="copied")notifyCard(overlay,"已複製文章連結，可貼上分享");
+          if(result==="shared")notifyCard(overlay,"已開啟分享功能");
+        }).catch(function(){notifyCard(overlay,"分享失敗，請改用複製連結",true)});
+      };
+    });
+    overlay.addEventListener("click",function(e){if(e.target===overlay)closeOverlay()});
+    overlay._swidOnKey=function(e){
+      if(overlay.dataset.open!=="1")return;
+      if(e.key==="Escape"){e.preventDefault();closeOverlay();return;}
+      if(e.key==="Tab"){
+        var els=qa('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])',overlay)
+          .filter(function(el){return el.getClientRects().length>0&&!el.closest('[inert]')&&!el.closest('[aria-hidden="true"]')});
+        if(!els.length)return;
+        var first=els[0],last=els[els.length-1];
+        if(e.shiftKey&&(document.activeElement===first||!overlay.contains(document.activeElement))){e.preventDefault();last.focus();}
+        else if(!e.shiftKey&&(document.activeElement===last||!overlay.contains(document.activeElement))){e.preventDefault();first.focus();}
         return;
       }
-      if (Math.abs(dx) > 55)
-        stack.dataset.flipped = stack.dataset.flipped === "1" ? "0" : "1";
+      if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)||e.target.closest("a,button,summary"))return;
+      if(e.key==="ArrowUp"){e.preventDefault();setTray(overlay,true);}
+      if(e.key==="ArrowDown"){e.preventDefault();setTray(overlay,false);}
+      if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();setFlipped(overlay,stack.dataset.flipped!=="1");}
+    };
+    document.addEventListener("keydown",overlay._swidOnKey);
+    bindTilt(overlay);
+    var start=null,target=q(".swid-card-wrap",overlay);
+    target.addEventListener("pointerdown",function(e){
+      if(e.target.closest("a,button,input,textarea"))return;
+      start={x:e.clientX,y:e.clientY,id:e.pointerId};
     });
+    target.addEventListener("pointercancel",function(){start=null});
+    target.addEventListener("pointerup",function(e){
+      if(!start||e.pointerId!==start.id)return;
+      var dx=e.clientX-start.x,dy=e.clientY-start.y;
+      start=null;
+      if(Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>60){setTray(overlay,dy<0);return;}
+      if(Math.abs(dx)>65)setFlipped(overlay,stack.dataset.flipped!=="1");
+    });
+    setTray(overlay,false);
+    setFlipped(overlay,false);
   }
   function tiltEnabled() {
     try {
@@ -662,50 +732,62 @@
     viewport.addEventListener('pointerenter', function(e){ if (!['mouse','pen'].includes(e.pointerType) || !tiltEnabled()) return; active = true; setTarget(e.clientX,e.clientY); });
     viewport.addEventListener('pointermove', function(e){ if (!['mouse','pen'].includes(e.pointerType) || !tiltEnabled()) return; active = true; setTarget(e.clientX,e.clientY); });
     viewport.addEventListener('pointerleave', function(){ reset(false); });
-    window.addEventListener('resize', function(){ reset(true); });
-    (function tick(now){
-      var enabled = tiltEnabled();
-      viewport.dataset.tiltEnabled = enabled ? '1' : '0';
-      if (!enabled) {
-        targetX = 0; targetY = 0; apply(0,0);
-      } else if (!active) {
-        var t = Number(now || performance.now());
-        targetX = Math.sin(t * 0.00039 + 0.7) * 1.8;
-        targetY = Math.cos(t * 0.00034 + 1.1) * 2.5;
-        apply(targetY / 16, -targetX / 13);
+    overlay._swidOnResize=function(){reset(true)};
+    window.addEventListener('resize',overlay._swidOnResize);
+    var rafId=0;
+    function tick(now){
+      rafId=0;
+      if(!card.isConnected||overlay.dataset.open!=="1")return;
+      var enabled=tiltEnabled();
+      viewport.dataset.tiltEnabled=enabled?'1':'0';
+      if(!enabled){targetX=0;targetY=0;apply(0,0);}
+      else if(!active){
+        var t=Number(now||performance.now());
+        targetX=Math.sin(t*.00039+.7)*1.8;
+        targetY=Math.cos(t*.00034+1.1)*2.5;
+        apply(targetY/16,-targetX/13);
       }
-      var ease = active ? 0.11 : 0.055;
-      currentX += (targetX - currentX) * ease;
-      currentY += (targetY - currentY) * ease;
-      card.style.setProperty('--swid-rx', currentX.toFixed(3) + 'deg');
-      card.style.setProperty('--swid-ry', currentY.toFixed(3) + 'deg');
-      requestAnimationFrame(tick);
-    })();
+      var ease=active?.11:.055;
+      currentX+=(targetX-currentX)*ease;
+      currentY+=(targetY-currentY)*ease;
+      card.style.setProperty('--swid-rx',currentX.toFixed(3)+'deg');
+      card.style.setProperty('--swid-ry',currentY.toFixed(3)+'deg');
+      rafId=requestAnimationFrame(tick);
+    }
+    overlay._swidStopTilt=function(){if(rafId){cancelAnimationFrame(rafId);rafId=0;}};
+    overlay._swidWakeTilt=function(){if(!rafId&&overlay.dataset.open==="1")rafId=requestAnimationFrame(tick);};
     reset(true);
   }
   function copyText(v) {
-    if (navigator.clipboard && navigator.clipboard.writeText)
-      return navigator.clipboard.writeText(String(v)).catch(function () {});
-    var x = document.createElement("textarea");
-    x.value = String(v);
-    document.body.appendChild(x);
-    x.select();
-    try {
-      document.execCommand("copy");
-    } catch (_) {}
-    x.remove();
-    return Promise.resolve();
+    var value=String(v||"");
+    function fallback(){
+      var x=document.createElement("textarea");
+      x.value=value;
+      x.setAttribute("readonly","");
+      x.style.cssText="position:fixed;top:0;left:-10000px;opacity:0";
+      document.body.appendChild(x);
+      x.select();
+      var ok=false;
+      try{ok=document.execCommand("copy")}catch(_){}
+      x.remove();
+      if(!ok)throw new Error("COPY_NOT_AVAILABLE");
+      return true;
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText)
+      return navigator.clipboard.writeText(value).then(function(){return true}).catch(fallback);
+    return Promise.resolve().then(fallback);
   }
   function sharePayload(p) {
-    var url = p.qrTarget || p.url || location.href;
-    var text = "SIGN WELL｜" + String(p.title || "文章");
-    if (navigator.share)
-      return navigator
-        .share({ title: p.title || "SIGN WELL", text: text, url: url })
-        .catch(function (e) {
-          if (e && e.name !== "AbortError") copyText(url);
+    var url=safeHttps(p.qrTarget||p.url)||location.href;
+    var text="SIGN WELL｜"+String(p.title||"文章");
+    if(navigator.share)
+      return navigator.share({title:p.title||"SIGN WELL",text:text,url:url})
+        .then(function(){return "shared"})
+        .catch(function(e){
+          if(e&&e.name==="AbortError")return "cancelled";
+          return copyText(url).then(function(){return "copied"});
         });
-    return copyText(url);
+    return copyText(url).then(function(){return "copied"});
   }
   function mountButton(payload, root) {
     if (!payload || !payload.title) return;
