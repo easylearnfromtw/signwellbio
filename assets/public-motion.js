@@ -10,7 +10,7 @@
  if(!host||!template||!host.attachShadow)return;
  const root=host.attachShadow({mode:"open"});
  const style=document.createElement("link");
- style.rel="stylesheet";style.href="assets/public-motion.css?version=11.0.1";
+ style.rel="stylesheet";style.href="assets/public-motion.css?version=12.0.0";
  root.appendChild(style);
  const content=document.createElement("div");content.className="sw-public-motion-root";content.innerHTML=template;
  root.appendChild(content);
@@ -167,7 +167,7 @@
     if(!window.ScrollTrigger)await load("https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js")
    }catch(error){console.warn("[SIGNWELL] GSAP unavailable; using native scroll with 3D",error)}
    if(suspended)return;
-   import("./public-motion-three.js").catch(error=>console.warn("[SIGNWELL] WebGL module unavailable; CSS fallback kept",error))
+   import("./public-motion-three.js?v=12.0.0").catch(error=>console.warn("[SIGNWELL] WebGL module unavailable; CSS fallback kept",error))
   };
   if("IntersectionObserver" in window){
    const observer=new IntersectionObserver(entries=>{
