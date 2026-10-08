@@ -8,15 +8,87 @@
   const clamp=n=>Math.max(0,Math.min(1,n));
   const ease=t=>{t=clamp(t);return t*t*(3-2*t)};
   let instance=null,queued=false;
+  /* Keyboard- and touch-friendly access to every sheet, including sheets
+     covered by the physical stack. The papers remain the real topic buttons. */
+  function buildIndex(rail,cards){
+    const stage=rail.querySelector(".sw-topic-sticky");
+    if(!stage)return null;
+    const wrap=document.createElement("div");
+    wrap.className="sw-topic-atlas";
+    const toggle=document.createElement("button");
+    toggle.type="button";
+    toggle.className="sw-topic-atlas-toggle";
+    toggle.setAttribute("aria-expanded","false");
+    toggle.setAttribute("aria-controls","sw-topic-atlas-list");
+    toggle.textContent="主題快速索引 ";
+    const count=document.createElement("span");
+    count.className="sw-topic-atlas-count";
+    count.textContent="01 / "+String(cards.length).padStart(2,"0");
+    toggle.append(count);
+    const list=document.createElement("nav");
+    list.id="sw-topic-atlas-list";
+    list.className="sw-topic-atlas-list";
+    list.setAttribute("aria-label","選擇主題專欄");
+    list.hidden=true;
+    const buttons=cards.map((paper,i)=>{
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.className="sw-topic-atlas-item";
+      const numeral=document.createElement("span");
+      numeral.className="sw-topic-atlas-no";
+      numeral.textContent=String(i+1).padStart(2,"0");
+      const label=document.createElement("span");
+      label.textContent=paper.querySelector("strong")?.textContent||"主題專欄";
+      btn.append(numeral,label);
+      btn.addEventListener("click",()=>{
+        list.hidden=true;
+        toggle.setAttribute("aria-expanded","false");
+        paper.click();
+      });
+      list.append(btn);
+      return btn;
+    });
+    toggle.addEventListener("click",()=>{
+      const open=list.hidden;
+      list.hidden=!open;
+      toggle.setAttribute("aria-expanded",String(open));
+    });
+    wrap.append(toggle,list);
+    stage.append(wrap);
+    return {wrap,toggle,list,count,buttons};
+  }
+  document.addEventListener("keydown",event=>{
+    if(event.key==="Escape"&&instance?.atlas&&!instance.atlas.list.hidden){
+      instance.atlas.list.hidden=true;
+      instance.atlas.toggle.setAttribute("aria-expanded","false");
+      instance.atlas.toggle.focus();
+    }
+  });
+  document.addEventListener("pointerdown",event=>{
+    if(instance?.atlas&&!instance.atlas.wrap.contains(event.target)){
+      instance.atlas.list.hidden=true;
+      instance.atlas.toggle.setAttribute("aria-expanded","false");
+    }
+  },{passive:true});
   function update(){
     queued=false;
     if(!instance||!instance.rail.isConnected||reduced.matches)return;
-    const {rail,cards,progressLabel}=instance;
+    const {rail,cards,progressLabel,atlas}=instance;
     const top=rail.getBoundingClientRect().top;
     const distance=Math.max(1,rail.offsetHeight-innerHeight);
     const p=clamp(-top/distance),total=cards.length;
     const position=p*total,active=Math.min(total-1,Math.max(0,Math.floor(position)));
     progressLabel.textContent=String(active+1).padStart(2,"0")+" / "+String(total).padStart(2,"0");
+    if(atlas){
+      atlas.count.textContent=progressLabel.textContent;
+      atlas.buttons.forEach((button,i)=>{
+        button.classList.toggle("is-laid",i<=active);
+        button.classList.toggle("is-current",i===active);
+        if(i===active)button.setAttribute("aria-current","true");
+        else button.removeAttribute("aria-current");
+      });
+    }
+    rail.style.setProperty("--sw-topic-roll-angle",(p*720).toFixed(1)+"deg");
     rail.style.setProperty("--sw-topic-feed",Math.round(35+ease(position-active)*100)+"px");
     cards.forEach((card,i)=>{
       const local=ease((position-i+.34)/.91);
@@ -48,7 +120,7 @@
     const cards=[...rail.querySelectorAll(".sw-topic-paper")];
     const progressLabel=rail.querySelector("[data-sw-topic-current]");
     if(!cards.length||!progressLabel)return;
-    instance={rail,cards,progressLabel};
+    instance={rail,cards,progressLabel,atlas:buildIndex(rail,cards)};
     rail.classList.add("is-ready");
     if(reduced.matches){
       cards.forEach(c=>{c.tabIndex=0;c.style.pointerEvents="auto"});
