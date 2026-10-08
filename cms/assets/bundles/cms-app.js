@@ -3,6 +3,29 @@
 window.SignWellErrors?.installGlobal?.({surface:'CMS',module:'cms-runtime',homeUrl:'index.html'});
 function swShowOperationalError(err,context={}){return window.SignWellErrors?.show?.(err,{surface:'CMS',homeUrl:'index.html',...context});}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const KEY='signwell-cms-data-v1',ACTKEY='signwell-cms-last-active';const DEFAULT_SITE_TEXT={"siteTitle":"SIGN WELL · 欣緯生醫","metaDescription":"SIGN WELL · 欣緯生醫 — 臨床筆記、醫學推理與值得留下的知識。","brandEnglish":"SIGN WELL","brandChinese":"欣緯生醫","navArticles":"文章","navTopics":"主題","navAbout":"關於我們","heroEyebrow":"SIGN WELL BIOMED · 欣緯生醫","heroTitleLine1":"把臨床問題，","heroTitleLine2":"寫成值得留下的答案。","heroSubtitle":"臨床筆記、醫學推理、醫療科技與自費醫療觀察。不是追求資訊最多，而是把真正值得記住的框架整理清楚。","heroCardTitle":"醫學筆記、臨床推理，與值得留下的知識。","heroCardBody":"以閱讀品質為核心的個人醫學出版空間。從床邊問題出發，保留推理脈絡與可回顧的知識。","heroCardTiny":"獨立醫學筆記","featuredEyebrow":"編輯精選","featuredTitle":"精選臨床筆記","topicsEyebrow":"知識地圖","topicsTitle":"主題分類","topicsDescription":"依臨床領域瀏覽","recentEyebrow":"最近整理","recentTitle":"最新文章","publishedCountSuffix":"篇已發布筆記","articleCountSuffix":"篇文章","minutesReadSuffix":"分鐘閱讀","articleBrand":"SIGN WELL · 欣緯生醫","updatedLabel":"更新","shareLabel":"分享","copyLinkLabel":"複製連結","tocTitle":"本頁內容","aboutEyebrow":"關於 SIGN WELL","aboutTitle":"欣緯生醫","aboutBody":"一個以臨床推理、醫學教育與自費醫療觀察為核心的個人出版空間。網站內容希望保留「為什麼」而不只留下答案，讓每篇筆記都能在下一次遇到病人或問題時真正派上用場。","aboutFocusLabel":"核心","aboutFocusValue":"臨床推理","aboutFormatLabel":"形式","aboutFormatValue":"筆記 · 深度整理","aboutPrincipleLabel":"原則","aboutPrincipleValue":"清楚勝過複雜","aboutDisclaimer":"本站不提供醫療服務、不招攬醫療業務；內容僅供醫學教育與資訊整理，不構成個別醫療建議，也不能取代正式臨床評估。","aboutManifestoTitle":"把複雜的醫學，整理成真正能被理解與使用的知識。","aboutManifestoBody":"我們重視推理、脈絡與長期可回顧性，而不只是快速堆疊資訊。","aboutPeopleEyebrow":"PEOPLE","aboutPeopleTitle":"我們是誰","aboutPeopleSubtitle":"以不同背景與專長，共同整理值得留下的醫學與健康知識。","footerTagline":"臨床筆記、醫學推理，以及值得留下的知識。","footerDisclaimer":"本站不提供醫療服務、不招攬醫療業務；內容僅供醫學教育與資訊整理，不構成個別醫療建議。","searchPlaceholder":"搜尋文章、主題、關鍵字…","emptyCategory":"目前沒有這個分類的文章。","notFoundTitle":"找不到文章","notFoundBody":"這篇文章可能尚未發布或網址已改變。","homeEyebrow":"SIGN WELL BIOMED · 欣緯生醫","homeTitle1":"從臨床出發，","homeTitle2":"把值得留下的醫學寫清楚。","homeSubtitle":"以臨床推理、醫學教育與自費醫療觀察為核心的知識平台。從一個問題開始，整理成下一次真正用得上的答案。","homeCardTitle":"醫學不只是答案，而是理解答案從哪裡來。","homeCardBody":"把床邊問題、閱讀與思考整理成可回顧的知識，讓資訊回到臨床情境。","dailyEyebrow":"每日更新","dailyTitle":"每日新文章","dailyDescription":"最新整理與近期發布","topicsSubtitle":"依領域整理文章、臨床問題與延伸閱讀。","shareEyebrow":"分享我們","shareTitle":"把 SIGN WELL 分享給需要的人。","shareSubtitle":"複製網站連結，或使用 QR Code 讓另一台裝置快速開啟。"};
+/* CMS homepage v2 fields: use the existing authenticated siteText publication pipeline. */
+const SW_MOTION_DEFAULTS=Object.freeze({
+  "motionIntroLead": "不只研究身體，",
+  "motionIntroAccent": "也重新看見人。",
+  "motionIntroDescription": "將醫學、健康、美感與社會之間的關係，編排成值得探索的觀點。這一次，讓捲動也成為敘事。",
+  "motionSceneOneLabel": "01 / THE HUMAN CONDITION",
+  "motionSceneOneDescription": "健康，不只是被數據量化的結果，也關乎生活中的每一次選擇。",
+  "motionSceneTwoLine1": "把觀點，",
+  "motionSceneTwoLine2": "放進新的框架。",
+  "motionSceneTwoDescription": "讓醫學研究、生活經驗與審美文化互相對話，不急著用一個答案總結所有事情。",
+  "motionSceneThreeLine1": "同一個人，",
+  "motionSceneThreeLine2": "不只有一種定義。",
+  "motionSceneThreeDescription": "醫學是理解身體的方式之一。把證據與人的生活放在一起，才能看見更完整的故事。",
+  "motionCurrentSectionTitle": "最新焦點",
+  "motionFeaturesSectionTitle": "精選閱讀",
+  "motionNoteLine1": "好的內容，不需要每次都急著給答案。",
+  "motionNoteLine2": "有時候，更重要的是提出對的問題。",
+  "motionNoteDescription": "觀察醫學，也觀察醫學之外的世界。保留證據、立場與不確定性之間應有的距離。",
+  "motionNewsletterLine1": "Something",
+  "motionNewsletterLine2": "worth reading.",
+  "motionNewsletterDescription": "不定期寄出新文章與值得記住的觀察。沒有不必要的推銷。"
+});
+Object.assign(DEFAULT_SITE_TEXT,SW_MOTION_DEFAULTS);
 const DEFAULT_HERO_CONFIG=Object.freeze({
   spinRate:0.24,ringSize:0.78,tube:0.36,ior:1.40,iorFresnel:1.50,dispersion:0.018,
   baseRoll:36,baseTilt:-52,textZ:-0.22,jelly:1,floatAmp:0.020,ringLift:0.10,word:'SIGN WELL'
@@ -5406,6 +5429,49 @@ function renderSiteText(){
         </div>
       </div>
 
+      <div class="site-section sw-motion-cms-intro">
+        <div class="site-section-title">首頁動態敘事 / Three.js</div>
+        <p>與正式主頁設定一起儲存、一起經過原有的 GitHub 發布檢查。下方文案不會修改動畫光影或既有文章資料。</p>
+        <p><strong>預覽：</strong>發布後可在 <a href="../test/index.html?preview=published" target="_blank" rel="noopener noreferrer">新版動態首頁（已發布資料）</a> 檢查。尚未發布的修改不會被公開預覽讀到。</p>
+      </div>
+      <div class="site-section sw-motion-cms-group">
+        <div class="site-section-title">動態首頁 / 品牌開場</div>
+        ${input('motionIntroLead','首頁主標第一行')}
+        ${input('motionIntroAccent','首頁主標重點文字')}
+        ${input('motionIntroDescription','首頁說明',true)}
+      </div>
+      <div class="site-section sw-motion-cms-group">
+        <div class="site-section-title">動態場景 01 / 深色章節</div>
+        ${input('motionSceneOneLabel','第一幕標籤')}
+        ${input('motionSceneOneDescription','第一幕說明',true)}
+      </div>
+      <div class="site-section sw-motion-cms-group">
+        <div class="site-section-title">動態場景 02 / 香檳金章節</div>
+        ${input('motionSceneTwoLine1','第二幕標題第一行')}
+        ${input('motionSceneTwoLine2','第二幕標題第二行')}
+        ${input('motionSceneTwoDescription','第二幕說明',true)}
+      </div>
+      <div class="site-section sw-motion-cms-group">
+        <div class="site-section-title">動態場景 03 / 霧藍章節</div>
+        ${input('motionSceneThreeLine1','第三幕標題第一行')}
+        ${input('motionSceneThreeLine2','第三幕標題第二行')}
+        ${input('motionSceneThreeDescription','第三幕說明',true)}
+      </div>
+      <div class="site-section sw-motion-cms-group">
+        <div class="site-section-title">動態後續 / 編輯閱讀區</div>
+        ${input('motionCurrentSectionTitle','最新焦點標題')}
+        ${input('motionFeaturesSectionTitle','精選閱讀標題')}
+        ${input('motionNoteLine1','編輯觀點第一行')}
+        ${input('motionNoteLine2','編輯觀點第二行')}
+        ${input('motionNoteDescription','編輯觀點內文',true)}
+      </div>
+      <div class="site-section sw-motion-cms-group">
+        <div class="site-section-title">動態後續 / 電子報引言</div>
+        ${input('motionNewsletterLine1','電子報標題第一行')}
+        ${input('motionNewsletterLine2','電子報標題第二行')}
+        ${input('motionNewsletterDescription','電子報介紹',true)}
+      </div>
+
       <div class="site-section">
         <div class="site-section-title">每日新文章</div>
         ${input('dailyEyebrow','區段小標')}
@@ -5539,7 +5605,15 @@ function renderSiteText(){
   </div>`;
 
   const collect=()=>{
-    $$('[data-site-key]').forEach(el=>{data.siteText[el.dataset.siteKey]=el.value});
+    // Limit public editorial fields; preserve existing fields and publish protocol.
+    $('[data-site-key]').forEach(el=>{
+      const key=el.dataset.siteKey;
+      if(Object.prototype.hasOwnProperty.call(SW_MOTION_DEFAULTS,key)){
+        const limit=/Description$/.test(key)?240:80;
+        const value=String(el.value||'').trim().slice(0,limit);
+        data.siteText[key]=value||SW_MOTION_DEFAULTS[key];
+      }else data.siteText[key]=el.value;
+    });
     const nextHero={...data.heroConfig};
     $$('[data-hero-key]').forEach(el=>{nextHero[el.dataset.heroKey]=Number(el.value)});
     data.heroConfig=normalizeHeroConfig(nextHero);
