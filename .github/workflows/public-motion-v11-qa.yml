@@ -4,12 +4,14 @@ on:
     branches:
       - release/public-motion-v11-20261008
       - release/public-v11-cross-page-20261008
+      - feature/public-motion-2k-gpu-outline-20261008
   pull_request:
     paths:
       - "index.html"
       - "assets/public-core.js"
       - "assets/public-motion*"
       - "qa/smoke-public-motion.mjs"
+      - "qa/verify-rendering-quality.mjs"
 jobs:
   browser:
     runs-on: ubuntu-latest
@@ -23,14 +25,18 @@ jobs:
           node-version: "22"
       - name: Install Chromium and Playwright
         run: |
-          npm install --no-save playwright@1.55.0
+          npm install --no-save playwright@1.55.0 three@0.180.0
           npx playwright install --with-deps chromium
-      - name: Smoke test Public desktop/mobile and regression surfaces
+      - name: Verify GPU budget, 2K output and real outline geometry
+        run: node qa/verify-rendering-quality.mjs
+      - name: Smoke test Public desktop/mobile and WebGL output
         run: node qa/smoke-public-motion.mjs
       - name: Upload browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: public-v11-browser-qa
-          path: qa-public-v11-*.png
+          path: |
+            qa-public-v11-*.png
+            qa-public-v12-*.png
           if-no-files-found: ignore
