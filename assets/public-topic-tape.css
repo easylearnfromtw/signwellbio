@@ -269,3 +269,46 @@ body:has(#app .sw-topic-tape) #app{overflow:visible}
     grid-template-columns:1fr;padding:120px 20px 210px;
   }
 }
+
+/* Story transition matches the Technology CSR floor-to-rising-paper treatment:
+   the original surface stays pinned; linen content lifts and covers it. */
+#app .sw-topic-directory{
+  position:relative;
+  z-index:4;
+  background:#f7f4eb;
+  border-radius:32px 32px 0 0;
+  box-shadow:0 -19px 60px rgba(54,57,52,.15);
+  margin-top:-32px;
+  padding:clamp(78px,9vw,138px) clamp(24px,6vw,95px) 65px;
+  width:100vw;
+  max-width:none;
+  margin-inline:calc(50% - 50vw);
+  scroll-margin-top:95px;
+}
+#app:has(.sw-topic-tape) #topicArticles{
+  position:relative;z-index:4;
+  background:#f7f4eb;
+  padding:32px clamp(24px,6vw,95px) 115px;
+  width:100vw;
+  max-width:none;
+  margin-inline:calc(50% - 50vw);
+  scroll-margin-top:90px;
+}
+#app:has(.sw-topic-tape) #topicArticles .cards,
+#app .sw-topic-directory .topic-grid{max-width:1410px;margin-inline:auto}
+#app .sw-topic-directory-head{max-width:1410px;margin-inline:auto auto;margin-bottom:35px}
+#app .sw-topic-tape.is-ready .sw-topic-paper{touch-action:pan-y}
+#app .sw-topic-tape.is-ready .sw-topic-paper[aria-hidden="true"]{pointer-events:none!important}
+@media(max-width:720px){
+  #app .sw-topic-directory{
+    border-radius:25px 25px 0 0;
+    margin-top:-25px;
+    padding:70px 22px 55px;
+  }
+  #app:has(.sw-topic-tape) #topicArticles{padding:20px 22px 115px}
+  #app .sw-topic-directory-head{margin-bottom:28px}
+  #app .sw-topic-directory .topic-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(prefers-reduced-motion:reduce){
+  #app .sw-topic-directory{margin-top:0}
+}
