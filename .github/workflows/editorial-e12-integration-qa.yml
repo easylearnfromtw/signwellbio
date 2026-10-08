@@ -1,0 +1,61 @@
+name: SIGNWELL Editorial E1.2 Integration QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/public-core.js'
+      - 'assets/signwell-editorial.css'
+      - 'assets/signwell-e12-article.css'
+      - 'assets/topic-art/**'
+      - 'cms/**'
+      - 'article/**'
+      - 'topics.html'
+      - 'index.html'
+      - 'sw.js'
+      - '.github/workflows/editorial-e12-integration-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check assets/public-core.js
+          node --check assets/public-topic-tape.js
+          node --check cms/assets/bundles/cms-app.js
+          node --check sw.js
+      - name: Validate Public to CMS integration
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const read=p=>fs.readFileSync(p,'utf8');
+          const main=read('index.html'),topics=read('topics.html');
+          const cms=read('cms/assets/bundles/cms-app.js');
+          const cmsHTML=read('cms/index.html'),js=read('assets/public-core.js'),css=read('assets/signwell-editorial.css');
+          for(const [n,s] of [['index.html',main],['topics.html',topics]]){
+            assert(s.includes('assets/signwell-editorial.css?build=ed12-20261008'),n+' lacks E1.2 stylesheet');
+          }
+          assert(css.includes('--ed-paper:#f8f6f0'), 'Editorial palette missing');
+          for(const name of ['function topicFan','function topicIndex','function mountTopicFan','function selectTopic']){
+            assert(js.includes(name), 'Missing frontend feature: '+name);
+          }
+          assert(cms.includes("english:String(x.english||'')"),'CMS topic JSON discards English column names');
+          assert(cms.includes("$('#topicEnglish')"),'CMS topic editor not integrated');
+          assert(cms.includes('assets/signwell-e12-article.css'),'New CMS articles do not link E1.2 CSS');
+          assert(cmsHTML.includes('cms-app.js?build=24.36.3-e12-editorial-20261008'),'CMS JS cache invalidation missing');
+          for(const n of ['research','longevity','prevention','adolescent','aesthetics','mens-health','medical-affairs']){
+            assert(fs.existsSync('assets/topic-art/'+n+'.svg'),'Editorial illustration missing: '+n);
+          }
+          const idx=JSON.parse(read('articles/index.json'));
+          const tt=JSON.parse(read('topics/index.json'));
+          const pd=JSON.parse(read('public-data.json'));
+          assert(Array.isArray(idx)&&Array.isArray(tt)&&pd&&typeof pd==='object','Static data shape mismatch');
+          assert(read('sw.js').includes('signwellbio-20261008-editorial-e12-2'),'Service worker cache not bumped');
+          console.log('E1.2 integration checks PASS:',idx.length,'article entries /',tt.length,'topics');
+          NODE
