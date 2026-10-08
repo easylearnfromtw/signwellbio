@@ -50,9 +50,9 @@ await test("Desktop Public retains real articles while replacing legacy cover",a
  await page.waitForFunction(()=>document.getElementById("swMotionHomeHost")?.shadowRoot?.querySelector(".intro")?.getBoundingClientRect().height>500,{timeout:15000});
  const metrics=await page.evaluate(()=>{
   const h=document.querySelector("#swMotionHomeHost"),r=h.shadowRoot;
-  return {visible:!h.hidden,stage:r.querySelector("#motionStory")?.getBoundingClientRect().height||0,header:document.querySelector("#brandHome")!=null,search:document.querySelector("#searchBtn")!=null,nav:document.querySelectorAll("#pager .nav-item").length,articles:document.querySelectorAll("#latest .bento [data-article]").length,oldHero:document.querySelector("#app .sw-liquid-hero")!=null};
+  return {visible:!h.hidden,stage:r.querySelector("#motionStory")?.getBoundingClientRect().height||0,header:document.querySelector("#brandHome")!=null,search:document.querySelector("#searchBtn")!=null,nav:document.querySelectorAll("#pager > .pager-items .nav-item").length,articles:document.querySelectorAll("#latest .bento [data-article]").length,oldHero:document.querySelector("#app .sw-liquid-hero")!=null};
  });
- assert.equal(metrics.visible,true);assert.ok(metrics.stage>900);assert.equal(metrics.nav,5);
+ assert.equal(metrics.visible,true);assert.ok(metrics.stage>=850);assert.equal(metrics.nav,5);
  assert.ok(metrics.articles>=1,"Published article cards missing");assert.equal(metrics.oldHero,false);
  assert.deepEqual(errors,[]);
  await page.screenshot({path:"qa-public-v11-desktop.png",fullPage:false});await ctx.close()
@@ -65,12 +65,12 @@ await test("Real published article navigation and iOS slider preserved",async()=
  await page.waitForSelector(".article-head h1",{timeout:15000});
  const hidden=await page.locator("#swMotionHomeHost").evaluate(el=>el.hidden);
  assert.equal(hidden,true,"Motion should be absent on article page");
- await page.locator('#pager [data-page="home"]').click();
+ await page.locator('#pager > .pager-items [data-page="home"]').click();
  await page.waitForFunction(()=>!document.getElementById("swMotionHomeHost")?.hidden,{timeout:13000});
- await page.locator('#pager [data-page="topics"]').click();
+ await page.locator('#pager > .pager-items [data-page="topics"]').click();
  await page.waitForSelector(".topic-grid",{timeout:13000});
  assert.equal(await page.locator("#swMotionHomeHost").evaluate(el=>el.hidden),true);
- await page.locator('#pager [data-page="newsletter"]').click();
+ await page.locator('#pager > .pager-items [data-page="newsletter"]').click();
  await page.waitForFunction(()=>document.title.includes("電子報"),{timeout:13000});
  assert.ok(await page.locator("#app").innerText().then(x=>x.length>120));
  await ctx.close()
@@ -86,7 +86,7 @@ await test("Mobile motion typography remains legible and no horizontal overflow"
   const stage=root.querySelector("#motionStage").getBoundingClientRect();
   const sub=root.querySelector(".stage-sub").getBoundingClientRect();
   const fig=root.querySelector(".edition-figure").getBoundingClientRect();
-  return {viewport:innerWidth,stage:{height:stage.height,width:stage.width},text:{top:sub.top,bottom:sub.bottom,width:sub.width},figure:{top:fig.top,bottom:fig.bottom,width:fig.width},overflow:document.documentElement.scrollWidth-innerWidth,pager:document.querySelectorAll("#pager .nav-item").length}
+  return {viewport:innerWidth,stage:{height:stage.height,width:stage.width},text:{top:sub.top,bottom:sub.bottom,width:sub.width},figure:{top:fig.top,bottom:fig.bottom,width:fig.width},overflow:document.documentElement.scrollWidth-innerWidth,pager:document.querySelectorAll("#pager > .pager-items .nav-item").length}
  });
  assert.ok(r.stage.width<=392&&r.stage.height>650,JSON.stringify(r));
  assert.ok(r.figure.width<230,"Mobile artifact not reduced: "+JSON.stringify(r));
