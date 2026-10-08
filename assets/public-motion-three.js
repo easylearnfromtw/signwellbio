@@ -85,7 +85,7 @@
     stage.appendChild(host);
 
     let renderer, scene, camera, artifact, metal, lens, ring, gold, stroke, fill, bodyOutline;
-    let trigger = null, timeline = null, resizeObserver = null;
+    let trigger = null, timeline = null, resizeObserver = null, qualityObserver = null;
     let active = true;
     let lastProgress = -1;
     let width = 0, height = 0;
@@ -96,6 +96,7 @@
       trigger?.kill?.();
       timeline?.kill?.();
       resizeObserver?.disconnect();
+      qualityObserver?.disconnect();
       if (scene) {
         scene.traverse((node) => {
           if (node.geometry) node.geometry.dispose();
@@ -345,16 +346,13 @@
       resizeObserver.observe(host);
       addEventListener("resize", onResize, { passive: true });
       // Respect the existing governor when it downgrades quality after long tasks.
-      const qualityObserver = new MutationObserver(() => {
+      qualityObserver = new MutationObserver(() => {
         if (active) paint(lastProgress < 0 ? scrollProgress() : lastProgress);
       });
       qualityObserver.observe(document.documentElement, {
         attributes: true, attributeFilter: ["data-sw-gpu-profile"]
       });
-      const oldDispose = disposeAll;
-      // Disconnect the quality observer on page teardown or WebGL failure.
-      window.addEventListener("pagehide", () => qualityObserver.disconnect(), { once: true });
-      reduced.addEventListener?.("change", () => qualityObserver.disconnect(), { once: true });
+      // disposeAll handles the profile observer on context-loss and pagehide.
 
       canvas.addEventListener("webglcontextlost", (e) => {
         e.preventDefault();
