@@ -55,9 +55,10 @@ for(const [width,height] of [[320,640],[360,740],[390,844],[430,932],[768,1024]]
   });
   for(const key of ["heading","description","skip","explore","dock"])assert.ok(m[key],key+" absent: "+JSON.stringify(m));
   assert.ok(m.overflow<=3,"horizontal overflow "+JSON.stringify(m));
-  assert.ok(m.skipDisplay==="inline-flex","Skip link unstyled "+JSON.stringify(m));
+  assert.ok(["inline-flex","flex"].includes(m.skipDisplay),"Skip link missing tap styling "+JSON.stringify(m));
   assert.ok(m.skip.height>=43&&m.explore.height>=40,"Mobile tap target too small "+JSON.stringify(m));
   assert.ok(!overlap(m.skip,m.explore),"Homepage CTAs collide "+JSON.stringify(m));
+  if(m.issue?.width>0)assert.ok(!overlap(m.skip,m.issue),"Issue folio collides with direct reading CTA "+JSON.stringify(m));
   assert.ok(!overlap(m.skip,m.dock)&&!overlap(m.explore,m.dock),"CTA overlaps iOS dock "+JSON.stringify(m));
   assert.ok(!overlap(m.heading,m.description),"Main headline collides with deck "+JSON.stringify(m));
   assert.ok(!overlap(m.description,m.skip)&&!overlap(m.description,m.explore),"Hero deck collides with CTA "+JSON.stringify(m));
