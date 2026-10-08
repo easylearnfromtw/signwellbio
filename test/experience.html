@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="color-scheme" content="light">
 <meta name="description" content="SIGNWELL 欣緯生醫—專屬空間敘事動態實驗。">
-<title>Motion Study 03 / REAL 3D｜SIGNWELL 欣緯生醫</title>
+<title>Motion Study 04 / MOBILE READABILITY｜SIGNWELL 欣緯生醫</title>
 <style>
 :root{--bone:#efeee7;--ink:#171b1e;--sea:#7896a4;--gold:#dccf95;--pink:#d4b9c0;--serif:"Songti TC","Noto Serif TC","Source Han Serif TC",Georgia,serif;--sans:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",Arial,sans-serif}
 *,*:before,*:after{box-sizing:border-box}html{scroll-behavior:smooth;scrollbar-gutter:stable}body{margin:0;color:var(--ink);background:var(--bone);font-family:var(--sans);-webkit-font-smoothing:antialiased;min-width:0}body.exp-menu-open{overflow:hidden}[hidden]{display:none!important}
@@ -282,6 +282,82 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
  #motionStage .edition-figure{transition:none!important}
  .webgl-figure-host{display:none!important}
 }
+
+/* V04 — mobile-first readability: editorial copy has reserved clear space.
+   Deliberate overlap remains only over oversized decorative letterforms. */
+@media(max-width:720px){
+  #motionStage .stage-sub{
+    top:18%;left:24px;right:24px;
+    width:min(290px,calc(100% - 48px));max-width:290px;
+    z-index:2;
+  }
+  #motionStage .stage-sub b{
+    font-size:10px;line-height:1.7;letter-spacing:.19em;
+  }
+  #motionStage .stage-sub p{
+    font-size:13px;line-height:1.85;max-width:26em;
+    margin:13px 0 0;
+  }
+  #motionStage .stage-page-inner,
+  #motionStage .final-page .stage-page-inner{
+    top:17%;left:24px;right:24px;max-width:calc(100% - 48px);
+  }
+  #motionStage .stage-page-kicker{
+    font-size:10px;line-height:1.7;letter-spacing:.15em;
+  }
+  #motionStage .stage-page h2{
+    margin:19px 0 13px;
+    max-width:100%;
+    font-size:clamp(33px,8.3vw,43px);
+    line-height:1.27;letter-spacing:-.055em;
+    text-wrap:balance;
+  }
+  #motionStage .stage-page p{
+    margin:0;max-width:27em;
+    font-size:13px;line-height:1.9;
+  }
+  /* The 3D artifact occupies the lower-right; copy stays on upper-left. */
+  #motionStage .edition-figure{
+    width:clamp(140px,43vw,198px);
+    left:71%;top:71%;
+    filter:drop-shadow(12px 16px 11px #081b253a);
+  }
+  #motionStage .story-caption{
+    left:24px;width:calc(100% - 48px);
+    bottom:15%;font-size:8px;line-height:1.75;
+  }
+  #motionStage .story-caption span:last-child{display:none}
+  #motionStage .story-progress{left:24px;bottom:11%;width:118px}
+  #motionStage .webgl-status{
+    top:11.8%;bottom:auto;right:24px;
+    font-size:8px;padding:6px 8px;
+    background:#18272c3d;
+  }
+  #motionStage .stage-page:not(.final-page) .stage-page-inner{
+    opacity:var(--mid-text-opacity,1);
+    transition:opacity .16s linear;
+  }
+  #motionStage .final-page .stage-page-inner{
+    opacity:var(--last-text-opacity,1);
+    transition:opacity .16s linear;
+  }
+}
+/* Smaller-height phones need a little more headroom. */
+@media(max-width:720px) and (max-height:730px){
+  #motionStage .stage-sub{top:17%}
+  #motionStage .stage-page-inner,
+  #motionStage .final-page .stage-page-inner{top:16%}
+  #motionStage .stage-page h2{
+    font-size:clamp(29px,7.8vw,38px);line-height:1.2;margin:14px 0 11px;
+  }
+  #motionStage .stage-page p{font-size:12px;line-height:1.75}
+  #motionStage .edition-figure{width:clamp(130px,39vw,182px);top:73%}
+}
+/* 2D safety state retains text even with reduced motion. */
+@media(prefers-reduced-motion:reduce){
+  #motionStage .stage-page-inner{opacity:1!important;transition:none!important}
+}
+
 </style>
 <link rel="stylesheet" href="assets/site.css">
 <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
@@ -377,6 +453,13 @@ function update(){
  const finalRise=smooth((p-.58)/.30);
  stage.style.setProperty("--panel-y", (100-rise*100).toFixed(2)+"%");
  stage.style.setProperty("--final-y",(100-finalRise*100).toFixed(2)+"%");
+ if(matchMedia("(max-width: 720px)").matches){
+  stage.style.setProperty("--mid-text-opacity",smooth((rise-.75)/.24).toFixed(3));
+  stage.style.setProperty("--last-text-opacity",smooth((finalRise-.75)/.24).toFixed(3));
+ }else{
+  stage.style.setProperty("--mid-text-opacity","1");
+  stage.style.setProperty("--last-text-opacity","1");
+ }
  stage.style.setProperty("--story-progress",(p*100).toFixed(1)+"%");
  stage.style.setProperty("--figure-y",lerp(30,-42,p).toFixed(1)+"px");
  stage.style.setProperty("--figure-rotate",lerp(-12,11,p).toFixed(1)+"deg");
