@@ -1,5 +1,5 @@
 /**
- * SIGNWELL BIO / Motion Study 03
+ * SIGNWELL BIO / Public Motion V12 — 2K Adaptive GPU / Silhouette Outline
  * Three.js 0.180.0 + GSAP ScrollTrigger 3.13.0
  * Static GitHub Pages-compatible progressive enhancement.
  * Rendering happens only on scroll/resize; CSS figure stays as fallback.
@@ -18,7 +18,28 @@
   // The host is mounted only on the Public home route; hide gracefully elsewhere.
   const mobile = matchMedia("(max-width: 720px)");
   const clamp = (n, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
-  const defaultStatus = status ? status.textContent : "";
+  const gpuProfile = () => {
+    const profile = document.documentElement.dataset.swGpuProfile || "balanced";
+    return /lite/.test(profile) ? "lite" : profile === "high" ? "high" : "balanced";
+  };
+  const adaptiveRatio = (width, height) => {
+    // 2K-class cap is for the actual GPU draw surface, not the whole page.
+    // High-end desktop deliberately supersamples above the screen DPR when safe.
+    const profile = gpuProfile();
+    const handheld = mobile.matches;
+    const qualityCap = profile === "lite" ? 1.1
+      : handheld ? 1.55
+      : profile === "high" ? 2.7 : 1.85;
+    const pixelBudget = profile === "lite" ? 850000
+      : handheld ? 1350000
+      : profile === "high" ? 4200000 : 2400000;
+    const deviceRatio = Math.max(1, Number(window.devicePixelRatio) || 1);
+    const requested = profile === "high" && !handheld
+      ? Math.max(deviceRatio, 2.55) : deviceRatio;
+    const pixelLimit = Math.sqrt(pixelBudget / Math.max(1, width * height));
+    const edgeLimit = Math.min(2048 / width, 2048 / height);
+    return Math.max(0.8, Math.min(requested, qualityCap, pixelLimit, edgeLimit));
+  };
   const setStatus = (t, mode) => {
     if (status) status.textContent = t;
     stage.dataset.renderer = mode;
@@ -63,17 +84,19 @@
     host.appendChild(canvas);
     stage.appendChild(host);
 
-    let renderer, scene, camera, artifact, metal, lens, ring, gold, stroke, fill;
-    let trigger = null, timeline = null, resizeObserver = null;
+    let renderer, scene, camera, artifact, metal, lens, ring, gold, stroke, fill, bodyOutline;
+    let trigger = null, timeline = null, resizeObserver = null, qualityObserver = null;
     let active = true;
     let lastProgress = -1;
     let width = 0, height = 0;
 
     const disposeAll = () => {
+      if (!active) return;
       active = false;
       trigger?.kill?.();
       timeline?.kill?.();
       resizeObserver?.disconnect();
+      qualityObserver?.disconnect();
       if (scene) {
         scene.traverse((node) => {
           if (node.geometry) node.geometry.dispose();
@@ -91,12 +114,14 @@
       renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: true,
-        antialias: !mobile.matches,
-        powerPreference: "high-performance",
-        preserveDrawingBuffer: false
+        antialias: true, // MSAA at all breakpoints; crop the framebuffer instead.
+        powerPreference: mobile.matches || gpuProfile() === "lite" ? "default" : "high-performance",
+        preserveDrawingBuffer: false,
+        stencil: false
       });
       // Three.js r180 already requires WebGL2; successful renderer creation is the capability check.
-      renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile.matches ? 1.3 : 1.75));
+      renderer.setPixelRatio(1); // Adaptive ratio is set after the viewport is measured.
+      renderer.shadowMap.enabled = false;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.5;
@@ -137,7 +162,7 @@
       const bodyGeo = new THREE.ExtrudeGeometry(roundedShape(2.55, 3.24, 0.08), {
         steps: 1, depth: 0.29, bevelEnabled: true,
         bevelThickness: 0.056, bevelSize: 0.05,
-        bevelSegments: 3, curveSegments: 5
+        bevelSegments: mobile.matches ? 5 : 7, curveSegments: mobile.matches ? 12 : 16
       });
       bodyGeo.center();
 
@@ -147,6 +172,14 @@
         side: THREE.FrontSide
       });
       const body = new THREE.Mesh(bodyGeo, metal);
+      // Back-face hull produces a solid art-directed outer silhouette.
+      // Unlike WebGL lineWidth it is hardware-independent and MSAA smooths it.
+      const outlineMaterial = new THREE.MeshBasicMaterial({
+        color: 0x25343b, side: THREE.BackSide, depthWrite: true
+      });
+      bodyOutline = new THREE.Mesh(bodyGeo, outlineMaterial);
+      bodyOutline.scale.setScalar(mobile.matches ? 1.034 : 1.022);
+      artifact.add(bodyOutline);
       artifact.add(body);
 
       const inset = new THREE.Mesh(
@@ -163,13 +196,15 @@
         color: 0x859da5, metalness: 0.55, roughness: 0.11,
         clearcoat: 1, clearcoatRoughness: 0.07
       });
-      lens = new THREE.Mesh(new THREE.SphereGeometry(0.79, 48, 32), lightDiskMat);
+      lens = new THREE.Mesh(new THREE.SphereGeometry(
+        0.79, mobile.matches ? 56 : 88, mobile.matches ? 40 : 64
+      ), lightDiskMat);
       lens.scale.z = 0.28;
       lens.position.set(0, 0.44, 0.37);
       artifact.add(lens);
 
       ring = new THREE.Mesh(
-        new THREE.TorusGeometry(0.824, 0.034, 12, 72),
+        new THREE.TorusGeometry(0.824, 0.032, mobile.matches ? 12 : 20, mobile.matches ? 80 : 128),
         new THREE.MeshStandardMaterial({ color: 0xe9e3d5, metalness: 0.75, roughness: 0.19 })
       );
       ring.position.set(0, 0.44, 0.47);
@@ -185,17 +220,18 @@
       // Text is printed onto the 3D object using a local CanvasTexture.
       // No image download; improves consistency with editorial typography.
       const c = document.createElement("canvas");
-      c.width = 1024; c.height = 310;
+      // 2K texture for editorial lettering; no low-resolution bitmap enlargement.
+      c.width = 2048; c.height = 620;
       const ctx = c.getContext("2d");
       if (!ctx) throw new Error("Canvas 2D unavailable");
       ctx.clearRect(0, 0, c.width, c.height);
       ctx.fillStyle = "#182933";
       ctx.textBaseline = "alphabetic";
-      ctx.font = "800 160px Arial, sans-serif";
-      ctx.fillText("SIGNWELL.", 24, 166);
-      ctx.font = "600 33px Arial, sans-serif";
-      ctx.letterSpacing = "5px";
-      ctx.fillText("BIO  /  THE HUMAN CONDITION", 30, 238);
+      ctx.font = "800 320px Arial, sans-serif";
+      ctx.fillText("SIGNWELL.", 48, 332);
+      ctx.font = "600 66px Arial, sans-serif";
+      if ("letterSpacing" in ctx) ctx.letterSpacing = "10px";
+      ctx.fillText("BIO  /  THE HUMAN CONDITION", 60, 476);
       const texture = new THREE.CanvasTexture(c);
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 4);
@@ -216,7 +252,9 @@
       artifact.add(microLines);
 
       const pose = { rx: -0.11, ry: -0.34, rz: -0.12, y: 0, scale: 1 };
-      const initPose = { ...pose };
+      const cool = new THREE.Color(0xa9b6ba);
+      const warmColor = new THREE.Color(0xd6cfb8);
+      const blue = new THREE.Color(0x9db9b9);
       const gsap = window.gsap, ScrollTrigger = window.ScrollTrigger;
       const useGSAP = !!(gsap && ScrollTrigger);
       const sample = (p) => {
@@ -234,17 +272,23 @@
         return { rx: -0.11 + e * 0.2, ry: 1.52 + e * 1.07, rz: -0.02 + e * 0.13, y: -0.04 + e * 0.17, scale: 1.02 + e * 0.14 };
       };
 
+      let pixelRatio = 0;
       function resize() {
         if (!active) return;
-        const w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight);
-        if (w === width && h === height) return;
-        width = w; height = h;
-        renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile.matches ? 1.3 : 1.75));
+        const w = Math.max(1, Math.round(host.clientWidth));
+        const h = Math.max(1, Math.round(host.clientHeight));
+        const ratio = adaptiveRatio(w, h);
+        if (w === width && h === height && Math.abs(pixelRatio - ratio) < 0.01) return;
+        width = w; height = h; pixelRatio = ratio;
+        renderer.setPixelRatio(ratio);
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
-        // Keep object readable in portrait without dominating the typography.
-        camera.position.z = mobile.matches ? 10.8 : 10.0;
+        // Cropped render surface: same model footprint for far fewer GPU pixels.
+        camera.position.z = mobile.matches ? 5.85 : 8.25;
         camera.updateProjectionMatrix();
+        canvas.dataset.pixelRatio = ratio.toFixed(2);
+        canvas.dataset.resolution = canvas.width + "x" + canvas.height;
+        canvas.dataset.quality = gpuProfile();
       }
       function paint(p) {
         if (!active || document.hidden) return;
@@ -257,13 +301,13 @@
         // Camera x/y use world units, not CSS pixels; perspective still works.
         if (mobile.matches) {
           const shortScreen = innerHeight < 730;
-          artifact.position.set(0.72, -1.40 + v.y * 0.30, 0);
-          artifact.scale.setScalar(v.scale * (shortScreen ? 0.48 : 0.54));
+          // Canvas itself sits in the phone's lower-right reading-safe zone.
+          artifact.position.set(0, v.y * 0.25, 0);
+          artifact.scale.setScalar(v.scale * (shortScreen ? 0.53 : 0.57));
         } else {
           artifact.position.set(0, v.y, 0);
           artifact.scale.setScalar(v.scale * 1.07);
         }
-        const cool = new THREE.Color(0xa9b6ba), warmColor = new THREE.Color(0xd6cfb8), blue = new THREE.Color(0x9db9b9);
         const alpha = Math.min(1, Math.max(0, (t - 0.16) / 0.31));
         const beta = Math.min(1, Math.max(0, (t - 0.57) / 0.3));
         metal.color.copy(cool).lerp(warmColor, alpha).lerp(blue, beta);
@@ -299,8 +343,16 @@
 
       const onResize = () => { if (active) paint(scrollProgress()); };
       resizeObserver = new ResizeObserver(onResize);
-      resizeObserver.observe(stage);
+      resizeObserver.observe(host);
       addEventListener("resize", onResize, { passive: true });
+      // Respect the existing governor when it downgrades quality after long tasks.
+      qualityObserver = new MutationObserver(() => {
+        if (active) paint(lastProgress < 0 ? scrollProgress() : lastProgress);
+      });
+      qualityObserver.observe(document.documentElement, {
+        attributes: true, attributeFilter: ["data-sw-gpu-profile"]
+      });
+      // disposeAll handles the profile observer on context-loss and pagehide.
 
       canvas.addEventListener("webglcontextlost", (e) => {
         e.preventDefault();
@@ -313,7 +365,7 @@
       paint(scrollProgress());
       stage.classList.add("is-webgl-ready");
       stage.dataset.renderer = useGSAP ? "three-gsap" : "three";
-      setStatus(useGSAP ? "THREE.JS + GSAP / LIVE 3D" : "THREE.JS / LIVE 3D", useGSAP ? "three-gsap" : "three");
+      setStatus(useGSAP ? "THREE.JS + GSAP / OUTLINE 3D" : "THREE.JS / OUTLINE 3D", useGSAP ? "three-gsap" : "three");
 
       document.addEventListener("visibilitychange", () => {
         if (!document.hidden && active) paint(lastProgress < 0 ? scrollProgress() : lastProgress);

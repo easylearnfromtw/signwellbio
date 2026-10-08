@@ -21,7 +21,7 @@ const server=http.createServer((req,res)=>{
 });
 await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
 const base="http://127.0.0.1:"+server.address().port+"/";
-const browser=await chromium.launch({headless:true,args:["--no-sandbox"]});
+const browser=await chromium.launch({headless:true,args:["--no-sandbox","--use-angle=swiftshader","--enable-unsafe-swiftshader"]});
 const outcomes=[];
 async function test(name,fn){
  try{await fn();outcomes.push({name,pass:true});console.log("PASS "+name)}
@@ -153,6 +153,83 @@ await test("Late-loaded motion frontend hydrates latest published CMS snapshot",
  assert.ok(status.title.includes(status.expectedLead),JSON.stringify(status));
  assert.equal(status.publishedFeatures,status.expectedFeatured,JSON.stringify(status));
  await ctx.close();
+});
+
+await test("Real Three.js WebGL 2K-adaptive buffer and silhouette render",async()=>{
+ const ctx=await openContext(1280,860,{reducedMotion:"no-preference"});
+ // Keep the test deterministic: serve the pinned Three distribution locally
+ // instead of depending on the CDN's availability.
+ await ctx.route("https://cdn.jsdelivr.net/npm/three@0.180.0/build/**",async route=>{
+  const file=route.request().url().split("/build/")[1]?.split("?")[0];
+  if(!["three.module.js","three.core.js"].includes(file)){await route.abort();return}
+  await route.fulfill({
+   path:path.join(baseDir,"node_modules","three","build",file),
+   headers:{"access-control-allow-origin":"*","content-type":"text/javascript"}
+  });
+ });
+ const page=await ctx.newPage();const errors=[];
+ page.on("pageerror",e=>errors.push(String(e)));
+ await page.goto(home(),{waitUntil:"domcontentloaded"});
+ await page.waitForFunction(()=>!document.getElementById("swMotionHomeHost")?.hidden,{timeout:16000});
+ await page.evaluate(()=>document.getElementById("swMotionHomeHost")?.shadowRoot?.getElementById("motionStory")?.scrollIntoView());
+ await page.waitForFunction(()=>{
+  const stage=document.getElementById("swMotionHomeHost")?.shadowRoot?.getElementById("motionStage");
+  return stage?.dataset.renderer?.startsWith("three");
+ },{timeout:27000});
+ const metrics=await page.evaluate(()=>{
+  const root=document.getElementById("swMotionHomeHost").shadowRoot;
+  const host=root.querySelector(".webgl-figure-host");
+  const canvas=root.querySelector(".webgl-figure-canvas");
+  return {stageWidth:root.querySelector("#motionStage").clientWidth,
+   canvasCssWidth:host.clientWidth,canvasCssHeight:host.clientHeight,
+   bufferWidth:canvas.width,bufferHeight:canvas.height,
+   resolution:canvas.dataset.resolution,
+   quality:canvas.dataset.quality,
+   maxRatio:parseFloat(canvas.dataset.pixelRatio),
+   renderer:root.getElementById("motionStage").dataset.renderer};
+ });
+ assert.ok(metrics.bufferWidth>0&&metrics.bufferHeight>0,JSON.stringify(metrics));
+ assert.ok(metrics.bufferWidth<=2048&&metrics.bufferHeight<=2048,"Exceeds 2K cap: "+JSON.stringify(metrics));
+ assert.ok(metrics.canvasCssWidth<metrics.stageWidth*.85,"Did not crop GPU buffer: "+JSON.stringify(metrics));
+ assert.ok(metrics.maxRatio>=.8&&metrics.maxRatio<=2.71,"DPR governor invalid: "+JSON.stringify(metrics));
+ assert.ok(!errors.length,"Page errors: "+errors.join("; "));
+ console.log("GPU desktop metrics",JSON.stringify(metrics));
+ await page.screenshot({path:"qa-public-v12-webgl-desktop.png",fullPage:false});
+ await ctx.close()
+});
+await test("Mobile WebGL canvas stays in reading-safe area at Retina DPR",async()=>{
+ const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:3,reducedMotion:"no-preference"});
+ await ctx.route("**/*",r=>r.request().url().startsWith(base)?r.continue():r.abort());
+ await ctx.route("https://cdn.jsdelivr.net/npm/three@0.180.0/build/**",async route=>{
+  const file=route.request().url().split("/build/")[1]?.split("?")[0];
+  if(!["three.module.js","three.core.js"].includes(file)){await route.abort();return}
+  await route.fulfill({path:path.join(baseDir,"node_modules","three","build",file),headers:{"access-control-allow-origin":"*","content-type":"text/javascript"}})
+ });
+ const page=await ctx.newPage();
+ await page.goto(home(),{waitUntil:"domcontentloaded"});
+ await page.waitForFunction(()=>!document.getElementById("swMotionHomeHost")?.hidden,{timeout:16000});
+ await page.evaluate(()=>document.getElementById("swMotionHomeHost").shadowRoot.getElementById("motionStory").scrollIntoView());
+ await page.waitForFunction(()=>{
+  const stage=document.getElementById("swMotionHomeHost")?.shadowRoot?.getElementById("motionStage");
+  return stage?.dataset.renderer?.startsWith("three");
+ },{timeout:27000});
+ const m=await page.evaluate(()=>{
+  const r=document.getElementById("swMotionHomeHost").shadowRoot;
+  const canvas=r.querySelector(".webgl-figure-canvas");
+  const bounds=r.querySelector(".webgl-figure-host").getBoundingClientRect();
+  const heading=r.querySelector(".stage-sub").getBoundingClientRect();
+  return {view:innerWidth,ratio:parseFloat(canvas.dataset.pixelRatio),
+   quality:canvas.dataset.quality,pixels:canvas.width*canvas.height,
+   buffer:[canvas.width,canvas.height],canvas:bounds.toJSON(),
+   heading:heading.toJSON()};
+ });
+ assert.ok(m.ratio<=1.56,"Mobile DPR too high: "+JSON.stringify(m));
+ assert.ok(m.pixels<=1350000,"Mobile GPU budget exceeded: "+JSON.stringify(m));
+ assert.ok(m.heading.bottom<m.canvas.top+55,"Foreground blocks legible text: "+JSON.stringify(m));
+ assert.ok(m.canvas.width<m.view,"Canvas unexpectedly full viewport width: "+JSON.stringify(m));
+ console.log("GPU mobile metrics",JSON.stringify({ratio:m.ratio,quality:m.quality,buffer:m.buffer,canvasWidth:m.canvas.width}));
+ await page.screenshot({path:"qa-public-v12-webgl-mobile.png",fullPage:false});
+ await ctx.close()
 });
 
 await browser.close();await new Promise(resolve=>server.close(resolve));
