@@ -1,42 +1,144 @@
 [
   {
+    "id": "topic-editorial-research",
+    "name": "白話醫學論文專欄",
+    "slug": "research",
+    "english": "MEDICAL LITERATURE",
+    "description": "解析研究脈絡、證據強度與臨床意義。",
+    "cover": "assets/topic-art/research.svg",
+    "legacyNames": [],
+    "order": 0,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blue"
+  },
+  {
+    "id": "topic-editorial-longevity",
+    "name": "抗衰老醫學專欄",
+    "slug": "longevity",
+    "english": "LONGEVITY MEDICINE",
+    "description": "從老化生物學到健康壽命與生活策略。",
+    "cover": "assets/topic-art/longevity.svg",
+    "legacyNames": [
+      "抗衰老醫學"
+    ],
+    "order": 1,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "butter"
+  },
+  {
+    "id": "topic-editorial-prevention",
+    "name": "預防醫學專欄",
+    "slug": "prevention",
+    "english": "PREVENTIVE MEDICINE",
+    "description": "從風險評估、篩檢與早期介入看健康。",
+    "cover": "assets/topic-art/prevention.svg",
+    "legacyNames": [],
+    "order": 2,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "linen"
+  },
+  {
+    "id": "topic-editorial-adolescent",
+    "name": "青少年專欄",
+    "slug": "adolescent",
+    "english": "ADOLESCENT HEALTH",
+    "description": "成長、心理、身體發育與青春期健康。",
+    "cover": "assets/topic-art/adolescent.svg",
+    "legacyNames": [],
+    "order": 3,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blush"
+  },
+  {
+    "id": "topic-editorial-aesthetics",
+    "name": "美學醫學專欄",
+    "slug": "aesthetics",
+    "english": "AESTHETIC MEDICINE",
+    "description": "以醫學證據解讀外觀、輪廓與審美。",
+    "cover": "assets/topic-art/aesthetics.svg",
+    "legacyNames": [
+      "醫美科普"
+    ],
+    "order": 4,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blush"
+  },
+  {
+    "id": "topic-editorial-mens-health",
+    "name": "男性醫學專欄",
+    "slug": "mens-health",
+    "english": "MEN'S MEDICINE",
+    "description": "男性健康、體態、代謝與自我照護。",
+    "cover": "assets/topic-art/mens-health.svg",
+    "legacyNames": [],
+    "order": 5,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blue"
+  },
+  {
+    "id": "topic-editorial-medical-affairs",
+    "name": "時事醫學專欄",
+    "slug": "medical-affairs",
+    "english": "MEDICAL PERSPECTIVES",
+    "description": "從重要醫療事件回到證據與社會脈絡。",
+    "cover": "assets/topic-art/medical-affairs.svg",
+    "legacyNames": [
+      "時事探討"
+    ],
+    "order": 6,
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "butter"
+  },
+  {
     "id": "topic-1789132939821",
     "name": "營養品科普",
     "slug": "swmedical",
     "description": "",
-    "order": 0,
-    "active": true
+    "order": 107,
+    "active": false,
+    "tapeFeatured": false
   },
   {
     "id": "topic-1789132972590",
     "name": "減重醫學",
     "slug": "nonfat",
     "description": "",
-    "order": 1,
-    "active": true
+    "order": 108,
+    "active": false,
+    "tapeFeatured": false
   },
   {
     "id": "topic-1789133007315",
     "name": "抗衰老醫學",
     "slug": "抗衰老醫學",
     "description": "",
-    "order": 2,
-    "active": true
+    "order": 109,
+    "active": false,
+    "tapeFeatured": false
   },
   {
     "id": "topic-1789133021571",
     "name": "醫美科普",
     "slug": "醫美科普",
     "description": "",
-    "order": 3,
-    "active": true
+    "order": 110,
+    "active": false,
+    "tapeFeatured": false
   },
   {
     "id": "topic-1789204762177",
     "name": "時事探討",
     "slug": "signwellnownews",
     "description": "",
-    "order": 4,
-    "active": true
+    "order": 111,
+    "active": false,
+    "tapeFeatured": false
   }
 ]

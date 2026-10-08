@@ -1,0 +1,366 @@
+/* SIGNWELL BIO · Editorial Inner Pages / Palette 01
+   Scope contract:
+   - No styling applies to the Public homepage or its Three.js ShadowRoot.
+   - CMS routes, newsletter protocol, article content and iOS dock behavior untouched.
+   - Warm linen paper is the dominant canvas; powder blue, butter yellow
+     and powder rose are used as restrained editorial punctuation.
+*/
+:root{
+  --sw-e-linen:#f6f3ea;
+  --sw-e-paper:#fffcf6;
+  --sw-e-blue:#e4eef2;
+  --sw-e-blue-2:#d3e4eb;
+  --sw-e-butter:#f5eccd;
+  --sw-e-butter-2:#ede0af;
+  --sw-e-blush:#f4e4e8;
+  --sw-e-blush-2:#edcfd9;
+  --sw-e-ink:#263339;
+  --sw-e-muted:#606a6d;
+  --sw-e-line:#dcd9cf;
+  --sw-e-accent:#446878;
+}
+body:has(#app :is(.page-hero,.article-view,.share-card,.newsletter-experience)){
+  --ink:var(--sw-e-ink);
+  --ink-2:#374950;
+  --ink-3:#556167;
+  --muted:var(--sw-e-muted);
+  --muted-2:#798382;
+  --paper:var(--sw-e-paper);
+  --paper-2:var(--sw-e-linen);
+  --paper-3:var(--sw-e-blue);
+  --canvas:var(--sw-e-linen);
+  --blue:var(--sw-e-accent);
+  --blue-2:#7498a6;
+  --blue-soft:var(--sw-e-blue);
+  --green:#507166;
+  --green-soft:#e7eee2;
+  --line:rgba(75,82,78,.12);
+  --line-2:rgba(75,82,78,.19);
+  background:var(--sw-e-linen);
+  color:var(--sw-e-ink);
+}
+/* Ambient color replaces cool-white glows only while an inner route is active.
+   Fixed GPU layers are not multiplied, and the home scene stays unchanged. */
+body.sw-ambient-enabled:has(#app :is(.page-hero,.article-view,.share-card,.newsletter-experience)){
+  background:linear-gradient(180deg,var(--sw-e-linen),#fbf9f3 80%,var(--sw-e-linen));
+}
+body.sw-ambient-enabled:has(#app :is(.page-hero,.article-view,.share-card,.newsletter-experience)) .sw-ambient-pages::before{
+  background:
+    radial-gradient(65% 45% at 9% 10%,rgba(222,237,243,.54),transparent 69%),
+    radial-gradient(55% 45% at 93% 25%,rgba(244,222,227,.43),transparent 70%),
+    radial-gradient(60% 45% at 50% 94%,rgba(246,232,193,.35),transparent 67%),
+    linear-gradient(180deg,#f7f4ec,#f8f5ed);
+}
+body.sw-ambient-enabled:has(#app :is(.page-hero,.article-view,.share-card,.newsletter-experience)) .sw-ambient-pages::after{
+  opacity:.12;
+  filter:blur(12px);
+}
+/* Shared understated editorial typography and navigational controls. */
+body:has(#app :is(.page-hero,.article-view,.share-card,.newsletter-experience)) #app{
+  color:var(--sw-e-ink);
+}
+body:has(#app :is(.page-hero,.article-view,.share-card,.newsletter-experience)) #app :is(h1,h2,h3){
+  color:var(--sw-e-ink);
+}
+body:has(#app :is(.page-hero,.article-view,.share-card,.newsletter-experience)) #app a:focus-visible,
+body:has(#app :is(.page-hero,.article-view,.share-card,.newsletter-experience)) #app button:focus-visible{
+  outline:2px solid #628395;
+  outline-offset:4px;
+}
+body:has(#app :is(.page-hero,.article-view,.share-card,.newsletter-experience)) :is(.brand-top,.top-actions .iconbtn){
+  border-color:rgba(180,180,169,.36);
+}
+/* TOPICS — blue as the information/navigation accent, linen behind cards. */
+body:has(#app .topic-grid) #app .page-hero{
+  max-width:none;
+  position:relative;
+  padding:clamp(65px,8vw,112px) clamp(23px,5vw,72px) clamp(36px,5vw,66px);
+  margin:0 0 clamp(27px,4vw,46px);
+  border:1px solid rgba(137,164,168,.22);
+  background:
+    radial-gradient(ellipse at 97% 0%,rgba(209,230,238,.76),transparent 54%),
+    linear-gradient(125deg,var(--sw-e-paper) 0%,#f1f2e9 66%,var(--sw-e-blue) 100%);
+}
+body:has(#app .topic-grid) #app .page-hero .eyebrow{color:#527387}
+body:has(#app .topic-grid) #app .page-hero p{color:#55696d;max-width:50em}
+body:has(#app .topic-grid) #app .topic-card{
+  border:1px solid rgba(109,135,140,.23);
+  background:var(--sw-e-paper);
+  box-shadow:0 14px 38px -32px rgba(40,69,77,.32);
+}
+body:has(#app .topic-grid) #app .topic-card:nth-child(3n+1){
+  background:linear-gradient(135deg,#f8fbf9,var(--sw-e-blue));
+}
+body:has(#app .topic-grid) #app .topic-card:nth-child(3n+2){
+  background:linear-gradient(145deg,var(--sw-e-paper),#faf4e0);
+}
+body:has(#app .topic-grid) #app .topic-card:nth-child(3n){
+  background:linear-gradient(145deg,var(--sw-e-paper),#f7e9ec);
+}
+body:has(#app .topic-grid) #app .topic-card.is-active{
+  border-color:#7293a1;
+  box-shadow:0 0 0 2px rgba(101,148,165,.18),0 18px 45px -28px rgba(43,77,85,.3);
+}
+body:has(#app .topic-grid) #app .topic-card .topic-icon{
+  background:linear-gradient(145deg,#799eab,#466879);
+  box-shadow:0 8px 20px -12px rgba(56,88,99,.55);
+}
+body:has(#app .topic-grid) #app #topicArticles .article-card{
+  background:var(--sw-e-paper);
+  border-color:rgba(131,150,148,.22);
+}
+/* ABOUT — buttermilk principle panel, powder-blue author surfaces. */
+body:has(#app .manifesto) #app .page-hero{
+  padding:clamp(62px,8vw,104px) clamp(23px,5vw,72px) clamp(35px,5vw,62px);
+  max-width:none;
+  margin-bottom:23px;
+  border:1px solid rgba(189,167,117,.22);
+  background:
+    radial-gradient(ellipse at 88% 8%,rgba(247,236,202,.78),transparent 56%),
+    linear-gradient(140deg,#fffdf8,#f8f1de);
+}
+body:has(#app .manifesto) #app .page-hero .eyebrow{color:#816d45}
+body:has(#app .manifesto) #app .manifesto{
+  background:linear-gradient(145deg,var(--sw-e-butter),#fffaf0 90%);
+  border:1px solid #e6d7ad;
+  box-shadow:0 18px 42px -32px rgba(113,87,41,.28);
+}
+body:has(#app .manifesto) #app .manifesto::after{
+  background:radial-gradient(circle,rgba(244,208,220,.6),transparent 68%);
+}
+body:has(#app .manifesto) #app .person-card{
+  background:var(--sw-e-paper);
+  border:1px solid rgba(113,140,148,.20);
+  box-shadow:0 12px 34px -29px rgba(48,70,75,.32);
+}
+body:has(#app .manifesto) #app .person-card:nth-child(3n+1){background:linear-gradient(155deg,var(--sw-e-paper),#edf4f4)}
+body:has(#app .manifesto) #app .person-card:nth-child(3n+2){background:linear-gradient(155deg,var(--sw-e-paper),#f7eced)}
+body:has(#app .manifesto) #app .person-tags span{background:var(--sw-e-blue);color:#426372}
+/* ARTICLES — the body remains quiet linen; context and annotations use pastel ink. */
+body:has(#app .article-view) #app .article-view{
+  background:transparent;
+}
+body:has(#app .article-view) #app .article-head{
+  position:relative;
+  border-bottom:1px solid var(--sw-e-line);
+}
+body:has(#app .article-view) #app .article-head .kicker,
+body:has(#app .article-view) #app .article-crumbs .cat{
+  background:var(--sw-e-blue);
+  color:#426779;
+}
+body:has(#app .article-view) #app .article-head h1{color:var(--sw-e-ink)}
+body:has(#app .article-view) #app .article-body{
+  color:#303a3a;
+}
+body:has(#app .article-view) #app .summary10s{
+  border:1px solid #d4e2e6;
+  background:linear-gradient(140deg,#fafdfe,var(--sw-e-blue));
+  box-shadow:0 13px 35px -30px rgba(64,105,113,.36);
+}
+body:has(#app .article-view) #app .summary10s::before{
+  background:linear-gradient(var(--sw-e-accent),#ba8a9b);
+}
+body:has(#app .article-view) #app .article-body :is(blockquote,.quote){
+  background:#fcf5dd;
+  border-color:#c6b584;
+}
+body:has(#app .article-view) #app .article-body :is(mark,.core){
+  background:#f9edc1;
+  color:#38352b;
+}
+body:has(#app .article-view) #app .article-body a{color:#456c7d}
+body:has(#app .article-view) #app .article-cover{background:var(--sw-e-blue)}
+body:has(#app .article-view) #app :is(.article-actions .softbtn,.article-crumbs .cat,.sw-reader-panel){
+  border-color:#d5deda;
+}
+/* SHARE — blush as a soft frame; QR itself stays uncolored for reliable scans. */
+body:has(#app .share-card) #app .share-scene{
+  background:transparent;
+}
+body:has(#app .share-card) #app .share-card{
+  background:linear-gradient(135deg,#fffdf9 0%,#faeff0 75%,var(--sw-e-blush) 100%);
+  border:1px solid #e9d4db;
+  box-shadow:0 23px 56px -35px rgba(116,81,94,.30);
+}
+body:has(#app .share-card) #app .share-card .kicker{color:#875d6d}
+body:has(#app .share-card) #app .share-url{
+  background:#fffbf5;
+  border:1px solid #e3d9d7;
+}
+body:has(#app .share-card) #app .share-url input{
+  background:transparent;color:var(--sw-e-ink);
+}
+body:has(#app .share-card) #app .share-qr-pane{
+  background:linear-gradient(135deg,var(--sw-e-blue),#f6f9f6);
+}
+body:has(#app .share-card) #app .share-qr-card{
+  background:linear-gradient(150deg,#fffcf7,#e8f2f4);
+  border-color:#cedfe2;
+}
+body:has(#app .share-card) #app .share-qr{
+  background:#fff;
+}
+/* NEWSLETTER — linen reading field, blush card, yellow consent/notice cues. */
+body:has(#app .newsletter-experience) #app .newsletter-experience{
+  background:transparent;
+}
+body:has(#app .newsletter-experience) #app .newsletter-card{
+  background:linear-gradient(145deg,#fffdf7 0%,#fff9f5 55%,#f8edf0);
+  border:1px solid #e7d9d6;
+  box-shadow:0 22px 52px -35px rgba(109,82,87,.28);
+}
+body:has(#app .newsletter-experience) #app .newsletter-main .kicker{color:#946d7b}
+body:has(#app .newsletter-experience) #app .newsletter-lead{color:#5e6b6f}
+body:has(#app .newsletter-experience) #app .newsletter-form{
+  background:#fffcf6;
+  border-color:#ded5cc;
+}
+body:has(#app .newsletter-experience) #app .newsletter-form:focus-within{
+  border-color:#80a4b3;
+  box-shadow:0 0 0 3px rgba(126,167,181,.16);
+}
+body:has(#app .newsletter-experience) #app .newsletter-submit:not([disabled]){
+  background:linear-gradient(145deg,#567c8a,#365a69);
+  box-shadow:0 12px 24px -15px rgba(59,100,115,.36);
+}
+body:has(#app .newsletter-experience) #app .newsletter-consent{
+  color:#5c6461;
+}
+body:has(#app .newsletter-experience) #app .newsletter-status:not(.error){
+  color:#657057;
+}
+body:has(#app .newsletter-experience) #app .newsletter-bg-orb{
+  opacity:.5;
+  filter:saturate(.65);
+}
+/* Standalone privacy, terms, opt-out, error, confirmation, and 404 pages.
+   Scope strictly to their own .wrap > .top + .card structure. */
+body:has(> main.wrap > .top + .card){
+  --ink:var(--sw-e-ink);
+  --ink-3:#536268;
+  --muted:var(--sw-e-muted);
+  --line:rgba(86,95,90,.13);
+  --line-2:rgba(86,95,90,.23);
+  --blue:#466e80;
+  background:
+    radial-gradient(53% 36% at 93% 4%,rgba(224,239,242,.9),transparent 75%),
+    radial-gradient(52% 37% at 4% 92%,rgba(247,234,201,.60),transparent 74%),
+    linear-gradient(180deg,var(--sw-e-linen),#faf8f1) !important;
+  color:var(--sw-e-ink);
+}
+body:has(> main.wrap > .top + .card)::before{
+  opacity:.12;
+  background-size:34px 34px;
+}
+body:has(> main.wrap > .top + .card) >main.wrap>.card{
+  background:linear-gradient(160deg,var(--sw-e-paper),#fdfaf4 72%,#f8f0e5);
+  border:1px solid #e1ddd1;
+  box-shadow:0 16px 45px -32px rgba(56,76,81,.26);
+}
+body:has(> main.wrap > .top + .card) >main.wrap>.card h1{
+  color:var(--sw-e-ink);
+}
+body:has(> main.wrap > .top + .card) >main.wrap>.card h2{
+  color:#475e66;
+}
+body:has(> main.wrap > .top + .card) >main.wrap>.top a{
+  color:var(--sw-e-ink);
+  background:rgba(255,252,246,.83);
+  box-shadow:inset 0 1px 0 #fff,0 9px 22px -17px rgba(59,81,90,.27);
+}
+body:has(> main.wrap > .top + .card) >main.wrap>.top a:first-child::before{
+  background:linear-gradient(140deg,#7397a5,#496875);
+}
+body:has(> main.wrap > .top + .card) :is(.opts label,textarea){
+  background:#fffcf6;
+  border-color:#dedacc;
+}
+body:has(> main.wrap > .top + .card) :is(.btn,button:not(.newsletter-terms-textlink)){
+  background:linear-gradient(145deg,#577b89,#355968);
+  color:#fff;
+}
+/* Published static SEO article pages have their own HTML and inline CSS. */
+body:has(> main > article){
+  background:var(--sw-e-linen);
+  color:var(--sw-e-ink);
+}
+body:has(> main > article) >main{
+  background:transparent;
+}
+body:has(> main > article) >main>nav a{
+  display:inline-flex;align-items:center;
+  min-height:44px;padding:9px 12px;
+  color:#3e6574;background:#e4eef2;
+  border-radius:9px;
+}
+body:has(> main > article) >main>article>header h1{
+  color:var(--sw-e-ink);
+}
+body:has(> main > article) >main>article .meta{
+  color:#607077;
+}
+body:has(> main > article) >main>article .summary{
+  background:linear-gradient(140deg,#fbfdfd,var(--sw-e-blue));
+  border:1px solid #d3e2e6;
+  border-radius:14px;
+  color:#354e57;
+}
+body:has(> main > article) >main>article .article-body{
+  color:#303c3d;
+}
+body:has(> main > article) >main>article .article-body mark{
+  background:var(--sw-e-butter);
+  color:#3b382c;
+}
+body:has(> main > article) >main>article .open-app{
+  background:#416775;
+  color:#fff;
+}
+body:has(> main > article) >main>article .foot{
+  border-color:var(--sw-e-line);
+}
+body:has(> main.sw360){
+  background:var(--sw-e-linen);
+}
+body:has(> main.sw360) .sw360-card{
+  background:linear-gradient(145deg,var(--sw-e-paper),#f1f5f1);
+  border-color:var(--sw-e-line);
+}
+body:has(> main.sw360) .sw360-card:nth-child(2n){background:linear-gradient(145deg,var(--sw-e-paper),var(--sw-e-blue))}
+body:has(> main.sw360) .sw360-card:nth-child(3n){background:linear-gradient(145deg,var(--sw-e-paper),var(--sw-e-blush))}
+@media(max-width:760px){
+  body:has(#app .topic-grid) #app .page-hero,
+  body:has(#app .manifesto) #app .page-hero{
+    padding:65px 23px 32px;
+    margin:0 0 25px;
+  }
+  body:has(#app .topic-grid) #app .topic-card,
+  body:has(#app .manifesto) #app .person-card{min-width:0}
+  body:has(#app .article-view) #app .summary10s{
+    padding:19px 19px 19px 22px;
+  }
+  body:has(> main.wrap > .top + .card) >main.wrap>.card{
+    border-radius:21px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body:has(#app .topic-grid) #app .topic-card,
+  body:has(#app .manifesto) #app .person-card{
+    transition:none;
+  }
+}
+
+/* Later UI legacy styles sometimes use !important; contain override to routes. */
+body:has(#app .topic-grid) #app .page-hero{
+  background-image:linear-gradient(125deg,#fffcf6 0%,#f1f2e9 65%,#e4eef2 100%)!important;
+}
+body:has(#app .manifesto) #app .manifesto{
+  background-image:linear-gradient(145deg,#f5eccd,#fffaf0 90%)!important;
+}
+body:has(#app .share-card) #app .share-card{
+  background-image:linear-gradient(135deg,#fffdf9 0%,#faeff0 75%,#f4e4e8 100%)!important;
+}
+body:has(#app .newsletter-experience) #app .newsletter-card{
+  background-image:linear-gradient(145deg,#fffdf7 0%,#fff9f5 55%,#f8edf0)!important;
+}

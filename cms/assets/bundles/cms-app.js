@@ -3,6 +3,13 @@
 window.SignWellErrors?.installGlobal?.({surface:'CMS',module:'cms-runtime',homeUrl:'index.html'});
 function swShowOperationalError(err,context={}){return window.SignWellErrors?.show?.(err,{surface:'CMS',homeUrl:'index.html',...context});}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const KEY='signwell-cms-data-v1',ACTKEY='signwell-cms-last-active';const DEFAULT_SITE_TEXT={"siteTitle":"SIGN WELL · 欣緯生醫","metaDescription":"SIGN WELL · 欣緯生醫 — 臨床筆記、醫學推理與值得留下的知識。","brandEnglish":"SIGN WELL","brandChinese":"欣緯生醫","navArticles":"文章","navTopics":"主題","navAbout":"關於我們","heroEyebrow":"SIGN WELL BIOMED · 欣緯生醫","heroTitleLine1":"把臨床問題，","heroTitleLine2":"寫成值得留下的答案。","heroSubtitle":"臨床筆記、醫學推理、醫療科技與自費醫療觀察。不是追求資訊最多，而是把真正值得記住的框架整理清楚。","heroCardTitle":"醫學筆記、臨床推理，與值得留下的知識。","heroCardBody":"以閱讀品質為核心的個人醫學出版空間。從床邊問題出發，保留推理脈絡與可回顧的知識。","heroCardTiny":"獨立醫學筆記","featuredEyebrow":"編輯精選","featuredTitle":"精選臨床筆記","topicsEyebrow":"知識地圖","topicsTitle":"主題分類","topicsDescription":"依臨床領域瀏覽","recentEyebrow":"最近整理","recentTitle":"最新文章","publishedCountSuffix":"篇已發布筆記","articleCountSuffix":"篇文章","minutesReadSuffix":"分鐘閱讀","articleBrand":"SIGN WELL · 欣緯生醫","updatedLabel":"更新","shareLabel":"分享","copyLinkLabel":"複製連結","tocTitle":"本頁內容","aboutEyebrow":"關於 SIGN WELL","aboutTitle":"欣緯生醫","aboutBody":"一個以臨床推理、醫學教育與自費醫療觀察為核心的個人出版空間。網站內容希望保留「為什麼」而不只留下答案，讓每篇筆記都能在下一次遇到病人或問題時真正派上用場。","aboutFocusLabel":"核心","aboutFocusValue":"臨床推理","aboutFormatLabel":"形式","aboutFormatValue":"筆記 · 深度整理","aboutPrincipleLabel":"原則","aboutPrincipleValue":"清楚勝過複雜","aboutDisclaimer":"本站不提供醫療服務、不招攬醫療業務；內容僅供醫學教育與資訊整理，不構成個別醫療建議，也不能取代正式臨床評估。","aboutManifestoTitle":"把複雜的醫學，整理成真正能被理解與使用的知識。","aboutManifestoBody":"我們重視推理、脈絡與長期可回顧性，而不只是快速堆疊資訊。","aboutPeopleEyebrow":"PEOPLE","aboutPeopleTitle":"我們是誰","aboutPeopleSubtitle":"以不同背景與專長，共同整理值得留下的醫學與健康知識。","footerTagline":"臨床筆記、醫學推理，以及值得留下的知識。","footerDisclaimer":"本站不提供醫療服務、不招攬醫療業務；內容僅供醫學教育與資訊整理，不構成個別醫療建議。","searchPlaceholder":"搜尋文章、主題、關鍵字…","emptyCategory":"目前沒有這個分類的文章。","notFoundTitle":"找不到文章","notFoundBody":"這篇文章可能尚未發布或網址已改變。","homeEyebrow":"SIGN WELL BIOMED · 欣緯生醫","homeTitle1":"從臨床出發，","homeTitle2":"把值得留下的醫學寫清楚。","homeSubtitle":"以臨床推理、醫學教育與自費醫療觀察為核心的知識平台。從一個問題開始，整理成下一次真正用得上的答案。","homeCardTitle":"醫學不只是答案，而是理解答案從哪裡來。","homeCardBody":"把床邊問題、閱讀與思考整理成可回顧的知識，讓資訊回到臨床情境。","dailyEyebrow":"每日更新","dailyTitle":"每日新文章","dailyDescription":"最新整理與近期發布","topicsSubtitle":"依領域整理文章、臨床問題與延伸閱讀。","shareEyebrow":"分享我們","shareTitle":"把 SIGN WELL 分享給需要的人。","shareSubtitle":"複製網站連結，或使用 QR Code 讓另一台裝置快速開啟。"};
+/* Editorial topic-tape fields share the original authenticated siteText publish contract. */
+Object.assign(DEFAULT_SITE_TEXT,{
+  topicsTapeEyebrow:"THE ATLAS OF IDEAS",
+  topicsTapeGuide:"向上滑動，逐張展開醫學觀點",
+  topicsDirectoryTitle:"選一個值得深入的問題。",
+  topicsDirectoryDescription:"選擇主題後，只顯示正式發布的相關文章；尚無文章的分類會如實顯示空白狀態。"
+});
 /* CMS homepage v2 fields: use the existing authenticated siteText publication pipeline. */
 const SW_MOTION_DEFAULTS=Object.freeze({
   "motionIntroLead": "不只研究身體，",
@@ -5348,14 +5355,31 @@ function compressImage(file,maxSide=1600,quality=.82){return new Promise((resolv
 function preview(){updateFromEditor();const a=getCurrent();$('#previewContent').innerHTML=`${a.cover?`<img src="${a.cover}" alt="" style="width:100%;max-height:420px;object-fit:cover;border-radius:22px;margin-bottom:28px">`:'<div class="preview-default-cover" aria-label="SIGN WELL 預設封面"></div>'}<h1>${escapeHTML(a.title||'未命名文章')}</h1>${cmsSummary10s(a)?`<aside class="cms-summary10s-preview"><b>10 秒摘要</b><p>${escapeHTML(cmsSummary10s(a))}</p></aside>`:''}${articleHTML(a)}`;$('#previewOverlay').classList.add('show')}
 function renderTopicsManager(){
   data.topics=Array.isArray(data.topics)?data.topics:[];let editId=null;
-  const paint=()=>{const sorted=data.topics.slice().sort((a,b)=>(a.order??999)-(b.order??999));$('#view').innerHTML=`<div class="page-head"><div><h1>主題管理</h1><p>在這裡建立前台「主題探討」頁的分類。文章編輯器會自動使用這些主題。</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="top-action online" id="syncTopicsBtn">發佈到網頁</button><button class="top-action primary" id="newTopicBtn">新增主題</button></div></div><div class="topic-admin"><section class="topic-list"><div class="panel-head"><span>主題列表</span><span>${sorted.length} 個</span></div>${sorted.length?sorted.map((tp,i)=>`<div class="topic-row-admin"><div><strong>${escapeHTML(tp.name||'未命名主題')} ${tp.active===false?'<span class="topic-badge">已隱藏</span>':''}</strong><span>${escapeHTML(tp.description||'尚未填寫說明')} · ${data.articles.filter(a=>a.category===tp.name).length} 篇文章</span></div><div class="topic-row-actions"><button data-topic-edit="${escapeHTML(tp.id)}">編輯</button><button data-topic-up="${escapeHTML(tp.id)}">↑</button><button data-topic-down="${escapeHTML(tp.id)}">↓</button><button data-topic-del="${escapeHTML(tp.id)}">刪除</button></div></div>`).join(''):'<div class="empty">尚未建立主題。</div>'}</section><aside class="topic-form"><h3 id="topicFormTitle">新增主題</h3><div class="field-group"><label>主題名稱</label><input id="topicName" placeholder="例如：重症醫學"></div><div class="field-group"><label>公開網址代稱</label><input id="topicSlug" placeholder="critical-care"></div><div class="field-group"><label>主題說明</label><textarea id="topicDesc" placeholder="說明這個主題涵蓋哪些內容。"></textarea></div><label class="topic-active"><input type="checkbox" id="topicActive" checked> 顯示在前台主題探討頁</label><div class="site-text-actions" style="margin-top:14px"><button class="top-action primary" id="saveTopic">儲存主題</button><button class="top-action online" id="saveTopicOnline">儲存並發佈到網頁</button><button class="top-action" id="cancelTopic">清除</button></div><p class="topic-help">按「儲存並發佈到網頁」會直接更新 <code>topics/index.json</code>、<code>public-data.json · siteText + topics + people</code> 與 <code>site-content.js</code>，再從 GitHub 讀回驗證。主題名稱、說明與主題頁文字會使用同一份資料來源。</p></aside></div>`;
-    const clear=()=>{editId=null;$('#topicFormTitle').textContent='新增主題';$('#topicName').value='';$('#topicSlug').value='';$('#topicDesc').value='';$('#topicActive').checked=true};
-    $$('[data-topic-edit]').forEach(b=>b.onclick=()=>{const tp=data.topics.find(x=>x.id===b.dataset.topicEdit);if(!tp)return;editId=tp.id;$('#topicFormTitle').textContent='編輯主題';$('#topicName').value=tp.name||'';$('#topicSlug').value=tp.slug||'';$('#topicDesc').value=tp.description||'';$('#topicActive').checked=tp.active!==false});
+  const paint=()=>{const sorted=data.topics.slice().sort((a,b)=>(a.order??999)-(b.order??999));$('#view').innerHTML=`<div class="page-head"><div><h1>主題管理</h1><p>管理醫學專欄封面、紙張色系與上方捲軸排序。原有文章分類會保留。</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="top-action online" id="syncTopicsBtn">發佈到網頁</button><button class="top-action" id="importPublicTopicsBtn">載入已發布主題</button><button class="top-action primary" id="newTopicBtn">新增主題</button></div></div><div class="topic-admin"><section class="topic-list"><div class="panel-head"><span>主題列表</span><span>${sorted.length} 個</span></div>${sorted.length?sorted.map((tp,i)=>`<div class="topic-row-admin"><div><strong>${escapeHTML(tp.name||'未命名主題')} ${tp.active===false?'<span class="topic-badge">已隱藏</span>':''}${tp.tapeFeatured===true?'<span class="topic-badge">紙張堆疊</span>':''}</strong><span>${escapeHTML(tp.description||'尚未填寫說明')} · ${data.articles.filter(a=>a.category===tp.name||(Array.isArray(tp.legacyNames)&&tp.legacyNames.includes(a.category))).length} 篇文章</span></div><div class="topic-row-actions"><button data-topic-edit="${escapeHTML(tp.id)}">編輯</button><button data-topic-up="${escapeHTML(tp.id)}">↑</button><button data-topic-down="${escapeHTML(tp.id)}">↓</button><button data-topic-del="${escapeHTML(tp.id)}">刪除</button></div></div>`).join(''):'<div class="empty">尚未建立主題。</div>'}</section><aside class="topic-form"><h3 id="topicFormTitle">新增主題</h3><div class="field-group"><label>主題名稱</label><input id="topicName" placeholder="例如：重症醫學"></div><div class="field-group"><label>公開網址代稱</label><input id="topicSlug" placeholder="critical-care"></div><div class="field-group"><label>主題說明</label><textarea id="topicDesc" placeholder="說明這個主題涵蓋哪些內容。"></textarea></div><div class="field-group"><label>舊分類名稱（相容已發布文章）</label><input id="topicAliases" placeholder="例如：時事探討、醫美科普"><small>以頓號或逗號分隔，舊分類文章會繼續歸入此專欄。</small></div><div class="field-group"><label>專欄紙張封面圖片</label><input id="topicCover" placeholder="assets/topic-art/research.svg 或媒體素材圖片網址"><small>使用媒體工作室發布的圖片網址，或內建封面；支援站內 assets/ 路徑與 HTTPS 圖片。</small></div><div class="field-group"><label>紙張色系</label><select id="topicTapeTone"><option value="linen">亞麻白</option><option value="blue">淺藍</option><option value="butter">淺黃</option><option value="blush">淺粉</option></select></div><label class="topic-active"><input type="checkbox" id="topicTapeFeatured"> 顯示在膠帶捲軸主題堆疊（最多 7 張，依主題順序）</label><label class="topic-active"><input type="checkbox" id="topicActive" checked> 顯示在前台主題探討頁</label><div class="site-text-actions" style="margin-top:14px"><button class="top-action primary" id="saveTopic">儲存主題</button><button class="top-action online" id="saveTopicOnline">儲存並發佈到網頁</button><button class="top-action" id="cancelTopic">清除</button></div><p class="topic-help">按「儲存並發佈到網頁」會直接更新 <code>topics/index.json</code>、<code>public-data.json · siteText + topics + people</code> 與 <code>site-content.js</code>，再從 GitHub 讀回驗證。主題名稱、說明與主題頁文字會使用同一份資料來源。</p></aside></div>`;
+    const clear=()=>{editId=null;$('#topicFormTitle').textContent='新增主題';$('#topicName').value='';$('#topicSlug').value='';$('#topicDesc').value='';$('#topicAliases').value='';$('#topicCover').value='';$('#topicTapeTone').value='linen';$('#topicTapeFeatured').checked=false;$('#topicActive').checked=true};
+    $$('[data-topic-edit]').forEach(b=>b.onclick=()=>{const tp=data.topics.find(x=>x.id===b.dataset.topicEdit);if(!tp)return;editId=tp.id;$('#topicFormTitle').textContent='編輯主題';$('#topicName').value=tp.name||'';$('#topicSlug').value=tp.slug||'';$('#topicDesc').value=tp.description||'';$('#topicAliases').value=Array.isArray(tp.legacyNames)?tp.legacyNames.join('、'):'';$('#topicCover').value=tp.cover||'';$('#topicTapeTone').value=['blue','butter','blush','linen'].includes(tp.tapeTone)?tp.tapeTone:'linen';$('#topicTapeFeatured').checked=tp.tapeFeatured===true;$('#topicActive').checked=tp.active!==false});
     const move=(id,dir)=>{const arr=data.topics.slice().sort((a,b)=>(a.order??999)-(b.order??999)),i=arr.findIndex(x=>x.id===id),j=i+dir;if(i<0||j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];arr.forEach((x,k)=>x.order=k);data.topics=arr;persist(true);paint()};
     $$('[data-topic-up]').forEach(b=>b.onclick=()=>move(b.dataset.topicUp,-1));$$('[data-topic-down]').forEach(b=>b.onclick=()=>move(b.dataset.topicDown,1));
     $$('[data-topic-del]').forEach(b=>b.onclick=async()=>{const tp=data.topics.find(x=>x.id===b.dataset.topicDel);if(!tp)return;if(!(await swConfirm(`刪除主題「${tp.name}」？\n文章本身不會被刪除。`,{title:'刪除主題？',kicker:'DANGER ZONE',danger:true,confirmText:'確認刪除'})))return;data.topics=data.topics.filter(x=>x.id!==tp.id);persist(true);paint();showToast('主題已刪除')});
-    const saveTopicLocal=()=>{const name=$('#topicName').value.trim(),slug=$('#topicSlug').value.trim()||slugify(name),description=$('#topicDesc').value.trim(),active=$('#topicActive').checked;if(!name){showToast('請輸入主題名稱');return null}let renamed=false;if(editId){const tp=data.topics.find(x=>x.id===editId);if(!tp)return null;const oldName=tp.name||'';renamed=Boolean(oldName&&oldName!==name);Object.assign(tp,{name,slug,description,active});if(renamed)data.articles.forEach(a=>{if(a.category===oldName)a.category=name})}else data.topics.push({id:'topic-'+Date.now(),name,slug,description,active,order:data.topics.length});persist(true);editId=null;return{renamed}};$('#saveTopic').onclick=()=>{if(!saveTopicLocal())return;paint();showToast('主題已儲存')};$('#saveTopicOnline').onclick=async()=>{const result=saveTopicLocal();if(!result)return;paint();try{if(result.renamed)await publishGitHub();else await publishTopicsOnly()}catch(e){showToast('主題同步失敗：'+e.message)}};
+    const saveTopicLocal=()=>{const legacyNames=[...new Set($('#topicAliases').value.split(/[、，,\n]+/).map(v=>v.trim()).filter(Boolean))];const name=$('#topicName').value.trim(),slug=$('#topicSlug').value.trim()||slugify(name),description=$('#topicDesc').value.trim(),active=$('#topicActive').checked,cover=$('#topicCover').value.trim(),tapeTone=$('#topicTapeTone').value,tapeFeatured=$('#topicTapeFeatured').checked;if(cover&&!/^(?:https:\/\/|assets\/|\/assets\/)/i.test(cover)){showToast('請使用站內 assets/ 或 HTTPS 圖片網址');return null}if(!name){showToast('請輸入主題名稱');return null}let renamed=false;if(editId){const tp=data.topics.find(x=>x.id===editId);if(!tp)return null;const oldName=tp.name||'';renamed=Boolean(oldName&&oldName!==name);Object.assign(tp,{name,slug,description,active,cover:cover.slice(0,700),tapeTone,tapeFeatured,legacyNames});if(renamed)data.articles.forEach(a=>{if(a.category===oldName)a.category=name})}else data.topics.push({id:'topic-'+Date.now(),name,slug,description,active,cover:cover.slice(0,700),tapeTone,tapeFeatured,legacyNames,order:data.topics.length});persist(true);editId=null;return{renamed}};$('#saveTopic').onclick=()=>{if(!saveTopicLocal())return;paint();showToast('主題已儲存')};$('#saveTopicOnline').onclick=async()=>{const result=saveTopicLocal();if(!result)return;paint();try{if(result.renamed)await publishGitHub();else await publishTopicsOnly()}catch(e){showToast('主題同步失敗：'+e.message)}};
     $('#cancelTopic').onclick=clear;$('#newTopicBtn').onclick=clear;$('#syncTopicsBtn').onclick=async()=>{try{await publishTopicsOnly()}catch(e){showToast('主題同步失敗：'+e.message)}};
+    $('#importPublicTopicsBtn').onclick=async()=>{
+      try{
+        const url=new URL('../topics/index.json',location.href);
+        if(url.origin!==location.origin)throw Error('僅允許同站匯入');
+        const response=await fetch(url,{cache:'no-store'});
+        if(!response.ok)throw Error('公開主題載入失敗 '+response.status);
+        const published=await response.json();
+        if(!Array.isArray(published)||!published.length)throw Error('公開主題格式不正確');
+        if(!(await swConfirm('同步公開站的七大專欄、封面及堆疊排序？文章與未同步的自訂主題資料會保留。',{title:'同步公開主題？',kicker:'CMS / TOPIC IMPORT',confirmText:'匯入公開主題'})))return;
+        const extras=data.topics.filter(t=>!published.some(p=>p.id===t.id||p.name===t.name));
+        // Historical categories stay editable, but no longer pollute the seven new columns.
+        const historical=new Set(['營養品科普','減重醫學','抗衰老醫學','醫美科普','時事探討']);
+        data.topics=[...clone(published),...extras.map(t=>historical.has(t.name)?{...t,active:false,tapeFeatured:false}:t)];
+        persist(true);paint();
+        showToast('已同步 '+published.filter(t=>t.active!==false).length+' 個公開主題；文章與原有草稿保留');
+      }catch(e){showToast('載入主題失敗：'+e.message)}
+    };
 
     $('#view').insertAdjacentHTML('beforeend',`
       <section class="panel sw-glossary-panel sw-settings-subsection" id="glossaryPanel">
@@ -5484,6 +5508,10 @@ function renderSiteText(){
         ${input('topicsEyebrow','頁面小標')}
         ${input('topicsTitle','頁面標題',true)}
         ${input('topicsSubtitle','頁面說明',true)}
+        ${input('topicsTapeEyebrow','紙張捲軸英文小標')}
+        ${input('topicsTapeGuide','紙張堆疊捲動提示')}
+        ${input('topicsDirectoryTitle','主題按鈕區標題')}
+        ${input('topicsDirectoryDescription','主題按鈕區說明',true)}
       </div>
 
       <div class="site-section">
@@ -9321,7 +9349,7 @@ async function v11FetchTopicsRaw(){
     const a=JSON.parse(base64Utf8(remote.content||''));if(!Array.isArray(a))throw new Error('topics invalid');return a;
   }catch(err){throw normalizeGithubBridgeError(err)}
 }
-function v11TopicPayload(){return (data.topics||[]).map((x,i)=>({id:x.id||('topic-'+i),name:x.name||'未命名主題',slug:x.slug||slugify(x.name||('topic-'+i)),description:x.description||'',order:Number.isFinite(Number(x.order))?Number(x.order):i,active:x.active!==false}))}
+function v11TopicPayload(){return (data.topics||[]).map((x,i)=>({id:x.id||('topic-'+i),name:x.name||'未命名主題',slug:x.slug||slugify(x.name||('topic-'+i)),description:x.description||'',order:Number.isFinite(Number(x.order))?Number(x.order):i,active:x.active!==false,tapeFeatured:x.tapeFeatured===true,tapeTone:['blue','butter','blush','linen'].includes(x.tapeTone)?x.tapeTone:'linen',cover:String(x.cover||'').trim().slice(0,700),legacyNames:Array.isArray(x.legacyNames)?x.legacyNames.map(String).filter(Boolean):[]}))}
 function currentSiteTextPayload(){return {...DEFAULT_SITE_TEXT,...(data.siteText||{})}}
 function publicBundlePayload(revision=Date.now(),peopleOverride=null){
   const peopleSource=Array.isArray(peopleOverride)?peopleOverride:(data.people||[]);
@@ -9364,7 +9392,9 @@ function canonTopics(a){return JSON.stringify((a||[]).map((x,i)=>({
   slug:String(x.slug||''),
   description:String(x.description||''),
   order:Number.isFinite(Number(x.order))?Number(x.order):i,
-  active:x.active!==false
+  active:x.active!==false,
+  cover:String(x.cover||''),tapeTone:String(x.tapeTone||'linen'),tapeFeatured:x.tapeFeatured===true,
+  legacyNames:Array.isArray(x.legacyNames)?x.legacyNames.map(String).filter(Boolean):[]
 })))}
 function canonSiteText(o){return JSON.stringify({...DEFAULT_SITE_TEXT,...(o||{})})}
 function canonHeroConfig(o){return JSON.stringify(normalizeHeroConfig(o))}
@@ -9434,7 +9464,9 @@ async function verifyPublishedTopics(expected,token){
   if(!Array.isArray(remote))throw new Error('GitHub 上的 topics/index.json 格式錯誤');
   const canon=a=>JSON.stringify((a||[]).map(x=>({
     id:String(x.id||''),name:String(x.name||''),slug:String(x.slug||''),
-    description:String(x.description||''),order:Number(x.order||0),active:x.active!==false
+    description:String(x.description||''),order:Number(x.order||0),active:x.active!==false,
+    cover:String(x.cover||''),tapeTone:String(x.tapeTone||'linen'),tapeFeatured:x.tapeFeatured===true,
+    legacyNames:Array.isArray(x.legacyNames)?x.legacyNames.map(String).filter(Boolean):[]
   })));
   if(canon(remote)!==canon(expected))throw new Error('GitHub 主題檔驗證失敗：遠端內容與 CMS 不一致');
   return {sha:file.sha||'',count:remote.length};

@@ -1,0 +1,42 @@
+name: Public Inner Palette and Topic Atlas QA
+on:
+  push:
+    branches:
+      - feature/public-inner-linen-pastels-20261008
+  pull_request:
+    paths:
+      - "assets/public-inner-palette.css"
+      - "assets/public-topic-tape.*"
+      - "assets/public-core.js"
+      - "topics/**"
+      - "cms/assets/bundles/cms-app.js"
+      - "qa/smoke-public-inner-palette.mjs"
+      - "qa/smoke-public-topic-atlas.mjs"
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Validate non-home palette, article readability and homepage isolation
+        run: node qa/smoke-public-inner-palette.mjs
+      - name: Validate seven CMS topics and scroll-stacked clickable papers
+        run: node qa/smoke-public-topic-atlas.mjs
+      - name: Upload snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-inner-topic-atlas-qa
+          if-no-files-found: ignore
+          path: |
+            qa-inner-*.png
+            qa-topic-atlas-*.png

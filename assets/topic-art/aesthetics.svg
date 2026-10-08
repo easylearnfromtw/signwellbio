@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 600" role="img" aria-label="美學醫學專欄">
+ <defs><linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1e5e7"/><stop offset=".7" stop-color="#fbf8f1"/><stop offset="1" stop-color="#c4b1bc"/></linearGradient><pattern id="grid" width="35" height="35" patternUnits="userSpaceOnUse"><path d="M35 0H0V35" fill="none" stroke="#745c66" stroke-opacity=".08"/></pattern></defs>
+ <rect width="720" height="600" fill="url(#paper)"/><rect width="720" height="600" fill="url(#grid)"/><circle cx="580" cy="85" r="166" fill="#c4b1bc" opacity=".16"/>
+ <g color="#745c66" transform="translate(10 -6)"><path d="M277 495c-31-49-53-129-37-192 18-77 61-125 130-133 99-11 156 81 132 157-10 32-30 53-55 69l-19 66c-38 39-100 57-151 33" fill="none" stroke="currentColor" stroke-width="9"/><path d="M341 317h30m49 0h29m-54 9l-10 71h22m-53 38q35 20 72 0" fill="none" stroke="currentColor" stroke-width="6"/></g>
+ <rect x="38" y="38" width="644" height="524" fill="none" stroke="#745c66" stroke-opacity=".24" stroke-width="2"/>
+ <text x="66" y="86" fill="#745c66" font-size="18" letter-spacing="4" font-family="Arial,sans-serif">SIGNWELL BIO / ARCHIVE</text>
+ <text x="66" y="538" fill="#745c66" font-size="21" letter-spacing="3" font-family="Arial,sans-serif">AESTHETIC MEDICINE</text>
+ </svg>
