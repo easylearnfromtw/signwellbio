@@ -58,14 +58,15 @@ await check("Desktop scene creates seven covers with native scroll and clickable
   const rail=document.querySelector("#topicTape");
   return{height:rail.offsetHeight,viewport:innerHeight,cards:rail.querySelectorAll("button.sw-topic-paper[data-topic]").length,directory:document.querySelectorAll("#topicDirectory .topic-card").length,overflow:document.documentElement.scrollWidth-innerWidth};
  });
- assert.ok(init.height>innerHeight*4,"Story rail not scrollable "+JSON.stringify(init));
+ assert.ok(init.height>init.viewport*4,"Story rail not scrollable "+JSON.stringify(init));
  assert.equal(init.cards,7);assert.equal(init.directory,12);assert.ok(init.overflow<=3,JSON.stringify(init));
  await p.evaluate(()=>{
   const rail=document.querySelector("#topicTape");
   const distance=rail.offsetHeight-innerHeight;
-  window.scrollTo(0,rail.getBoundingClientRect().top+scrollY+distance*.45);
+  window.scrollTo({top:rail.getBoundingClientRect().top+scrollY+distance*.45,behavior:'instant'});
  });
- await p.waitForTimeout(250);
+ await p.waitForFunction(()=>document.querySelector('#topicTape .sw-topic-current')?.textContent?.trim()!=='01 / 07',{timeout:7500});
+ await p.waitForTimeout(180);
  const state=await p.evaluate(()=>{
   const rail=document.querySelector("#topicTape");
   const cards=[...rail.querySelectorAll(".sw-topic-paper")];
@@ -91,10 +92,11 @@ for(const width of [320,390,430]){
   await page.waitForFunction(()=>document.querySelector("#topicTape.is-ready")?.querySelectorAll(".sw-topic-paper").length===7,{timeout:14000});
   const first=await page.evaluate(()=>{
    const rail=document.querySelector("#topicTape"),distance=rail.offsetHeight-innerHeight;
-   window.scrollTo(0,rail.getBoundingClientRect().top+scrollY+distance*.20);
+   window.scrollTo({top:rail.getBoundingClientRect().top+scrollY+distance*.27,behavior:'instant'});
    return true;
   });
-  await page.waitForTimeout(250);
+  await page.waitForFunction(()=>document.querySelector('#topicTape .sw-topic-current')?.textContent?.trim()!=='01 / 07',{timeout:7500});
+  await page.waitForTimeout(180);
   const ui=await page.evaluate(()=>{
    const rail=document.querySelector("#topicTape"),top=rail.querySelector(".sw-topic-paper.is-top");
    return{width:innerWidth,overflow:document.documentElement.scrollWidth-innerWidth,
