@@ -500,6 +500,8 @@ menu.addEventListener("click",e=>{if(e.target===menu)close()});
 addEventListener("keydown",e=>{if(e.key==="Escape"&&!menu.hidden)close();if(e.key==="Tab"&&!menu.hidden){const focusable=[...menu.querySelectorAll('button,a')];const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
 })();
 </script>
+<script defer src="assets/test-cms-schema.js"></script>
+<script defer src="assets/home-preview.js"></script>
 <script defer src="assets/site.js"></script>
 <script type="module" src="assets/experience-three.js"></script>
 </body></html>
