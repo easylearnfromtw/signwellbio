@@ -40,7 +40,7 @@ test("CMS publish uses existing validated public-data pipeline", ()=>{
  has(cms,"function publicBundlePayload(");has(cms,"PUBLIC_BUNDLE_PATH");has(cms,"function verifyPublicBundle(");
  has(cms,"const published=await publishGitHub();");
  has(cms,"if(published!==true)throw new Error(");
- has(cms,"CMS_FRAME_BLOCKED");
+ has(cmsHtml,"CMS_FRAME_BLOCKED");
 });
 test("Public production homepage and its existing backend remain in place", ()=>{
  has(originalIndex,'id="app"');
