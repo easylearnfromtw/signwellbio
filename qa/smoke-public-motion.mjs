@@ -75,6 +75,16 @@ await test("Real published article navigation and iOS slider preserved",async()=
  assert.ok(await page.locator("#app").innerText().then(x=>x.length>120));
  await ctx.close()
 });
+await test("Returning home from secondary Public document restores the new motion cover",async()=>{
+ const ctx=await openContext(1280,850);
+ const page=await ctx.newPage();await page.goto(base+"topics.html",{waitUntil:"domcontentloaded"});
+ await page.waitForSelector("#pager > .pager-items [data-page=home]",{timeout:13000});
+ await page.locator("#pager > .pager-items [data-page=home]").click();
+ await page.waitForURL(/\/index\.html(?:\?|$)/,{timeout:15000});
+ await page.waitForFunction(()=>document.getElementById("swMotionHomeHost")?.shadowRoot?.querySelector(".intro")&&!document.getElementById("swMotionHomeHost").hidden,{timeout:15000});
+ assert.ok(await page.locator("#latest .bento").count()>=1,"Published feed lost after cross-page navigation");
+ await ctx.close()
+});
 await test("Mobile motion typography remains legible and no horizontal overflow",async()=>{
  const ctx=await openContext(390,844,{touch:true});
  const page=await ctx.newPage();await page.goto(home(),{waitUntil:"domcontentloaded"});
