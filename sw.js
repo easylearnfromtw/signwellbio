@@ -1,12 +1,11 @@
 /* SIGN WELL · canonical Public service worker (R9.9 search/logo polish · R9.8 white-blue-pink social preview + R9.7 cubic ambient background on non-home pages + R10.2 GPU governor + R9.11 stable liquid dock + R9.10 pastel favicon + R9.6 mobile lock + unified brand + clean share/newsletter · R9.4 social preview + adaptive hero + jelly glass)
    Stable filenames, network-first code/data, image/font SWR. */
 const SW_PUBLIC_CACHE_PREFIX='signwell-public-';
-const SW_PUBLIC_CACHE=SW_PUBLIC_CACHE_PREFIX+'signwellbio-20261008-topicstudio';
+const SW_PUBLIC_CACHE=SW_PUBLIC_CACHE_PREFIX+'signwellbio-20261008-visual-recovery';
 const SW_PUBLIC_SHELL=[
   './','./index.html','./topics.html','./about.html','./share.html','./newsletter.html',
   './manifest.webmanifest','./site-content.js','./analytics-config.js',
   './assets/public-core.css','./assets/public-core.js',
-  './assets/public-inner-palette.css','./assets/public-topic-tape.css','./assets/public-topic-tape.js',
   './assets/uiux-system.css','./assets/uiux-system.js','./assets/gpu-optimizer.css','./assets/gpu-optimizer.js','./assets/signwell-ios-glass-r3.css','./assets/signwell-liquid-hero.css','./assets/signwell-liquid-hero.js','./assets/signwell-ambient-pages.css','./assets/signwell-ambient-pages.js',
   './assets/bundles/public-liquid-navigation.js','./assets/bundles/article-id-card.js',
   './assets/components/styles/public-liquid-dock.css','./assets/components/styles/article-id-card.css',
