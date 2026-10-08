@@ -522,7 +522,7 @@
         tagCardMorph($(`[data-article="${CSS.escape(leaving)}"]`, app));
       }
       setTitle(p);
-      document.dispatchEvent(new CustomEvent("signwell:render", { detail: { page: p } }));
+      document.dispatchEvent(new CustomEvent("signwell:render", { detail: { page: p, siteText: site, articles, topics, ready: dataReady } }));
     };
     const canVT = transition && document.startViewTransition && !reducedMQ.matches && !document.hidden;
     if (!canVT) pendingMorph = null;
