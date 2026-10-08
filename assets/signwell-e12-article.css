@@ -34,3 +34,20 @@ body{background:var(--paper)!important;color:var(--ink)!important;font-family:va
 :focus-visible{outline:2px solid var(--sea);outline-offset:3px}
 @media(max-width:640px){.wrap{width:calc(100% - 30px)!important}.article-shell{padding:0 1px 28px!important}.hero h1{font-size:clamp(32px,9vw,46px)!important}.article{line-height:1.95!important}.summary10s{padding:16px 18px!important}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;scroll-behavior:auto!important}}
+
+/* Existing static articles (before CMS E1.2 template upgrade). */
+body:has(.article-body){background:var(--paper)!important;color:var(--ink)!important}
+body:has(.article-body) main{width:min(810px,calc(100% - 34px));padding:34px 0 76px}
+body:has(.article-body) nav{border-bottom:1px solid var(--line-2);padding:0 0 22px;margin-bottom:32px}
+body:has(.article-body) nav a{font:700 12px/1.5 var(--sans);letter-spacing:.16em;color:var(--ink)!important}
+body:has(.article-body) h1{font:500 clamp(34px,5.4vw,54px)/1.35 var(--serif)!important;letter-spacing:-.04em!important;color:var(--ink);margin-bottom:20px}
+body:has(.article-body) .meta{font:400 12px/1.7 var(--sans)!important;letter-spacing:.06em;color:var(--muted)}
+body:has(.article-body) .summary{background:var(--paper-hi)!important;border:1px solid var(--line);border-left:3px solid var(--gold-rule)!important;border-radius:2px!important;padding:20px 23px!important;font:500 16px/1.92 var(--serif)}
+body:has(.article-body) .article-body{font:400 18px/2 var(--serif);color:#283033;counter-reset:swLegacySection}
+body:has(.article-body) .article-body h2{counter-increment:swLegacySection;font:600 27px/1.55 var(--serif)!important;margin-top:50px}
+body:has(.article-body) .article-body h2:before{content:counter(swLegacySection,decimal-leading-zero);display:block;font:400 12px/1.2 Georgia,serif;color:var(--gold-ink);width:42px;padding-bottom:10px;border-bottom:1px solid var(--gold-rule);margin-bottom:18px}
+body:has(.article-body) .article-body a{color:var(--sea);text-underline-offset:3px}
+body:has(.article-body) .article-body mark{background:linear-gradient(transparent 58%,rgba(216,197,143,.42) 58%);color:inherit}
+body:has(.article-body) .article-body img{max-width:100%;height:auto}
+body:has(.article-body) .open-app{background:var(--ink)!important;color:#fff!important;border-radius:3px!important;padding:12px 17px;text-decoration:none!important}
+@media(max-width:600px){body:has(.article-body) .article-body{font-size:17px!important}body:has(.article-body) main{padding-top:22px}body:has(.article-body) .summary{padding:17px!important}}
