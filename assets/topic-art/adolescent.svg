@@ -1,8 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 600" role="img" aria-label="青少年專欄">
- <defs><linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4e4e8"/><stop offset=".7" stop-color="#fbf8f1"/><stop offset="1" stop-color="#d0a4b5"/></linearGradient><pattern id="grid" width="35" height="35" patternUnits="userSpaceOnUse"><path d="M35 0H0V35" fill="none" stroke="#85606d" stroke-opacity=".08"/></pattern></defs>
- <rect width="720" height="600" fill="url(#paper)"/><rect width="720" height="600" fill="url(#grid)"/><circle cx="580" cy="85" r="166" fill="#d0a4b5" opacity=".16"/>
- <g color="#85606d" transform="translate(10 -6)"><circle cx="357" cy="229" r="52" fill="none" stroke="currentColor" stroke-width="9"/><path d="M242 499q7-151 115-151t115 151M212 401l-55 35m345-54l55-38m-347-65l-58-27m349-6l61-35" fill="none" stroke="currentColor" stroke-width="8"/></g>
- <rect x="38" y="38" width="644" height="524" fill="none" stroke="#85606d" stroke-opacity=".24" stroke-width="2"/>
- <text x="66" y="86" fill="#85606d" font-size="18" letter-spacing="4" font-family="Arial,sans-serif">SIGNWELL BIO / ARCHIVE</text>
- <text x="66" y="538" fill="#85606d" font-size="21" letter-spacing="3" font-family="Arial,sans-serif">ADOLESCENT HEALTH</text>
- </svg>
+<rect width="720" height="600" fill="#f3e5e8"/>
+<g stroke="#82606c" stroke-opacity=".075" stroke-width="1" fill="none"><path d="M144 0V600"/><path d="M288 0V600"/><path d="M432 0V600"/><path d="M576 0V600"/></g>
+<circle cx="584" cy="112" r="176" fill="#fff" opacity=".3"/><circle cx="118" cy="534" r="150" fill="#fff" opacity=".18"/>
+<path d="M44 58H676M44 542H676" stroke="#82606c" stroke-opacity=".26" stroke-width="1.5"/>
+<g transform="translate(91.76 47.03) scale(0.7514)" fill="none" stroke="#82606c" stroke-width="9.32" stroke-linecap="round" stroke-linejoin="round"><circle cx="357" cy="229" r="52"/><path d="M242 499q7-151 115-151t115 151"/><path d="M212 401l-55 35M502 382l55-38M210 279l-58-27M501 246l61-35"/></g>
+</svg>
