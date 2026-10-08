@@ -1,0 +1,46 @@
+name: Public Inner Editorial and Medical Topic Atlas QA
+on:
+  push:
+    branches:
+      - feature/public-inner-linen-pastels-20261008
+  pull_request:
+    paths:
+      - 'assets/public-inner-palette.css'
+      - 'assets/public-topic-tape*'
+      - 'assets/topic-art/**'
+      - 'assets/public-core.js'
+      - 'cms/assets/bundles/cms-app.js'
+      - 'topics.html'
+      - 'topics/index.json'
+      - 'public-data.json'
+      - 'qa/smoke-public-inner-palette.mjs'
+      - 'qa/smoke-topic-atlas.mjs'
+      - '.github/workflows/inner-topic-qa.yml'
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Check 4-color palette and every Public secondary page
+        run: node qa/smoke-public-inner-palette.mjs
+      - name: Check seven interactive tape-stacking medical columns and CMS
+        run: node qa/smoke-topic-atlas.mjs
+      - name: Upload visual screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-pastel-topic-qa
+          path: |
+            qa-inner-*.png
+            qa-topic-atlas-*.png
+          if-no-files-found: ignore
