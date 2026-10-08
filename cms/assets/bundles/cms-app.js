@@ -5952,8 +5952,9 @@ function renderSiteText(){
       return;
     }
     try{
-      await publishGitHub();
-      showToast('主頁設定、人物與文章已同步');
+      const published=await publishGitHub();
+      if(published!==true)throw new Error('GitHub 發布並未完成；請檢查 Backend 與權限設定');
+      showToast('主頁設定、動態文案、人物與文章已同步');
     }catch(e){
       showToast('發布失敗：'+e.message);
     }
