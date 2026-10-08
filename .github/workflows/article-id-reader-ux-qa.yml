@@ -1,0 +1,26 @@
+name: SIGNWELL Article ID Reader UX QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/bundles/article-id-card.js'
+      - 'assets/components/styles/article-id-card.css'
+      - 'cms/assets/bundles/article-id-card.js'
+      - 'cms/assets/components/styles/article-id-card.css'
+      - 'qa/smoke-article-id-ux.mjs'
+      - 'sw.js'
+      - '*.html'
+      - '.github/workflows/article-id-reader-ux-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  article-id-ux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Article ID Card Reader UX
+        run: node qa/smoke-article-id-ux.mjs
