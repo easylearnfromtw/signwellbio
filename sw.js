@@ -5,7 +5,7 @@ const SW_PUBLIC_CACHE=SW_PUBLIC_CACHE_PREFIX+'signwellbio-20261008-visual-recove
 const SW_PUBLIC_SHELL=[
   './','./index.html','./topics.html','./about.html','./share.html','./newsletter.html',
   './manifest.webmanifest','./site-content.js','./analytics-config.js',
-  './assets/public-core.css','./assets/public-core.js',
+  './assets/public-core.css','./assets/signwell-editorial.css','./assets/public-core.js',
   './assets/uiux-system.css','./assets/uiux-system.js','./assets/gpu-optimizer.css','./assets/gpu-optimizer.js','./assets/signwell-ios-glass-r3.css','./assets/signwell-liquid-hero.css','./assets/signwell-liquid-hero.js','./assets/signwell-ambient-pages.css','./assets/signwell-ambient-pages.js',
   './assets/bundles/public-liquid-navigation.js','./assets/bundles/article-id-card.js',
   './assets/components/styles/public-liquid-dock.css','./assets/components/styles/article-id-card.css',
