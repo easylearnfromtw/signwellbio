@@ -250,9 +250,17 @@
         resize();
         const v = useGSAP ? pose : sample(t);
         artifact.rotation.set(v.rx, v.ry, v.rz);
-        artifact.position.y = v.y;
-        const targetScale = mobile.matches ? 0.93 : 1.07;
-        artifact.scale.setScalar(v.scale * targetScale);
+        // On portrait screens the stage heading/description occupy the upper
+        // reading zone. Keep the real 3D artifact in the lower-right area.
+        // Camera x/y use world units, not CSS pixels; perspective still works.
+        if (mobile.matches) {
+          const shortScreen = innerHeight < 730;
+          artifact.position.set(0.72, -1.40 + v.y * 0.30, 0);
+          artifact.scale.setScalar(v.scale * (shortScreen ? 0.48 : 0.54));
+        } else {
+          artifact.position.set(0, v.y, 0);
+          artifact.scale.setScalar(v.scale * 1.07);
+        }
         const cool = new THREE.Color(0xa9b6ba), warmColor = new THREE.Color(0xd6cfb8), blue = new THREE.Color(0x9db9b9);
         const alpha = Math.min(1, Math.max(0, (t - 0.16) / 0.31));
         const beta = Math.min(1, Math.max(0, (t - 0.57) / 0.3));
