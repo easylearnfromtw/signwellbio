@@ -5,12 +5,14 @@ on:
       - release/public-motion-v11-20261008
       - release/public-v11-cross-page-20261008
       - feature/public-motion-2k-gpu-outline-20261008
+      - feature/public-mobile-editorial-polish-20261008
   pull_request:
     paths:
       - "index.html"
       - "assets/public-core.js"
       - "assets/public-motion*"
       - "qa/smoke-public-motion.mjs"
+      - "qa/smoke-public-mobile.mjs"
       - "qa/verify-rendering-quality.mjs"
 jobs:
   browser:
@@ -31,6 +33,8 @@ jobs:
         run: node qa/verify-rendering-quality.mjs
       - name: Smoke test Public desktop/mobile and WebGL output
         run: node qa/smoke-public-motion.mjs
+      - name: Validate responsive layout at 320, 360, 390, 430 and 768px
+        run: node qa/smoke-public-mobile.mjs
       - name: Upload browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -39,4 +43,5 @@ jobs:
           path: |
             qa-public-v11-*.png
             qa-public-v12-*.png
+            qa-public-mobile-*.png
           if-no-files-found: ignore

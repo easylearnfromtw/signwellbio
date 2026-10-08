@@ -44,7 +44,7 @@ assert.ok(!js.includes('antialias: !mobile.matches'),"Mobile MSAA must remain en
 assert.ok(!js.includes('resizeObserver.observe(stage)'),"Do not render entire sticky scene");
 assert.ok(css.includes('width:min(78vw,720px)')&&css.includes('width:clamp(230px,75vw,320px)'),"Cropped raster layout missing");
 assert.ok(css.includes('left:71%')&&css.includes('top:71%'),"Mobile reading-safe placement missing");
-assert.ok(loader.includes('public-motion.css?version=12.0.0'),"Old cached CSS URL");
+assert.ok(loader.includes('public-motion.css?version=13.0.0'),"Old cached CSS URL");
 assert.ok(loader.includes('public-motion-three.js?v=12.0.0'),"Old cached 3D module");
-assert.ok(homepage.includes('public-v12-2k-outline-20261008'),"Old cached Public loader");
+assert.ok(homepage.includes('public-v13-mobile-20261008'),"Old cached Public loader");
 console.log("PASS", "MSAA, outline, GPU governor, cropped viewport, 2K texture and cache-busted assets");
