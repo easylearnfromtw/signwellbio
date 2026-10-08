@@ -54,13 +54,14 @@ await check("Desktop scene creates seven covers with native scroll and clickable
  const p=await ctx.newPage();const errors=[];p.on("pageerror",e=>errors.push(String(e)));
  await p.goto(base+"topics.html",{waitUntil:"domcontentloaded"});
  await p.waitForFunction(()=>document.querySelectorAll("#app .sw-topic-paper").length===7&&document.querySelector("#app .sw-topic-tape.is-ready"),{timeout:14000});
- await p.waitForFunction(()=>document.querySelectorAll("#topicDirectory .topic-card").length===12,{timeout:14000});
+ await p.waitForFunction(()=>window.SignWellPublicSnapshot?.ready===true,{timeout:15000});
+ await p.waitForFunction(()=>document.querySelectorAll("#topicDirectory .topic-card").length===7,{timeout:14000});
  const init=await p.evaluate(()=>{
   const rail=document.querySelector("#topicTape");
   return{height:rail.offsetHeight,viewport:innerHeight,cards:rail.querySelectorAll("button.sw-topic-paper[data-topic]").length,directory:document.querySelectorAll("#topicDirectory .topic-card").length,overflow:document.documentElement.scrollWidth-innerWidth};
  });
  assert.ok(init.height>init.viewport*4,"Story rail not scrollable "+JSON.stringify(init));
- assert.equal(init.cards,7);assert.equal(init.directory,12);assert.ok(init.overflow<=3,JSON.stringify(init));
+ assert.equal(init.cards,7);assert.equal(init.directory,7);assert.ok(init.overflow<=3,JSON.stringify(init));
  await p.evaluate(()=>{
   const rail=document.querySelector("#topicTape");
   const distance=rail.offsetHeight-innerHeight;
