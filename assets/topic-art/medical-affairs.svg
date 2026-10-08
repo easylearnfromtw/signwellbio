@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 600" role="img" aria-label="時事醫學專欄">
+ <defs><linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5eccd"/><stop offset=".7" stop-color="#fbf8f1"/><stop offset="1" stop-color="#d8baa1"/></linearGradient><pattern id="grid" width="35" height="35" patternUnits="userSpaceOnUse"><path d="M35 0H0V35" fill="none" stroke="#8c6357" stroke-opacity=".08"/></pattern></defs>
+ <rect width="720" height="600" fill="url(#paper)"/><rect width="720" height="600" fill="url(#grid)"/><circle cx="580" cy="85" r="166" fill="#d8baa1" opacity=".16"/>
+ <g color="#8c6357" transform="translate(10 -6)"><rect x="222" y="202" width="274" height="310" rx="9" fill="none" stroke="currentColor" stroke-width="8"/><path d="M247 249h214m-214 33h119m-119 48h95v91h-95zm115 0h98m-98 30h98m-98 30h98m-213 63h214m-214 26h214" fill="none" stroke="currentColor" stroke-width="6"/></g>
+ <rect x="38" y="38" width="644" height="524" fill="none" stroke="#8c6357" stroke-opacity=".24" stroke-width="2"/>
+ <text x="66" y="86" fill="#8c6357" font-size="18" letter-spacing="4" font-family="Arial,sans-serif">SIGNWELL BIO / ARCHIVE</text>
+ <text x="66" y="538" fill="#8c6357" font-size="21" letter-spacing="3" font-family="Arial,sans-serif">MEDICAL PERSPECTIVES</text>
+ </svg>
