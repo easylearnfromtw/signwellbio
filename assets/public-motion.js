@@ -198,7 +198,12 @@
  });
  // On late-loaded script, avoid showing a broken half-rendered intro:
  host.hidden=true;
- if(document.querySelector("#app #latest")&&!new URL(location.href).searchParams.has("article")){
-  setActive(true,{siteText:window.SIGNWELL_SITE_TEXT||{},ready:true})
+ const latestPublicSnapshot = window.SignWellPublicSnapshot;
+ if(latestPublicSnapshot?.page==="home"){
+  setActive(true,latestPublicSnapshot);
+ }else if(!latestPublicSnapshot && document.querySelector("#app #latest")&&!new URL(location.href).searchParams.has("article")){
+  // The initial Public fetch may still be pending. Its render event will
+  // replace this temporary presentation with authenticated published data.
+  setActive(true,{siteText:window.SIGNWELL_SITE_TEXT||{},ready:false});
  }
 })();

@@ -122,6 +122,39 @@ await test("Production published data populates intro; local draft never appears
  assert.equal(await page.locator('[href^="article.html?story="]').count(),0,"Mock article route leaked to Public");
  await ctx.close()
 });
+await test("Late-loaded motion frontend hydrates latest published CMS snapshot",async()=>{
+ const ctx=await openContext(1280,820);
+ const page=await ctx.newPage();
+ // Simulate a slow mobile connection where the existing Public data
+ // finishes rendering before the motion-enhancement JavaScript executes.
+ await page.route("**/assets/public-motion.js?*",async route=>{
+  await new Promise(resolve=>setTimeout(resolve,2300));
+  await route.continue();
+ });
+ await page.goto(home(),{waitUntil:"domcontentloaded",timeout:30000});
+ await page.waitForFunction(()=>{
+  const snapshot=window.SignWellPublicSnapshot;
+  const host=document.getElementById("swMotionHomeHost");
+  return snapshot?.page==="home"&&snapshot.ready&&!host?.hidden&&host?.shadowRoot?.querySelector(".intro h1");
+ },{timeout:15000});
+ const status=await page.evaluate(()=>{
+  const snap=window.SignWellPublicSnapshot;
+  const root=document.getElementById("swMotionHomeHost").shadowRoot;
+  const articles=snap.articles.filter(a=>a.status==="Published"&&a.slug);
+  return {
+   title:root.querySelector(".intro h1").textContent,
+   expectedLead:snap.siteText.motionIntroLead||"不只研究身體，",
+   publishedFeatures:document.querySelectorAll("#swMotionFeatures .sw-motion-feature").length,
+   expectedFeatured:Math.min(3,articles.length),
+   visible:!document.getElementById("swMotionHomeHost").hidden
+  };
+ });
+ assert.equal(status.visible,true);
+ assert.ok(status.title.includes(status.expectedLead),JSON.stringify(status));
+ assert.equal(status.publishedFeatures,status.expectedFeatured,JSON.stringify(status));
+ await ctx.close();
+});
+
 await browser.close();await new Promise(resolve=>server.close(resolve));
 const passed=outcomes.filter(x=>x.pass).length;
 console.log("\n"+passed+"/"+outcomes.length+" browser and regression tests passed");
