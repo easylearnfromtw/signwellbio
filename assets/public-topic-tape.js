@@ -24,16 +24,18 @@
       const isLaid=local>.03;
       const angle=[-5.4,3.2,-2.5,4.2,-4,2.6,-1.6][i%7];
       const fall=(1-local)*-innerHeight*.69;
-      const x=-depth*(matchMedia("(max-width:720px)").matches?5:10);
-      const y=fall-depth*(matchMedia("(max-width:720px)").matches?10:17);
+      const x=-depth*(matchMedia("(max-width:720px)").matches?13:20);
+      const y=fall-depth*(matchMedia("(max-width:720px)").matches?23:30);
       const scale=Math.max(.82,1-depth*.034);
       card.style.transform="translate(-50%,-50%) translate3d("+x.toFixed(1)+"px,"+y.toFixed(1)+"px,0) rotate("+((1-local)*-13+angle*local).toFixed(2)+"deg) scale("+scale.toFixed(3)+")";
       card.style.opacity=isLaid?String(Math.min(1,local*2.5)):"0";
       card.style.zIndex=String(5+i);
       const topCard=isLaid&&i===active;
       card.classList.toggle("is-top",topCard);
-      card.style.pointerEvents=topCard?"auto":"none";
-      card.tabIndex=topCard?0:-1;
+      // All laid and visible papers remain keyboard/click accessible, not just the top card.
+      card.style.pointerEvents=isLaid?"auto":"none";
+      card.tabIndex=isLaid?0:-1;
+      card.setAttribute("aria-hidden",String(!isLaid));
     });
   }
   function schedule(){
@@ -61,7 +63,7 @@
   document.addEventListener("signwell:render",()=>{bind();schedule()});
   addEventListener("scroll",schedule,{passive:true});
   addEventListener("resize",schedule,{passive:true});
-  reduced.addEventListener?.("change",()=>{if(instance){instance.rail.classList.add("is-ready");instance.cards.forEach(c=>{c.style.pointerEvents=reduced.matches?"auto":"none";c.tabIndex=reduced.matches?0:-1});schedule()}});
+  reduced.addEventListener?.("change",()=>{if(instance){instance.rail.classList.add("is-ready");instance.cards.forEach(c=>{c.style.pointerEvents=reduced.matches?"auto":"none";c.tabIndex=reduced.matches?0:-1;c.setAttribute("aria-hidden",String(!reduced.matches))});schedule()}});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind,{once:true});
   else bind();
 })();
