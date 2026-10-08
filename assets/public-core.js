@@ -682,10 +682,10 @@
     if(!featured.length)return "";
     return '<section class="sw-topic-tape" id="topicTape" data-sw-topic-tape style="--sw-topic-total:'+featured.length+'" aria-label="互動式主題紙張堆疊">'+
       '<div class="sw-topic-sticky"><div class="sw-topic-floor" aria-hidden="true"><span class="sw-topic-floor-horizon"></span><span class="sw-topic-floor-rule"></span></div>'+
-      '<div class="sw-topic-overline"><span>THE ATLAS OF IDEAS</span><span>THE EDITORIAL ARCHIVE / 2026</span></div>'+
+      '<div class="sw-topic-overline"><span>'+esc(site.topicsTapeEyebrow||"THE ATLAS OF IDEAS")+'</span><span>THE EDITORIAL ARCHIVE / 2026</span></div>'+
       '<div class="sw-topic-roll" aria-hidden="true"><span class="sw-topic-roll-cap"></span><span class="sw-topic-roll-film"></span><span class="sw-topic-roll-shadow"></span></div>'+
       '<div class="sw-topic-paper-stack" data-tape-stack>'+featured.map((t,i)=>topicTapeCard(t,i,featured.length)).join("")+'</div>'+
-      '<div class="sw-topic-legend"><span class="sw-topic-current" data-sw-topic-current>01 / '+String(featured.length).padStart(2,"0")+'</span><span>向上滑動，逐張展開醫學觀點</span></div>'+
+      '<div class="sw-topic-legend"><span class="sw-topic-current" data-sw-topic-current>01 / '+String(featured.length).padStart(2,"0")+'</span><span>'+esc(site.topicsTapeGuide||"向上滑動，逐張展開醫學觀點")+'</span></div>'+
       '<a class="sw-topic-skip" href="#topicDirectory">查看所有專欄</a></div></section>';
   }
   function renderTopics(){
@@ -695,8 +695,8 @@
       '<h1>'+esc(site.topicsTitle||"主題分類")+'</h1><p>'+esc(site.topicsSubtitle||"循著紙張與觀點，探索醫學的七個切面。")+'</p></header>'+
       renderTopicTape(featured)+
       '<section class="sw-topic-directory" id="topicDirectory" aria-label="所有主題分類">'+
-      '<div class="sw-topic-directory-head"><div class="eyebrow">EDITORIAL INDEX / TOPICS</div><h2>選一個值得深入的問題。</h2>'+
-      '<p>選擇主題後，只顯示正式發布的相關文章；尚無文章的分類會如實顯示空白狀態。</p></div>'+
+      '<div class="sw-topic-directory-head"><div class="eyebrow">EDITORIAL INDEX / TOPICS</div><h2>'+esc(site.topicsDirectoryTitle||"選一個值得深入的問題。")+'</h2>'+
+      '<p>'+esc(site.topicsDirectoryDescription||"選擇主題後，只顯示正式發布的相關文章；尚無文章的分類會如實顯示空白狀態。")+'</p></div>'+
       '<div class="topic-grid">'+(list.map(topicCard).join("")||(dataReady?emptyPanel("尚未建立主題。"):""))+'</div></section>'+
       '<section class="section" id="topicArticles" aria-live="polite"></section>';
     $$("[data-topic]",app).forEach(el=>el.onclick=()=>selectTopic(el.dataset.topic,{scroll:true}));
