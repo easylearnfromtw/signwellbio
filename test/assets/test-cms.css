@@ -72,3 +72,7 @@ h2{font-size:20px;letter-spacing:-.035em}
  .frame{height:550px;padding:8px}.toast{bottom:100px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+
+/* Navigation is desktop-sidebar-only until the iOS breakpoint. */
+.mobiletabs{display:none}
+@media(max-width:750px){.mobiletabs{display:grid}}
