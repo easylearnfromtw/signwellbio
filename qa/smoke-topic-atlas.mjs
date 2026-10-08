@@ -46,7 +46,7 @@ await check("Main homepage's WebGL markup and loader are unchanged by topics pre
  const html=fs.readFileSync("index.html","utf8");
  assert.ok(html.includes("swMotionHomeHost"));
  assert.ok(html.includes("public-v13-mobile-20261008"));
- assert.ok(!html.includes("public-topic-tape.js"));
+ assert.ok(!html.includes('id="topicTape"'),"Homepage HTML must not embed topic stage");
 });
 await check("Official CMS edits, publishes, verifies and reloads cover/tone/aliases/stack configuration",async()=>{
  const cms=fs.readFileSync("cms/assets/bundles/cms-app.js","utf8");
@@ -69,6 +69,7 @@ for(const [width,height] of [[360,760],[390,844],[768,1024],[1366,900]]){
   const context=await ctx(width,height,"reduce"),page=await context.newPage();
   await page.goto(base+"topics.html",{waitUntil:"domcontentloaded"});
   await page.waitForFunction(()=>document.querySelectorAll("#app .sw-topic-paper").length===7,{timeout:16000});
+  await page.waitForFunction(()=>{const img=document.querySelector("#app .sw-topic-paper img");return img&&img.complete&&img.naturalWidth>0},{timeout:13000});
   const v=await page.evaluate(()=>{
    const rail=document.querySelector("[data-sw-topic-tape]");
    const topics=[...rail.querySelectorAll(".sw-topic-paper")];
