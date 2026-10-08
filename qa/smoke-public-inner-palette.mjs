@@ -64,7 +64,7 @@ await check("Homepage visual CSS remains opt-out even when palette is loaded",as
    homeHost:!!document.querySelector("#swMotionHomeHost"),canvas:!!document.querySelector("#pager")};
  });
  assert.equal(r.bodyMatch,false,JSON.stringify(r));
- assert.equal(r.vars,"#ffffff",JSON.stringify(r));
+ assert.ok(["#fff","#ffffff"].includes(r.vars),JSON.stringify(r));
  assert.ok(r.cssLoaded&&r.homeHost&&r.canvas,JSON.stringify(r));
  await ctx.close()
 });
@@ -109,7 +109,7 @@ await check("SPA route switch from homepage and back never tints homepage",async
  assert.equal(await page.evaluate(()=>getComputedStyle(document.body).getPropertyValue("--paper").trim()),"#fffcf6");
  await page.locator("#pager > .pager-items [data-page='home']").click();
  await page.waitForSelector("#app #latest",{timeout:14000});
- assert.equal(await page.evaluate(()=>getComputedStyle(document.body).getPropertyValue("--paper").trim()),"#ffffff");
+ assert.ok(["#fff","#ffffff"].includes(await page.evaluate(()=>getComputedStyle(document.body).getPropertyValue("--paper").trim())));
  assert.equal(await page.evaluate(()=>document.body.matches("body:has(#app .page-hero)")),false);
  await ctx.close()
 });
