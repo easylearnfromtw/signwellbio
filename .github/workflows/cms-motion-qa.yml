@@ -1,0 +1,26 @@
+name: CMS Motion Integration QA
+on:
+  push:
+    branches:
+      - feature/cms-motion-home-integration-20261008
+  pull_request:
+    paths:
+      - "cms/**"
+      - "test/**"
+      - "qa/verify-cms-motion.mjs"
+      - ".github/workflows/cms-motion-qa.yml"
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout candidate branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: ""
+      - name: Validate CMS motion integration
+        run: node qa/verify-cms-motion.mjs
