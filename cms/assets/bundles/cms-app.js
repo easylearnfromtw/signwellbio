@@ -5363,7 +5363,23 @@ function renderTopicsManager(){
     $$('[data-topic-del]').forEach(b=>b.onclick=async()=>{const tp=data.topics.find(x=>x.id===b.dataset.topicDel);if(!tp)return;if(!(await swConfirm(`刪除主題「${tp.name}」？\n文章本身不會被刪除。`,{title:'刪除主題？',kicker:'DANGER ZONE',danger:true,confirmText:'確認刪除'})))return;data.topics=data.topics.filter(x=>x.id!==tp.id);persist(true);paint();showToast('主題已刪除')});
     const saveTopicLocal=()=>{const legacyNames=[...new Set($('#topicAliases').value.split(/[、，,\n]+/).map(v=>v.trim()).filter(Boolean))];const name=$('#topicName').value.trim(),slug=$('#topicSlug').value.trim()||slugify(name),description=$('#topicDesc').value.trim(),active=$('#topicActive').checked,cover=$('#topicCover').value.trim(),tapeTone=$('#topicTapeTone').value,tapeFeatured=$('#topicTapeFeatured').checked;if(cover&&!/^(?:https:\/\/|assets\/|\/assets\/)/i.test(cover)){showToast('請使用站內 assets/ 或 HTTPS 圖片網址');return null}if(!name){showToast('請輸入主題名稱');return null}let renamed=false;if(editId){const tp=data.topics.find(x=>x.id===editId);if(!tp)return null;const oldName=tp.name||'';renamed=Boolean(oldName&&oldName!==name);Object.assign(tp,{name,slug,description,active,cover:cover.slice(0,700),tapeTone,tapeFeatured,legacyNames});if(renamed)data.articles.forEach(a=>{if(a.category===oldName)a.category=name})}else data.topics.push({id:'topic-'+Date.now(),name,slug,description,active,cover:cover.slice(0,700),tapeTone,tapeFeatured,legacyNames,order:data.topics.length});persist(true);editId=null;return{renamed}};$('#saveTopic').onclick=()=>{if(!saveTopicLocal())return;paint();showToast('主題已儲存')};$('#saveTopicOnline').onclick=async()=>{const result=saveTopicLocal();if(!result)return;paint();try{if(result.renamed)await publishGitHub();else await publishTopicsOnly()}catch(e){showToast('主題同步失敗：'+e.message)}};
     $('#cancelTopic').onclick=clear;$('#newTopicBtn').onclick=clear;$('#syncTopicsBtn').onclick=async()=>{try{await publishTopicsOnly()}catch(e){showToast('主題同步失敗：'+e.message)}};
-    $('#importPublicTopicsBtn').onclick=async()=>{try{const url=new URL('../topics/index.json',location.href);if(url.origin!==location.origin)throw Error('僅允許同站匯入');const response=await fetch(url,{cache:'no-store'});if(!response.ok)throw Error('公開主題載入失敗 '+response.status);const published=await response.json();if(!Array.isArray(published))throw Error('公開主題格式不正確');let added=0;const known=new Set(data.topics.map(t=>String(t.id||'')));published.forEach(t=>{if(t&&typeof t==='object'&&t.id&&!known.has(String(t.id))){data.topics.push(t);known.add(String(t.id));added++}});persist(true);paint();showToast(added?'已匯入 '+added+' 個已發布主題，原有草稿保留':'所有已發布主題都已存在')}catch(e){showToast('載入主題失敗：'+e.message)}};
+    $('#importPublicTopicsBtn').onclick=async()=>{
+      try{
+        const url=new URL('../topics/index.json',location.href);
+        if(url.origin!==location.origin)throw Error('僅允許同站匯入');
+        const response=await fetch(url,{cache:'no-store'});
+        if(!response.ok)throw Error('公開主題載入失敗 '+response.status);
+        const published=await response.json();
+        if(!Array.isArray(published)||!published.length)throw Error('公開主題格式不正確');
+        if(!(await swConfirm('同步公開站的七大專欄、封面及堆疊排序？文章與未同步的自訂主題資料會保留。',{title:'同步公開主題？',kicker:'CMS / TOPIC IMPORT',confirmText:'匯入公開主題'})))return;
+        const extras=data.topics.filter(t=>!published.some(p=>p.id===t.id||p.name===t.name));
+        // Historical categories stay editable, but no longer pollute the seven new columns.
+        const historical=new Set(['營養品科普','減重醫學','抗衰老醫學','醫美科普','時事探討']);
+        data.topics=[...clone(published),...extras.map(t=>historical.has(t.name)?{...t,active:false,tapeFeatured:false}:t)];
+        persist(true);paint();
+        showToast('已同步 '+published.filter(t=>t.active!==false).length+' 個公開主題；文章與原有草稿保留');
+      }catch(e){showToast('載入主題失敗：'+e.message)}
+    };
 
     $('#view').insertAdjacentHTML('beforeend',`
       <section class="panel sw-glossary-panel sw-settings-subsection" id="glossaryPanel">
