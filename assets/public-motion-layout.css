@@ -1,0 +1,64 @@
+/* SIGNWELL BIO Public 11: motion intro + native published magazine index.
+ * Existing Public navigation, article/subscribe backend and accessibility styles
+ * remain owned by public-core.css and the iOS Liquid dock component.
+ */
+#swMotionHomeHost{display:block;position:relative;width:100%;max-width:100%;overflow:clip;background:#1d2327}
+#swMotionHomeHost[hidden]{display:none!important}
+body.sw-motion-active{--sw-motion-text:#202726;overflow-x:clip}
+body.sw-motion-active .brand-top{z-index:110;color:#fff!important;mix-blend-mode:difference;filter:none}
+body.sw-motion-active .brand-top .brand-copy :is(strong,span){color:inherit!important}
+body.sw-motion-active .top-actions{z-index:112}
+body.sw-motion-active .top-actions #searchBtn{background:#e8e8e6d9;border-color:#fff9;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+body.sw-motion-active #app{background:#f8f6f0;color:#202726;padding-top:0}
+body.sw-motion-active #app #latest{padding:clamp(85px,9vw,150px) clamp(24px,7vw,125px) clamp(95px,9vw,155px);margin:0;width:100%;max-width:none;background:#f8f6f0}
+body.sw-motion-active #app #latest .section-head h2{font-family:"Noto Serif TC","Songti TC","PMingLiU",Georgia,serif;font-weight:600;letter-spacing:-.07em}
+body.sw-motion-active #app #latest .bento{max-width:1430px;margin-inline:auto}
+body.sw-motion-active #app #latest .recent-list{max-width:1430px;margin-inline:auto}
+.sw-motion-features{padding:clamp(83px,9vw,145px) clamp(24px,7vw,125px);background:#eaeae4;color:#242928}
+.sw-motion-section-head{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid #bbbdb6;padding-bottom:30px;margin-bottom:43px;flex-wrap:wrap;gap:13px}
+.sw-motion-section-meta{font-size:10px;font-weight:800;letter-spacing:.21em;color:#66767a}
+.sw-motion-section-head h2{margin:0;font:500 clamp(39px,4.8vw,72px)/1.3 "Noto Serif TC","Songti TC","PMingLiU",Georgia,serif;letter-spacing:-.07em}
+.sw-motion-feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,43px);max-width:1430px;margin:auto}
+.sw-motion-feature{min-width:0;display:block;text-decoration:none;color:inherit}
+.sw-motion-feature:focus-visible{outline:3px solid #779aa8;outline-offset:5px}
+.sw-motion-feature-art{height:clamp(190px,20vw,330px);background:linear-gradient(130deg,#c6d5d4,#819aa3 45%,#2c4756);overflow:hidden;position:relative}
+.sw-motion-feature:nth-child(2) .sw-motion-feature-art{background:linear-gradient(130deg,#d9d4b8,#96aba8 58%,#4d6774)}
+.sw-motion-feature:nth-child(3) .sw-motion-feature-art{background:linear-gradient(130deg,#c6c7bd,#d6d4b6 48%,#76939a)}
+.sw-motion-feature-art img{height:100%;width:100%;display:block;object-fit:cover;transition:transform .55s ease}
+.sw-motion-feature:hover .sw-motion-feature-art img{transform:scale(1.035)}
+.sw-motion-feature-mark{position:absolute;top:13%;left:11%;font:750 clamp(15px,2.2vw,28px)/1.2 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:-.08em;color:#e7e9e0b8}
+.sw-motion-feature-meta{font-size:10px;font-weight:800;letter-spacing:.18em;color:#707871;margin:27px 0 12px}
+.sw-motion-feature h3{font:500 clamp(24px,2.25vw,34px)/1.57 "Noto Serif TC","Songti TC","PMingLiU",Georgia,serif;letter-spacing:-.055em;margin:0}
+.sw-motion-feature p{font-size:14px;line-height:1.9;color:#787c76;max-width:35em;margin:17px 0 0}
+.sw-motion-editorial-note{padding:clamp(98px,11vw,170px) clamp(24px,12vw,200px) 0;background:#f8f6f0;color:#23292b;border-top:1px solid #d9d7cf}
+.sw-motion-editorial-note>h2{margin:29px 0 22px;font:500 clamp(29px,3.5vw,53px)/1.65 "Noto Serif TC","Songti TC","PMingLiU",Georgia,serif;letter-spacing:-.055em}
+.sw-motion-editorial-note>h2 span{display:block}
+.sw-motion-editorial-note>p{max-width:44em;color:#737873;font-size:16px;line-height:2.05;margin:0}
+.sw-motion-newsletter{margin-top:clamp(85px,10vw,170px);padding:clamp(50px,6vw,95px) clamp(24px,6vw,95px);background:#1c252a;color:#f4f1e9;display:flex;align-items:end;justify-content:space-between;gap:35px}
+.sw-motion-newsletter small{font-size:10px;letter-spacing:.2em;color:#d7cba1}
+.sw-motion-newsletter h3{font:500 clamp(37px,5vw,72px)/1.15 Georgia,serif;letter-spacing:-.075em;margin:23px 0}
+.sw-motion-newsletter p{font-size:15px;line-height:1.9;color:#c2c8c4;max-width:39em}
+.sw-motion-newsletter-link{flex:none;border-bottom:1px solid #e8dba6;text-decoration:none;color:#f8f5ea;font-size:12px;font-weight:750;padding:16px 0;min-height:44px}
+.sw-motion-newsletter-link:hover{color:#e8dba6}
+@media(max-width:860px){
+ .sw-motion-feature-grid{grid-template-columns:1fr 1fr}
+ .sw-motion-feature:first-child{grid-column:1/-1}
+ .sw-motion-feature:first-child .sw-motion-feature-art{height:340px}
+}
+@media(max-width:720px){
+ body.sw-motion-active #app #latest{padding:76px 22px 100px}
+ .sw-motion-features{padding:90px 24px 110px}
+ .sw-motion-section-head{margin-bottom:28px;padding-bottom:22px}
+ .sw-motion-section-head h2{font-size:39px}
+ .sw-motion-feature-grid{grid-template-columns:1fr;gap:38px}
+ .sw-motion-feature:first-child{grid-column:auto}
+ .sw-motion-feature-art,.sw-motion-feature:first-child .sw-motion-feature-art{height:255px}
+ .sw-motion-feature h3{font-size:26px;line-height:1.65}
+ .sw-motion-editorial-note{padding:83px 24px 0}
+ .sw-motion-editorial-note>h2{font-size:29px;line-height:1.74}
+ .sw-motion-newsletter{margin-top:90px;flex-direction:column;align-items:start;padding:60px 26px;gap:16px}
+ .sw-motion-newsletter h3{font-size:45px}
+}
+@media(prefers-reduced-motion:reduce){
+ .sw-motion-feature-art img{transition:none}
+}
