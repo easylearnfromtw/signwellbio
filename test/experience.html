@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="color-scheme" content="light">
 <meta name="description" content="SIGNWELL 欣緯生醫—專屬空間敘事動態實驗。">
-<title>Motion Study 02｜SIGNWELL 欣緯生醫</title>
+<title>Motion Study 03 / REAL 3D｜SIGNWELL 欣緯生醫</title>
 <style>
 :root{--bone:#efeee7;--ink:#171b1e;--sea:#7896a4;--gold:#dccf95;--pink:#d4b9c0;--serif:"Songti TC","Noto Serif TC","Source Han Serif TC",Georgia,serif;--sans:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",Arial,sans-serif}
 *,*:before,*:after{box-sizing:border-box}html{scroll-behavior:smooth;scrollbar-gutter:stable}body{margin:0;color:var(--ink);background:var(--bone);font-family:var(--sans);-webkit-font-smoothing:antialiased;min-width:0}body.exp-menu-open{overflow:hidden}[hidden]{display:none!important}
@@ -256,8 +256,36 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
  .final-page{display:none!important}
  .reading-card-visual i{transition:none}
 }
+
+/* 03 / genuine Three.js foreground with resilient progressive enhancement. */
+.webgl-figure-host{
+ position:absolute;inset:0;z-index:11;display:block;overflow:hidden;
+ pointer-events:none;contain:layout paint;will-change:transform;
+}
+.webgl-figure-canvas{display:block;width:100%;height:100%;pointer-events:none}
+#motionStage.is-webgl-ready .edition-figure{opacity:0;visibility:hidden}
+#motionStage .edition-figure{transition:opacity .45s ease}
+.webgl-status{
+ position:absolute;z-index:24;right:clamp(22px,5vw,86px);bottom:5%;
+ font:750 9px/1.5 var(--sans);letter-spacing:.16em;color:#e8e8e1;
+ padding:7px 10px;border:1px solid #ffffff46;background:#1e2b3033;
+ backdrop-filter:blur(6px);pointer-events:none;
+}
+#motionStage[data-renderer="css"] .webgl-status{color:#e4e1d3;border-color:#ffffff2a}
+#motionStage[data-renderer="three-gsap"] .webgl-status{color:#e0f0e8;border-color:#c7ded890}
+#motionStage[data-renderer="loading"] .webgl-status{color:#f2e6c0}
+@media(max-width:720px){
+ .webgl-status{right:22px;bottom:5%;font-size:8px;padding:6px 8px}
+ .webgl-figure-host{z-index:11}
+}
+@media(prefers-reduced-motion:reduce){
+ #motionStage .edition-figure{transition:none!important}
+ .webgl-figure-host{display:none!important}
+}
 </style>
 <link rel="stylesheet" href="assets/site.css">
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 </head>
 <body data-page="home">
 <header class="study-chrome" aria-label="SIGNWELL 動態實驗導覽">
@@ -278,7 +306,7 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
  <a class="study-index" href="#motionStory">向下探索</a>
 </section>
 <section class="story-rail" id="motionStory" aria-label="動態敘事章節">
- <div class="story-stage" id="motionStage">
+ <div class="story-stage" id="motionStage" data-renderer="css">
   <div class="stage-dark">
     <div class="stage-grid" aria-hidden="true"></div><div class="stage-topline" aria-hidden="true"><span>STUDY Nº 01</span><span>THE BODY / THE PERSON</span></div>
     <div class="stage-sub"><b>01 / THE HUMAN CONDITION</b><p>健康，不只是被數據量化的結果，也關乎生活中的每一次選擇。</p></div>
@@ -300,6 +328,7 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
   </div>
   <div class="story-caption"><span>DESIGN OBJECT / SIGNWELL<br>EDITORIAL ARTIFACT 001</span><span id="storyPhase">01 / THE HUMAN CONDITION</span></div>
   <div class="story-progress" aria-hidden="true"><b></b></div>
+  <span class="webgl-status" id="webglStatus" role="status" aria-live="polite">3D 模組準備中</span>
  </div>
 </section>
 <section class="after-story" id="reading">
@@ -367,4 +396,5 @@ addEventListener("keydown",e=>{if(e.key==="Escape"&&!menu.hidden)close();if(e.ke
 })();
 </script>
 <script defer src="assets/site.js"></script>
+<script type="module" src="assets/experience-three.js"></script>
 </body></html>
