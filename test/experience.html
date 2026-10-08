@@ -358,6 +358,28 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
   #motionStage .stage-page-inner{opacity:1!important;transition:none!important}
 }
 
+
+/* Readable oversized type on phone: words remain legible even behind the artifact. */
+@media(max-width:720px){
+ #motionStage .stage-word{
+  font-size:clamp(80px,25vw,111px);
+  letter-spacing:-.105em;
+  left:50%;top:49%;
+  max-width:100vw;
+ }
+ #motionStage .stage-page-word{
+  bottom:7%;left:3%;
+  font-size:clamp(50px,14vw,75px);
+  color:#20292535;
+  letter-spacing:-.09em;
+ }
+ #motionStage .final-page .stage-page-word{
+  font-size:clamp(68px,18vw,93px);
+  color:#24414b35;
+  bottom:8%;left:3%;
+ }
+ #motionStage .webgl-status{background:rgba(24,39,44,.83);color:#f8f7f0}
+}
 </style>
 <link rel="stylesheet" href="assets/site.css">
 <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
