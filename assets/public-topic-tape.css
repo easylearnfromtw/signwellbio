@@ -334,3 +334,68 @@ body:has(#app .sw-topic-tape) #app>.page-hero{
    line-height:1.3;
  }
 }
+
+
+/* Topic-stack quick index — reach even fully covered sheets without guessing
+   which sliver belongs to which column. It does not alter scroll progression. */
+#app .sw-topic-atlas{
+  position:absolute;right:clamp(23px,6vw,108px);
+  bottom:calc(170px + env(safe-area-inset-bottom,0px));
+  z-index:48;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;
+  color:#2b444b;
+}
+#app .sw-topic-atlas-toggle{
+  display:inline-flex;align-items:center;justify-content:space-between;gap:18px;
+  min-height:44px;padding:11px 15px;border:1px solid rgba(82,112,119,.34);
+  border-radius:10px;background:rgba(255,252,245,.96);color:#385d69;
+  box-shadow:0 9px 27px -17px rgba(25,48,52,.35);
+  font-size:11px;font-weight:750;letter-spacing:.05em;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+#app .sw-topic-atlas-count{font-variant-numeric:tabular-nums;color:#697d80;letter-spacing:.08em}
+#app .sw-topic-atlas-list{
+  position:absolute;bottom:calc(100% + 10px);right:0;
+  width:min(330px,calc(100vw - 42px));max-height:min(53svh,460px);
+  padding:9px;overflow-y:auto;overscroll-behavior:contain;
+  border:1px solid rgba(111,131,129,.27);border-radius:14px;
+  background:#fffcf5;box-shadow:0 24px 64px -23px rgba(24,41,42,.36);
+  scrollbar-width:thin;
+}
+#app .sw-topic-atlas-list[hidden]{display:none!important}
+#app .sw-topic-atlas-item{
+  box-sizing:border-box;width:100%;min-height:47px;display:flex;
+  align-items:center;gap:13px;padding:10px 12px;
+  border:0;border-bottom:1px solid rgba(96,113,112,.12);
+  border-radius:7px;background:transparent;color:#3c5559;text-align:left;
+  font-size:13px;font-weight:660;line-height:1.45;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+#app .sw-topic-atlas-item:last-child{border-bottom:0}
+#app .sw-topic-atlas-item:hover,
+#app .sw-topic-atlas-item:focus-visible{background:#e5eff1;color:#284951}
+#app .sw-topic-atlas-item.is-laid .sw-topic-atlas-no{color:#3f7180}
+#app .sw-topic-atlas-item.is-current{background:#f5efd9;color:#273e42}
+#app .sw-topic-atlas-no{min-width:20px;font-size:10px;font-weight:760;color:#a0a8a6;letter-spacing:.04em}
+#app .sw-topic-atlas-toggle:focus-visible,
+#app .sw-topic-atlas-item:focus-visible{outline:2px solid #476f81;outline-offset:3px}
+#app .sw-topic-roll-cap{transform:rotate(var(--sw-topic-roll-angle,0deg))}
+#app .sw-topic-roll-cap::after{
+  content:"";position:absolute;left:50%;top:4px;width:3px;height:9px;
+  transform:translateX(-50%);background:rgba(69,83,80,.48);
+  border-radius:3px;pointer-events:none;
+}
+@media(max-width:720px){
+  #app .sw-topic-atlas{
+    right:23px;bottom:calc(188px + env(safe-area-inset-bottom,0px));
+  }
+  #app .sw-topic-atlas-toggle{font-size:10px;padding:10px 12px;gap:12px}
+  #app .sw-topic-atlas-list{max-height:min(48svh,365px)}
+}
+@media(max-width:365px){
+  #app .sw-topic-atlas{bottom:calc(176px + env(safe-area-inset-bottom,0px))}
+  #app .sw-topic-atlas-toggle{min-height:40px}
+}
+@media(prefers-reduced-motion:reduce){
+  #app .sw-topic-roll-cap{transform:none}
+  #app .sw-topic-atlas{bottom:calc(115px + env(safe-area-inset-bottom,0px))}
+}
