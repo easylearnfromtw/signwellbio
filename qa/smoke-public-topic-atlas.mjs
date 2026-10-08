@@ -48,6 +48,7 @@ await check("Desktop paper roller progressively stacks and each laid page is act
  await page.goto(base+"topics.html",{waitUntil:"domcontentloaded"});
  await page.waitForFunction(()=>document.querySelectorAll("#app .sw-topic-paper").length===7,{timeout:15000});
  await page.waitForFunction(()=>document.querySelector("#app .sw-topic-tape")?.classList.contains("is-ready"),{timeout:15000});
+ await page.waitForFunction(()=>window.SignWellPublicSnapshot?.ready===true,{timeout:15000});
  const first=await page.locator("#app .sw-topic-paper").first().evaluate(el=>({opacity:+getComputedStyle(el).opacity,tab:el.tabIndex}));
  assert.ok(first.opacity>0.1,"First paper invisible "+JSON.stringify(first));
  await page.evaluate(()=>{const el=document.querySelector("#topicTape");const start=el.getBoundingClientRect().top+scrollY;scrollTo({top:start+(el.offsetHeight-innerHeight)*.46,behavior:"instant"})});
@@ -70,6 +71,7 @@ await check("iPhone tape fits and links remain clickable through stacked animati
  const page=await ctx.newPage();await page.goto(base+"topics.html",{waitUntil:"domcontentloaded"});
  await page.waitForSelector("#app .sw-topic-paper");
  await page.waitForFunction(()=>document.querySelector("#app .sw-topic-tape")?.classList.contains("is-ready"),{timeout:12000});
+ await page.waitForFunction(()=>window.SignWellPublicSnapshot?.ready===true,{timeout:15000});
  await page.evaluate(()=>{const el=document.querySelector("#topicTape");const start=el.getBoundingClientRect().top+scrollY;window.scrollTo({top:start+(el.offsetHeight-innerHeight)*.78,behavior:"instant"})});
  await page.waitForTimeout(200);
  const metrics=await page.evaluate(()=>{
