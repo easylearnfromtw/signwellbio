@@ -312,3 +312,25 @@ body:has(#app .sw-topic-tape) #app{overflow:visible}
 @media(prefers-reduced-motion:reduce){
   #app .sw-topic-directory{margin-top:0}
 }
+
+/* The tape, not the taxonomy header, opens the topics page. The taxonomy
+   explanation becomes the natural transition after seven laid paper cards. */
+body:has(#app .sw-topic-tape) #app{padding-top:0}
+body:has(#app .sw-topic-tape) #app>.page-hero{
+  margin-top:clamp(75px,9vw,130px);
+  border-color:transparent;
+  background:transparent!important;
+  background-image:none!important;
+  padding:clamp(36px,5vw,70px) 0 clamp(12px,3vw,35px);
+  max-width:850px;
+}
+@media(max-width:720px){
+ body:has(#app .sw-topic-tape) #app>.page-hero{
+   margin-top:73px;
+   padding:20px 0 12px;
+ }
+ body:has(#app .sw-topic-tape) #app>.page-hero h1{
+   font-size:clamp(36px,10vw,49px);
+   line-height:1.3;
+ }
+}
