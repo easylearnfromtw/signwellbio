@@ -31,7 +31,7 @@ const normalized=()=>schema.normalize(values);
 const dirty=()=>JSON.stringify(normalized())!==baseline;
 function updateSaveUI(){
  const isDirty=dirty();
- state.textContent=isDirty?"有未儲存變更":saved||baseline!=="{}"?"草稿已就緒":"尚無草稿";
+ state.textContent=isDirty?"有未儲存變更":schema.load()?"已儲存草稿":"尚無草稿";
  state.classList.toggle("dirty",isDirty);
  $("#saveButton").disabled=!isDirty;
  const timestamp=$("#lastSaved");if(timestamp){const last=schema.load()?.updatedAt;timestamp.textContent=last?new Date(last).toLocaleString("zh-TW",{hour12:false}):"尚未儲存";}
@@ -183,6 +183,7 @@ function render(){
   const isActive=btn.dataset.panel===active;
   if(isActive)btn.setAttribute("aria-current","page");else btn.removeAttribute("aria-current");
  });
+ mobileNav.style.setProperty("--cms-tab-index",String(Math.max(0,panels.findIndex(p=>p.id===active))));
  $("#breadcrumb").textContent=meta.label;
  $("#pageEyebrow").textContent=meta.eyebrow;
  $("#pageTitle").textContent=meta.title;
@@ -208,6 +209,46 @@ function buildNav(container,mobile=false){
  });
 }
 buildNav(sidebar);buildNav(mobileNav,true);
+
+/* The 6-way mobile Studio thumb follows the active section and horizontal drag.
+ * A vertical finger gesture remains native page scroll.
+ */
+let pointer=null,draggedIndex=null,suppressNextClick=false;
+mobileNav.addEventListener("pointerdown",e=>{
+ if(e.button!==0&&e.pointerType==="mouse")return;
+ pointer={id:e.pointerId,x:e.clientX,y:e.clientY,dragged:false};draggedIndex=null;
+});
+mobileNav.addEventListener("pointermove",e=>{
+ if(!pointer||pointer.id!==e.pointerId)return;
+ const dx=e.clientX-pointer.x,dy=e.clientY-pointer.y;
+ if(!pointer.dragged){
+  if(Math.abs(dx)<12||Math.abs(dx)<Math.abs(dy)*1.2)return;
+  pointer.dragged=true;mobileNav.classList.add("is-dragging");
+  try{mobileNav.setPointerCapture(e.pointerId)}catch(_){}
+ }
+ const bounds=mobileNav.getBoundingClientRect();
+ draggedIndex=Math.min(5,Math.max(0,Math.floor((e.clientX-bounds.left)/bounds.width*6)));
+ mobileNav.style.setProperty("--cms-tab-index",String(draggedIndex));
+});
+mobileNav.addEventListener("pointerup",()=>{
+ const moved=pointer?.dragged&&draggedIndex!==null;
+ pointer=null;mobileNav.classList.remove("is-dragging");
+ if(moved){
+  suppressNextClick=true;
+  const target=panels[draggedIndex].id;
+  navigate(target);
+  setTimeout(()=>{suppressNextClick=false},150);
+ }else mobileNav.style.setProperty("--cms-tab-index",String(Math.max(0,panels.findIndex(p=>p.id===active))));
+ draggedIndex=null;
+});
+mobileNav.addEventListener("pointercancel",()=>{
+ pointer=null;draggedIndex=null;mobileNav.classList.remove("is-dragging");
+ mobileNav.style.setProperty("--cms-tab-index",String(Math.max(0,panels.findIndex(p=>p.id===active))));
+});
+mobileNav.addEventListener("click",e=>{
+ if(suppressNextClick){e.preventDefault();e.stopImmediatePropagation();suppressNextClick=false;}
+},true);
+
 $("#saveButton").addEventListener("click",()=>saveDraft());
 $("#previewButton").addEventListener("click",e=>{if(!saveDraft(false)){e.preventDefault();return;}toast("已同步本機草稿到預覽頁");});
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(h!==active&&panels.some(p=>p.id===h)){active=h;render();}});
