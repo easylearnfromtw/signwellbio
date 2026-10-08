@@ -1,0 +1,40 @@
+name: Public Inner Editorial Palette QA
+on:
+  push:
+    branches:
+      - feature/public-inner-linen-pastels-20261008
+  pull_request:
+    paths:
+      - "assets/public-inner-palette.css"
+      - "index.html"
+      - "topics.html"
+      - "about.html"
+      - "share.html"
+      - "newsletter.html"
+      - "article/**"
+      - "qa/smoke-public-inner-palette.mjs"
+      - ".github/workflows/public-inner-palette-qa.yml"
+jobs:
+  palette:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Chromium QA runtime
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify Public inner pages and unchanged homepage
+        run: node qa/smoke-public-inner-palette.mjs
+      - name: Archive color/layout QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-inner-palette-visual-qa
+          path: qa-inner-*.png
+          if-no-files-found: ignore
