@@ -54,6 +54,7 @@ await check("Desktop scene creates seven covers with native scroll and clickable
  const p=await ctx.newPage();const errors=[];p.on("pageerror",e=>errors.push(String(e)));
  await p.goto(base+"topics.html",{waitUntil:"domcontentloaded"});
  await p.waitForFunction(()=>document.querySelectorAll("#app .sw-topic-paper").length===7&&document.querySelector("#app .sw-topic-tape.is-ready"),{timeout:14000});
+ await p.waitForFunction(()=>document.querySelectorAll("#topicDirectory .topic-card").length===12,{timeout:14000});
  const init=await p.evaluate(()=>{
   const rail=document.querySelector("#topicTape");
   return{height:rail.offsetHeight,viewport:innerHeight,cards:rail.querySelectorAll("button.sw-topic-paper[data-topic]").length,directory:document.querySelectorAll("#topicDirectory .topic-card").length,overflow:document.documentElement.scrollWidth-innerWidth};
