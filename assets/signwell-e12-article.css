@@ -1,0 +1,36 @@
+/* SIGNWELL BIO E1.2 — shared editorial article skin for CMS-generated SEO pages. */
+:root{--paper:#f8f6f0;--paper-hi:#fcfbf7;--ink:#1d2327;--ink-3:#4a5357;--muted:#6c736f;--label:#66767a;--line:#e0ddd3;--line-2:#cdcabf;--sea:#456778;--gold:#d8c58f;--gold-rule:#cdb878;--gold-ink:#7f6a3b;--serif:"Noto Serif TC","Songti TC","Noto Serif CJK TC",Georgia,serif;--sans:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;color-scheme:light}
+html{background:var(--paper)}
+body{background:var(--paper)!important;color:var(--ink)!important;font-family:var(--sans)!important;-webkit-font-smoothing:antialiased;letter-spacing:.012em}
+.top{max-width:860px;padding:24px 20px 0!important;border-bottom:1px solid var(--line-2);padding-bottom:18px!important}
+.top a{font-size:11.5px;letter-spacing:.18em;color:var(--ink)!important}
+.top .back-home{background:transparent!important;border:1px solid var(--line)!important;border-radius:3px!important}
+.wrap{width:min(810px,calc(100% - 40px))!important;padding-top:32px!important}
+.article-shell{background:transparent!important;box-shadow:none!important;border:0!important;border-radius:0!important;padding:0 5px 48px!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.hero{padding:0 0 30px!important;border-color:var(--line-2)!important}
+.kicker{font-size:11px!important;color:var(--sea)!important;letter-spacing:.2em}
+.hero h1{font-family:var(--serif)!important;font-weight:500!important;font-size:clamp(34px,6vw,54px)!important;line-height:1.35!important;letter-spacing:-.045em!important;color:var(--ink)!important}
+.meta{color:var(--label)!important;font-size:12px!important;letter-spacing:.06em!important}
+.actions button{background:var(--paper-hi)!important;border:1px solid var(--line)!important;border-radius:3px!important;color:var(--ink-3)!important;font-weight:700!important}
+.reader-size{border-color:var(--line)!important;border-radius:3px!important;background:var(--paper-hi)!important}
+.reader-size button[aria-pressed="true"]{background:var(--ink)!important;color:var(--paper)!important;border-radius:2px!important}
+.cover{border-radius:3px!important}
+.summary10s{background:var(--paper-hi)!important;border:1px solid var(--line)!important;border-left:3px solid var(--gold-rule)!important;border-radius:3px!important;margin:30px 0!important;padding:21px 24px!important}
+.summary10s b{color:var(--gold-ink)!important;letter-spacing:.18em!important}
+.summary10s p{font:500 16px/1.95 var(--serif)!important;color:var(--ink-3)}
+.article{font-family:var(--serif)!important;line-height:2!important;color:#283033!important;counter-reset:swsec}
+.article h2{counter-increment:swsec;font-size:1.4em!important;line-height:1.48!important;margin-top:2.4em!important;font-weight:600!important;color:var(--ink)!important}
+.article h2:before{content:counter(swsec,decimal-leading-zero);display:block;width:2.6em;margin-bottom:.8em;padding-bottom:.55em;border-bottom:1px solid var(--gold-rule);font:400 .5em/1 Georgia,serif;color:var(--gold-ink)}
+.article h3{font-size:1.14em!important;line-height:1.5!important;color:var(--ink)}
+.article p{margin:1.12em 0}
+.article mark{color:inherit;background:linear-gradient(transparent 55%,rgba(216,197,143,.4) 55%)}
+.article a{color:var(--sea);text-decoration-color:rgba(69,103,120,.35);text-underline-offset:4px}
+.article p:last-of-type:after{content:"";display:inline-block;width:.42em;height:.42em;margin-left:.55em;background:var(--gold-rule);vertical-align:.08em}
+.article blockquote{background:var(--paper-hi)!important;border-left:3px solid var(--gold)!important;border-radius:0!important}
+.article th,.article td{border-color:var(--line)!important}
+.foot{border-color:var(--line)!important;color:var(--muted)!important;font:400 12.5px/1.9 var(--sans)!important}
+.foot a{color:var(--sea)!important}
+::selection{background:rgba(216,197,143,.42)}
+:focus-visible{outline:2px solid var(--sea);outline-offset:3px}
+@media(max-width:640px){.wrap{width:calc(100% - 30px)!important}.article-shell{padding:0 1px 28px!important}.hero h1{font-size:clamp(32px,9vw,46px)!important}.article{line-height:1.95!important}.summary10s{padding:16px 18px!important}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;scroll-behavior:auto!important}}
