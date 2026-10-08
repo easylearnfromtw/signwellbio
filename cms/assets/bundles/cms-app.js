@@ -519,26 +519,9 @@ function swCurrentPublicAuthoritativeArticles(localArticles,publicArticles){
 async function swHydrateCurrentPublicAfterLogin({pushCloud=true,render=true}={}){
   if(!cmsSessionToken)return {ok:false,skipped:true,reason:'no-session'};
   try{
-    let snapshot=null;
-    try{
-      snapshot=await swFetchCurrentPublicStaticSnapshot();
-    }catch(staticErr){
-      console.warn('Current Public static hydration failed; falling back to current GitHub repo.',staticErr);
-      await ensureGithubRuntimeTarget(true);
-      const remote=await v10LoadRemoteArticles('server-managed');
-      let bundle=null;try{bundle=await fetchRemotePublicBundle('server-managed')}catch(_){}
-      let topicSource=Array.isArray(bundle?.topics)?bundle.topics:[];
-      if(!topicSource.length){try{topicSource=await v11FetchTopicsRaw()}catch(_){}}
-      snapshot={
-        articles:Array.isArray(remote?.articles)?remote.articles:[],
-        topics:topicSource,
-        people:Array.isArray(bundle?.people)?bundle.people:[],
-        glossary:Array.isArray(bundle?.glossary)?bundle.glossary:[],
-        siteText:bundle?.siteText&&typeof bundle.siteText==='object'?bundle.siteText:{},
-        heroConfig:bundle?.heroConfig&&typeof bundle.heroConfig==='object'?bundle.heroConfig:null,
-        revision:Number(bundle?.revision||0),
-        publishedAt:String(bundle?.publishedAt||'')
-      };
+    const snapshot=await swFetchCurrentPublicStaticSnapshot();
+    if(!snapshot||!Number(snapshot.revision||0)){
+      throw new Error('目前 signwellbio Public snapshot 尚未就緒；CMS 不會改載舊網站內容。');
     }
 
     const beforePublished=(data.articles||[]).filter(a=>a?.status==='Published').length;
@@ -8122,6 +8105,7 @@ function swMergeEntityListLossless(localItems,sourceItems,keys,{sourceWins=true}
   source.forEach(x=>{const key=swEntityKey(x,keys);if(!seen.has(key)){out.push(clone(x));seen.add(key)}});
   return out;
 }
+const SW_AUTOMATIC_LEGACY_RECOVERY=false; // Legacy content is manual recovery only. Never auto-hydrate CMS from legacy sources.
 async function swLegacyRecoverySnapshot(){
   return signwellGasBridge('admin.github.legacySnapshot',{}, {adminKey:newsletterAdminKey(),timeoutMs:90000});
 }
@@ -8450,7 +8434,7 @@ function v10Revision(a){return v10Hash(JSON.stringify([a.title,a.slug,a.category
 function v10SafeSlug(a){return slugify(a.slug||a.title||a.id||('article-'+Date.now()))}
 const SW_DOMAIN_CONFIG=Object.freeze({
   currentPublicBase:SW_CMS_PUBLIC_BASE,
-  legacyGithubBase:'https://easylearnfromtw.github.io/-/',
+  legacyGithubBase:'https://980510linz.github.io/-/',
   futureCustomDomain:'https://easylearnfromtw.github.io/signwellbio/',
   customDomainEnabled:false
 });
@@ -9209,21 +9193,10 @@ async function v10FetchArticleRaw(file){
   }catch(err){throw normalizeGithubBridgeError(err)}
 }
 async function v10LoadRemoteArticles(token){
-  let idx;
-  try{
-    idx=await v10FetchIndexRaw();
-  }catch(err){
-    if(err.status!==404)throw err;
-    const legacy=await fetchRemoteArticles(token);
-    return {
-      articles:legacy.articles,
-      index:legacy.articles.map(v10IndexMeta),
-      mode:'legacy'
-    };
-  }
+  const idx=await v10FetchIndexRaw();
   const full=await Promise.all(idx.map(async m=>{
     const article=await v10FetchArticleRaw(m.file||`articles/${m.slug}.json`);
-    if(!article||typeof article.content!=='string')throw new Error('文章內容不完整：'+(m.slug||m.id));
+    if(!article||typeof article.content!=='string')throw new Error('目前 signwellbio 文章內容不完整：'+(m.slug||m.id));
     return {...m,...article,status:'Published'};
   }));
   return {articles:full,index:idx,mode:'v10'};
