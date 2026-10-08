@@ -69,7 +69,7 @@ await check("Homepage visual CSS remains opt-out even when palette is loaded",as
  await ctx.close()
 });
 for(const [pageName,selector,accent] of [
- ["topics.html",".topic-grid","rgb(228, 238, 242)"],
+ ["topics.html",".page-hero","rgb(228, 238, 242)"],
  ["about.html",".manifesto","rgb(245, 236, 205)"],
  ["share.html",".share-card","rgb(244, 228, 232)"],
  ["newsletter.html",".newsletter-card","rgb(244, 228, 232)"]
@@ -79,6 +79,7 @@ for(const [pageName,selector,accent] of [
   const errors=[];page.on("pageerror",err=>errors.push(err.message));
   await page.goto(base+pageName,{waitUntil:"domcontentloaded"});
   await page.waitForSelector("#app "+selector,{timeout:16000});
+  if(pageName==="topics.html")await page.waitForFunction(()=>document.querySelectorAll("#app .topic-card").length>=7,{timeout:16000});
   const state=await page.evaluate(selector=>{
    const el=document.querySelector("#app "+selector);
    return{body:getComputedStyle(document.body).getPropertyValue("--paper").trim(),
