@@ -12,6 +12,7 @@
   function enhance(){
     const cover=document.getElementById("topicCover");
     const title=document.getElementById("topicName");
+    const english=document.getElementById("topicEnglish");
     const description=document.getElementById("topicDesc");
     const tone=document.getElementById("topicTapeTone");
     const slug=document.getElementById("topicSlug");
@@ -52,6 +53,7 @@
     });
     function refresh(){
       heading.textContent=title.value.trim()||"主題名稱預覽";
+      eyebrow.textContent="SIGNWELL BIO / "+(english?.value.trim()||"EDITORIAL COLUMN");
       detail.textContent=description.value.trim()||"主題說明會顯示於紙張下方";
       const t=tone.value;
       figure.dataset.tone=["linen","blue","butter","blush"].includes(t)?t:"linen";
@@ -78,7 +80,7 @@
         }
       }
     }
-    for(const node of [cover,title,description,tone,slug]){
+    for(const node of [cover,title,description,tone,slug,english].filter(Boolean)){
       node.addEventListener("input",refresh);
       node.addEventListener("change",refresh);
     }

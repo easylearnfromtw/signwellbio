@@ -8581,7 +8581,7 @@ function swSeoHtmlEscape(v=''){return String(v??'').replace(/&/g,'&amp;').replac
 function swSeoAbs(v=''){try{return new URL(String(v||''),SW_SEO_SITE).href}catch(_){return String(v||'')}}
 function swSeoArticleUrl(a){const u=new URL('index.html',SW_SEO_SITE);u.searchParams.set('article',v10SafeSlug(a));return u.href}
 function swSeoDate(v){const s=String(v||'').trim();if(!s)return new Date().toISOString();const d=new Date(s.length<=10?s+'T00:00:00+08:00':s);return isNaN(d)?new Date().toISOString():d.toISOString()}
-function swSeoIsNews(a){return a?.sourceWorkspace?.type==='medical-news-workspace'||String(a?.category||'')==='時事探討'}
+function swSeoIsNews(a){return a?.sourceWorkspace?.type==='medical-news-workspace'||['時事探討','時事醫學專欄'].includes(String(a?.category||''))}
 function swSeoCleanContent(a){
   const doc=new DOMParser().parseFromString('<div id="swseo">'+String(a?.content||'')+'</div>','text/html'),root=doc.getElementById('swseo');
   root.querySelectorAll('script,style,iframe,object,embed,form').forEach(x=>x.remove());

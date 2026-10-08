@@ -55,6 +55,21 @@ jobs:
           const idx=JSON.parse(read('articles/index.json'));
           const tt=JSON.parse(read('topics/index.json'));
           const pd=JSON.parse(read('public-data.json'));
+          const activeTopics=tt.filter(t=>t.active!==false);
+          assert.equal(activeTopics.length,7,'Expected exactly seven active editorial columns');
+          assert.equal(new Set(activeTopics.map(t=>t.slug)).size,activeTopics.length,'Duplicate public topic slug');
+          for(const topic of activeTopics){
+            assert(topic.english&&topic.name,'A visible topic is missing its Chinese or English label: '+topic.slug);
+            assert(topic.cover&&fs.existsSync(topic.cover),'Visible topic cover missing: '+topic.slug);
+          }
+          for(const a of idx){
+            assert(activeTopics.some(t=>t.name===a.category||(t.legacyNames||[]).includes(a.category)),
+              'Published article category cannot be resolved to an active public topic: '+a.category);
+            assert(fs.existsSync(a.file),'Published article JSON is missing: '+a.file);
+          }
+          assert(cms.includes("'時事醫學專欄'"),'New editorial news category is absent from SEO sitemap detection');
+          const studio=read('cms/assets/topic-studio.js');
+          assert(studio.includes('topicEnglish'),'CMS topic preview does not track English column labels');
           assert(Array.isArray(idx)&&Array.isArray(tt)&&pd&&typeof pd==='object','Static data shape mismatch');
           assert(read('sw.js').includes('signwellbio-20261008-editorial-e12-2'),'Service worker cache not bumped');
           console.log('E1.2 integration checks PASS:',idx.length,'article entries /',tt.length,'topics');
