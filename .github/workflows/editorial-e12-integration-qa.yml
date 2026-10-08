@@ -42,6 +42,9 @@ jobs:
             assert(s.includes('assets/signwell-editorial.css?build=ed12-20261008'),n+' lacks E1.2 stylesheet');
           }
           assert(css.includes('--ed-paper:#f8f6f0'), 'Editorial palette missing');
+          const coreCss=read('assets/public-core.css');
+          assert(coreCss.includes('#app:has(#latest) button'),'Home button guard must be scoped to the actual home view');
+          assert(!coreCss.includes('body[data-page="home"] #app button {'),'Global home button rule would hide newsletter, share, and article actions');
           for(const name of ['function topicFan','function topicIndex','function mountTopicFan','function selectTopic']){
             assert(js.includes(name), 'Missing frontend feature: '+name);
           }

@@ -2758,7 +2758,8 @@ html[data-reader-size="xl"] .article-body { --reader-size: 23px; }
 
 /* SIGN WELL SWFX-R1 · homepage is editorial, not CTA-driven.
    Global search/navigation controls live outside #app and remain available. */
-body[data-page="home"] #app button { display:none !important; }
+/* E1 homepage guard: the body data-page value may remain "home" while in-app views change. */
+body[data-page="home"] #app:has(#latest) button { display:none !important; }
 
 /* Automatic lightweight rendering tier for constrained devices / runtime jank. */
 html.sw-lite body {
