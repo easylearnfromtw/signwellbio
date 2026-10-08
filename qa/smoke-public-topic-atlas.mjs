@@ -50,7 +50,7 @@ await check("Desktop paper roller progressively stacks and each laid page is act
  await page.waitForFunction(()=>document.querySelector("#app .sw-topic-tape")?.classList.contains("is-ready"),{timeout:15000});
  const first=await page.locator("#app .sw-topic-paper").first().evaluate(el=>({opacity:+getComputedStyle(el).opacity,tab:el.tabIndex}));
  assert.ok(first.opacity>0.1,"First paper invisible "+JSON.stringify(first));
- await page.evaluate(()=>{const el=document.querySelector("#topicTape");scrollTo(0,el.offsetTop+el.offsetHeight*.46)});
+ await page.evaluate(()=>{const el=document.querySelector("#topicTape");const start=el.getBoundingClientRect().top+scrollY;scrollTo({top:start+(el.offsetHeight-innerHeight)*.46,behavior:"instant"})});
  await page.waitForTimeout(200);
  const middle=await page.locator("#app .sw-topic-paper").evaluateAll(els=>els.map(el=>({opacity:+getComputedStyle(el).opacity,tab:el.tabIndex,text:el.querySelector("strong")?.textContent})));
  assert.ok(middle.filter(x=>x.opacity>.3).length>=2,"Stacked chapters not visible "+JSON.stringify(middle));
@@ -70,7 +70,7 @@ await check("iPhone tape fits and links remain clickable through stacked animati
  const page=await ctx.newPage();await page.goto(base+"topics.html",{waitUntil:"domcontentloaded"});
  await page.waitForSelector("#app .sw-topic-paper");
  await page.waitForFunction(()=>document.querySelector("#app .sw-topic-tape")?.classList.contains("is-ready"),{timeout:12000});
- await page.evaluate(()=>{const el=document.querySelector("#topicTape");window.scrollTo(0,el.offsetTop+el.offsetHeight*.78)});
+ await page.evaluate(()=>{const el=document.querySelector("#topicTape");const start=el.getBoundingClientRect().top+scrollY;window.scrollTo({top:start+(el.offsetHeight-innerHeight)*.78,behavior:"instant"})});
  await page.waitForTimeout(200);
  const metrics=await page.evaluate(()=>{
   const t=document.querySelector("#topicTape"),paper=t.querySelector(".sw-topic-paper.is-top"),skip=t.querySelector(".sw-topic-skip");
@@ -81,7 +81,7 @@ await check("iPhone tape fits and links remain clickable through stacked animati
  assert.ok(metrics.overflow<=3,"Horizontal overflow "+JSON.stringify(metrics));
  await page.screenshot({path:"qa-topic-atlas-mobile.png",fullPage:false});
  await page.locator(".sw-topic-skip").click();
- await page.waitForFunction(()=>Math.abs(document.querySelector("#topicDirectory").getBoundingClientRect().top)<125,{timeout:15000});
+ await page.waitForFunction(()=>{const d=document.querySelector("#topicDirectory");return location.hash==="#topicDirectory"&&d.getBoundingClientRect().top<300},{timeout:15000});
  const action=page.locator("#topicDirectory .topic-card").first();
  await action.click();
  await page.waitForSelector("#topicArticles .section-head",{timeout:15000});
