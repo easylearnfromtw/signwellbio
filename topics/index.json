@@ -8,7 +8,9 @@
     "cover": "assets/topic-art/research.svg",
     "legacyNames": [],
     "order": 0,
-    "active": true
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blue"
   },
   {
     "id": "topic-editorial-longevity",
@@ -21,7 +23,9 @@
       "抗衰老醫學"
     ],
     "order": 1,
-    "active": true
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "butter"
   },
   {
     "id": "topic-editorial-prevention",
@@ -32,7 +36,9 @@
     "cover": "assets/topic-art/prevention.svg",
     "legacyNames": [],
     "order": 2,
-    "active": true
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "linen"
   },
   {
     "id": "topic-editorial-adolescent",
@@ -43,7 +49,9 @@
     "cover": "assets/topic-art/adolescent.svg",
     "legacyNames": [],
     "order": 3,
-    "active": true
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blush"
   },
   {
     "id": "topic-editorial-aesthetics",
@@ -56,7 +64,9 @@
       "醫美科普"
     ],
     "order": 4,
-    "active": true
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blush"
   },
   {
     "id": "topic-editorial-mens-health",
@@ -67,7 +77,9 @@
     "cover": "assets/topic-art/mens-health.svg",
     "legacyNames": [],
     "order": 5,
-    "active": true
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "blue"
   },
   {
     "id": "topic-editorial-medical-affairs",
@@ -80,7 +92,9 @@
       "時事探討"
     ],
     "order": 6,
-    "active": true
+    "active": true,
+    "tapeFeatured": true,
+    "tapeTone": "butter"
   },
   {
     "id": "topic-1789132939821",
