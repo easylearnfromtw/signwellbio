@@ -1,0 +1,11 @@
+/* Supplemental motion homepage controls inside authenticated CMS site settings. */
+.sw-motion-cms-intro{background:linear-gradient(130deg,#edf2f1,#f5f5f1);border:1px solid #dde4e1;border-radius:14px;padding:25px 26px;margin:24px 0}
+.sw-motion-cms-intro .site-section-title{font-weight:780;letter-spacing:.015em}
+.sw-motion-cms-intro p{color:#5e6f72;font-size:12px;line-height:1.9;max-width:65em}
+.sw-motion-cms-intro a{color:#355768;text-decoration:underline;text-underline-offset:3px}
+.sw-motion-cms-group{padding:22px 25px;border:1px solid #e3e7e4;border-radius:13px;margin:12px 0;background:#fff}
+.sw-motion-cms-group .site-section-title{border-left:3px solid #8da5b0;padding-left:13px;font-size:13px;letter-spacing:.01em;margin-bottom:20px}
+.sw-motion-cms-group :is(input,textarea){max-width:100%;color:#20282b;background:#fcfcfa;border-radius:9px}
+.sw-motion-cms-group textarea{min-height:86px;line-height:1.8}
+@media(max-width:720px){.sw-motion-cms-intro{padding:22px 18px}.sw-motion-cms-group{padding:19px 17px}}
+@media(prefers-reduced-motion:reduce){.sw-motion-cms-group *{transition:none!important}}
