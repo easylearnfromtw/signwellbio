@@ -540,12 +540,14 @@ async function swHydrateCurrentPublicAfterLogin({pushCloud=true,render=true}={})
     syncPublicSnapshot();
     try{localStorage.setItem(SYNC_KEY,'1')}catch(_){}
     try{localStorage.setItem('signwell-current-public-authority-v1',String(snapshot.revision||Date.now()))}catch(_){}
+    swCurrentPublicAuthorityReady=true;
     if(pushCloud){try{await cmsCloudPushNow(cmsCloudChangeSeq)}catch(err){console.warn('Canonical CMS cloud rewrite pending',err)}}
     if(render)renderView();
     const nowPublished=(data.articles||[]).filter(a=>a?.status==='Published').length;
     if(render&&beforePublished!==nowPublished)showToast(`CMS 已校正為目前網站內容 · Published ${nowPublished} · Draft ${drafts}`);
     return {ok:true,changed:true,count:nowPublished,drafts,revision:snapshot.revision||0};
   }catch(err){
+    swCurrentPublicAuthorityReady=false;
     console.warn('Post-login current Public hydration failed',err);
     return {ok:false,changed:false,error:String(err?.message||err)};
   }
@@ -556,8 +558,22 @@ async function completeCmsLogin(method='legacy'){
   $('#answerInput').value='';
   $('#lockHint').textContent=method==='passkey'?'Passkey 驗證完成，正在同步內容…':'驗證完成，正在同步內容…';
   try{await dataReady}catch(_){}
-  // Current Public is canonical. Reconcile it before Cloud State can paint stale legacy content.
-  try{await swHydrateCurrentPublicAfterLogin({pushCloud:false,render:false})}catch(_){}
+  // Current signwellbio Public is canonical. If it cannot be loaded, do not allow
+  // stale Published content from local/Cloud State to masquerade as current content.
+  const authority=await swHydrateCurrentPublicAfterLogin({pushCloud:false,render:false});
+  if(!authority?.ok){
+    data={
+      ...data,
+      articles:(data.articles||[]).filter(a=>a?.status!=='Published').map(clone),
+      topics:[],
+      people:[],
+      glossary:[],
+      siteText:clone(DEFAULT_SITE_TEXT),
+      heroConfig:clone(DEFAULT_HERO_CONFIG)
+    };
+    persist(true);
+    console.warn('Current Public authority unavailable; stale published content was suppressed.',authority?.error||'');
+  }
   $('#lockScreen').classList.add('hidden');
   $('#cms').classList.remove('hidden');
   verifyButton?.classList.remove('auth-entering');if(verifyButton){verifyButton.disabled=false;verifyButton.textContent='驗證並進入'}
@@ -2288,6 +2304,7 @@ function cmsCloudPollDelay(){
   return CMS_CLOUD_POLL_MS;
 }
 
+let swCurrentPublicAuthorityReady=false;
 let cmsCloudRevision=0;
 let cmsCloudDirty=false;
 let cmsCloudApplying=false;
@@ -2372,19 +2389,23 @@ async function cmsCloudApplyRemote(wrapper,{initial=false}={}){
   cmsCloudApplying=true;
   try{
     const incoming=normalizeState(clone(wrapper.data));
-    let canonical=false;try{canonical=Boolean(localStorage.getItem('signwell-current-public-authority-v1'))}catch(_){}
-    if(canonical){
-      const currentPublished=(data.articles||[]).filter(a=>a?.status==='Published').map(clone);
-      const incomingDrafts=(incoming.articles||[]).filter(a=>a?.status!=='Published').map(clone);
-      const publishedKeys=new Set(currentPublished.map(swArticleSyncKey));
-      const safeDrafts=incomingDrafts.filter(a=>!publishedKeys.has(swArticleSyncKey(a)));
-      data=normalizeState({
-        ...data,
-        articles:[...safeDrafts,...currentPublished]
-      });
-    }else{
-      data=incoming;
-    }
+    // Cloud State is a work-in-progress store only. It is never authoritative
+    // for Public-facing content after the repository migration.
+    const currentPublished=(data.articles||[]).filter(a=>a?.status==='Published').map(clone);
+    const currentDrafts=(data.articles||[]).filter(a=>a?.status!=='Published').map(clone);
+    const incomingDrafts=(incoming.articles||[]).filter(a=>a?.status!=='Published').map(clone);
+    const publishedKeys=new Set(currentPublished.map(swArticleSyncKey));
+    const draftByKey=new Map();
+    [...currentDrafts,...incomingDrafts].forEach(a=>{
+      const key=swArticleSyncKey(a);
+      if(publishedKeys.has(key))return;
+      const prev=draftByKey.get(key);
+      if(!prev||swRecordTime(a)>=swRecordTime(prev))draftByKey.set(key,clone(a));
+    });
+    data=normalizeState({
+      ...data,
+      articles:[...draftByKey.values(),...currentPublished]
+    });
     reconcilePublishedReceipts();
     cmsCloudRevision=Number(wrapper.revision||0);
     cmsCloudDirty=false;
