@@ -627,11 +627,8 @@
     const i = topics.findIndex((x) => (x.slug || x.name) === (t.slug || t.name));
     return i >= 0 ? HUES[i % HUES.length] : hueOf(t.name);
   }
-  function topicCard(t) {
-    const count = articles.filter((a) => a.category === t.name).length;
-    const name = String(t.name || "主題");
-    return `<article class="topic-card" data-topic="${esc(t.slug || t.name)}" style="--h:${topicHue(t)}"><div class="topic-icon" aria-hidden="true">${esc(Array.from(name)[0] || "主")}</div><div><div class="kicker">TOPIC</div><h3>${esc(name)}</h3><p>${esc(t.description || "")}</p></div><div class="topic-foot"><span>${count} 篇文章</span><span class="go">查看 ${ICON.arrow}</span></div></article>`;
-  }
+  function topicCard(t,i=0){const n=topicCount(t),cover=/^(assets\/|https:\/\/)/.test(t.cover||"")?t.cover:"",no=String(i+1).padStart(2,"0");return `<article class="topic-card" data-topic="${esc(t.slug||t.name)}" style="--h:${topicHue(t)}">${cover?`<div class="topic-art" aria-hidden="true"><img src="${esc(cover)}" alt="" loading="lazy"></div>`:""}<div class="topic-icon" aria-hidden="true">${esc(Array.from(String(t.name||"主"))[0])}</div><div class="topic-body"><div class="kicker"><span class="no">${no}</span>${esc(t.english||"TOPIC")}</div><h3>${esc(t.name||"主題")}</h3><p>${esc(t.description||"")}</p></div><div class="topic-foot"><span>${n} 篇文章</span><span class="go">查看 ${ICON.arrow}</span></div></article>`;}
+
   function skeletonCards(n = 3) {
     return Array.from({ length: n }, () => `<div class="article-card" aria-hidden="true" style="cursor:default"><div class="cover skeleton"></div><div class="card-body"><div class="skeleton sk-line" style="width:40%"></div><div class="skeleton sk-line" style="height:22px;width:88%"></div><div class="skeleton sk-line" style="width:70%"></div></div></div>`).join("");
   }
@@ -664,36 +661,17 @@
     bindCards();
   }
 
-  /* ---------------------------------------------------------------- topics */
-  function renderTopics() {
-    const list = topics.filter((t) => t.active !== false);
-    app.innerHTML = `<header class="page-hero"><div class="eyebrow">${esc(site.topicsEyebrow || "知識地圖")}</div><h1>${esc(site.topicsTitle || "主題分類")}</h1><p>${esc(site.topicsSubtitle || "依領域整理文章與延伸閱讀。")}</p></header><div class="topic-grid">${list.map(topicCard).join("") || (dataReady ? emptyPanel("尚未建立主題。") : "")}</div><section class="section" id="topicArticles" aria-live="polite"></section>`;
-    $$("[data-topic]", app).forEach((el) => (el.onclick = () => selectTopic(el.dataset.topic, { scroll: true })));
-    const q = new URL(location.href).searchParams.get("topic");
-    if (q && dataReady) selectTopic(q, { scroll: true, replace: false });
-  }
-  function selectTopic(slug, { scroll = true, replace = true } = {}) {
-    const t = topics.find((x) => (x.slug || x.name) === slug),
-      list = articles.filter((a) => t && (a.category === t.name || (Array.isArray(t.legacyNames) && t.legacyNames.includes(a.category)))).sort(byDate);
-    const sec = $("#topicArticles");
-    if (!sec) return;
-    $$("[data-topic]", app).forEach((el) => el.classList.toggle("is-active", el.dataset.topic === slug));
-    sec.innerHTML = t
-      ? `${sectionHead("·", t.name || "主題", "相關文章", `<span>${list.length} 篇</span>`)}<div class="cards">${list.map((a) => articleCard(a)).join("") || emptyPanel("這個主題目前沒有文章。")}</div>`
-      : "";
-    bindCards(sec);
-    if (replace) {
-      const u = new URL(location.href);
-      u.searchParams.set("topic", slug);
-      try {
-        history.replaceState({ ...(history.state || {}), page: "topics" }, "", u);
-        routeKey = location.pathname + location.search;
-      } catch (_) {}
-    }
-    if (scroll && t) {
-      requestAnimationFrame(() => sec.scrollIntoView({ behavior: reducedMQ.matches ? "auto" : "smooth", block: "start" }));
-    }
-  }
+  /* E1.2 Editorial Atlas */
+  function topicCount(t){const aliases=Array.isArray(t.legacyNames)?t.legacyNames:[];return articles.filter(a=>a.category===t.name||aliases.includes(a.category)).length;}
+  function topicTone(t){const tones={research:["#e4ecef","#4f7484"],longevity:["#f2ebd2","#8f7f55"],prevention:["#e3ece6","#4a6c62"],adolescent:["#f3e5e8","#82606c"],aesthetics:["#ede6ea","#72606b"],"mens-health":["#dfe8eb","#587381"],"medical-affairs":["#efe8de","#86655a"]};return tones[t.slug]||["#e7ecea","#5a7580"];}
+  function topicsHeroMeta(list){const active=list.length,count=articles.filter(a=>list.some(t=>a.category===t.name||(t.legacyNames||[]).includes(a.category))).length;const last=articles.slice().sort(byDate)[0];return `<div class="topic-atlas-meta"><span>${String(active).padStart(2,"0")} 個專欄</span><span>${String(count).padStart(2,"0")} 篇文章</span>${last?`<span>最近更新 ${esc(String(last.publishedAt||last.updatedAt||"").slice(0,10))}</span>`:""}</div>`;}
+  function topicFan(list){const pad=n=>String(n).padStart(2,"0");const pages=list.map((t,i)=>{const slug=t.slug||t.name,[tone,ink]=topicTone(t),cover=/^(assets\/|https:\/\/)/.test(t.cover||"")?t.cover:"";const count=topicCount(t);return `<div class="fan-sheet fan-page" data-fan-topic="${esc(slug)}" style="--i:${i+1};--tone:${tone};--tone-ink:${ink}"><div class="fp-art">${cover?`<img src="${esc(cover)}" alt="" decoding="async">`:""}</div><div class="fp-body"><div class="fp-kicker"><span>${pad(i+1)} / ${pad(list.length)}</span>${esc(t.english||"TOPIC")}</div><p>${esc(t.description||"")}</p></div><div class="fp-rail"><span>${esc(t.english||"TOPIC")}</span></div><div class="fp-band"><b>${pad(i+1)}</b><span class="fp-name">${esc(t.name||"主題")}</span><span class="fp-count">${count?`${count} 篇`:"籌備中"}</span></div><i class="fp-hole"></i></div>`;}).join("");const cover=`<div class="fan-sheet fan-cover" style="--i:0"><div class="fc-top"><span>SIGN WELL · 欣緯生醫</span><span>EDITORIAL ATLAS</span></div><div class="fc-seal"><b><span>S</span><i></i><span>W</span></b></div><div class="fc-mid"><span>專欄目錄</span><span>${pad(list.length)} COLUMNS</span></div><div class="fc-word">ATLAS</div><div class="fc-foot"><span>VOL. ${pad(list.length)}</span><span>${new Date().getFullYear()}</span></div><i class="fp-hole"></i></div>`;return `<figure class="topic-fan" data-topic-fan style="--n:${list.length+1}"><div class="fan-scene" aria-hidden="true"><div class="fan-stack" style="--o:${reducedMQ.matches?1:0}"><div class="fan-floor"></div>${cover}${pages}</div></div><figcaption><span class="dot" aria-hidden="true"></span>點選主題目錄，展開專欄文章</figcaption></figure>`;}
+  function topicIndex(list){return `<nav class="topic-index" aria-label="主題目錄"><div class="eyebrow"><span class="idx">${String(list.length).padStart(2,"0")}</span>目錄 · CONTENTS</div><ol>${list.map((t,i)=>{const [tone,ink]=topicTone(t),n=topicCount(t);return `<li><button type="button" class="topic-row" data-topic="${esc(t.slug||t.name)}" style="--tone:${tone};--tone-ink:${ink}"><span class="no">${String(i+1).padStart(2,"0")}</span><span class="nm"><b>${esc(t.name||"主題")}</b><small>${esc(t.english||"TOPIC")}</small></span><span class="ct">${n?`${n} 篇`:"籌備中"}</span><span class="go" aria-hidden="true">${ICON.arrow}</span></button></li>`;}).join("")}</ol></nav>`;}
+  function mountTopicFan(){const fig=$("[data-topic-fan]",app);if(!fig)return;const stack=$(".fan-stack",fig),root=document.documentElement,peek=(slug,on)=>$$("[data-fan-topic]",fig).forEach(p=>p.classList.toggle("is-peek",on&&p.dataset.fanTopic===slug));$$("[data-fan-topic]",fig).forEach(p=>{p.onclick=()=>selectTopic(p.dataset.fanTopic,{scroll:true});p.onpointerenter=()=>$$(".topic-row",app).forEach(x=>x.classList.toggle("is-hot",x.dataset.topic===p.dataset.fanTopic));p.onpointerleave=()=>$$(".topic-row.is-hot",app).forEach(x=>x.classList.remove("is-hot"));});$$(".topic-row",app).forEach(r=>{r.addEventListener("pointerenter",()=>peek(r.dataset.topic,true));r.addEventListener("pointerleave",()=>peek("",false));r.addEventListener("focus",()=>peek(r.dataset.topic,true));r.addEventListener("blur",()=>peek("",false));});if(reducedMQ.matches){stack.style.setProperty("--o","1");return;}const lite=()=>root.classList.contains("sw-lite")||root.classList.contains("sw-gpu-lite");let o=0,v=0,target=0,phaseAt=performance.now()+420,holdUntil=0,raf=0,tm=0,last=0,inView=true;const kick=()=>{clearTimeout(tm);if(!raf&&inView&&!document.hidden&&fig.isConnected){last=0;raf=requestAnimationFrame(step);}};const hold=(ms)=>{holdUntil=ms===Infinity?Infinity:Math.max(holdUntil===Infinity?0:holdUntil,performance.now()+ms);target=1;kick();};const release=()=>{holdUntil=performance.now()+2200;target=1;phaseAt=holdUntil+1400;kick();};const step=(t)=>{raf=0;if(!fig.isConnected){io?.disconnect();return;}let dt=Math.min(.1,last?(t-last)/1000:.016);last=t;if(holdUntil>t||lite())target=1;else if(t>=phaseAt){target=target?0:1;phaseAt=t+(target?3400:1500);}const k=target?62:140,c=target?9.2:23.5;while(dt>0){const h=Math.min(dt,1/120);v+=(k*(target-o)-c*v)*h;o+=v*h;dt-=h;}if(Math.abs(target-o)<.0015&&Math.abs(v)<.002){o=target;v=0;stack.style.setProperty("--o",String(o));if(holdUntil===Infinity||(lite()&&target===1))return;const wake=holdUntil>t?holdUntil:phaseAt;tm=setTimeout(kick,Math.max(16,wake-t));return;}stack.style.setProperty("--o",o.toFixed(4));if(inView&&!document.hidden)raf=requestAnimationFrame(step);};const io="IntersectionObserver" in window?new IntersectionObserver(es=>{inView=es[es.length-1].isIntersecting;if(inView)kick();}):null;io?.observe(fig);fig.addEventListener("pointerenter",()=>hold(Infinity));fig.addEventListener("pointerleave",release);fig.addEventListener("pointerdown",()=>hold(9000));const idx=$(".topic-index",app);idx?.addEventListener("pointerenter",()=>hold(Infinity));idx?.addEventListener("pointerleave",release);idx?.addEventListener("focusin",()=>hold(Infinity));idx?.addEventListener("focusout",release);document.addEventListener("visibilitychange",()=>{if(!document.hidden)kick();},{once:true});if(new URL(location.href).searchParams.has("topic")){o=1;target=1;holdUntil=Infinity;}stack.style.setProperty("--o",String(o));kick();}
+  function renderTopics(){const list=topics.filter(t=>t.active!==false).slice().sort((a,b)=>(a.order??999)-(b.order??999)),title=esc(site.topicsTitle||"主題分類");const hero=`<header class="page-hero"><div class="eyebrow">${esc(site.topicsEyebrow||"知識地圖")}</div><h1>${title}</h1><p>${esc(site.topicsSubtitle||"依領域整理文章與延伸閱讀。")}</p>${topicsHeroMeta(list)}</header>`;const atlas=list.length?`<section class="topic-atlas">${hero}${topicFan(list)}${topicIndex(list)}</section>`:hero+(dataReady?emptyPanel("尚未建立主題。"):"");app.innerHTML=`${atlas}<section class="section" id="topicArticles" aria-live="polite"></section>`;$$("[data-topic]",app).forEach(el=>el.onclick=()=>selectTopic(el.dataset.topic,{scroll:true}));mountTopicFan();const q=new URL(location.href).searchParams.get("topic");if(q&&dataReady)selectTopic(q,{scroll:true,replace:false});}
+  function topicNo(t){const i=topics.filter(x=>x.active!==false).sort((a,b)=>(a.order??999)-(b.order??999)).indexOf(t);return i>=0?String(i+1).padStart(2,"0"):"·";}
+  function selectTopic(slug,{scroll=true,replace=true}={}){const t=topics.find(x=>(x.slug||x.name)===slug),list=articles.filter(a=>t&&(a.category===t.name||(Array.isArray(t.legacyNames)&&t.legacyNames.includes(a.category)))).sort(byDate),sec=$("#topicArticles");if(!sec)return;$$("[data-topic]",app).forEach(el=>el.classList.toggle("is-active",el.dataset.topic===slug));$$("[data-fan-topic]",app).forEach(el=>el.classList.toggle("is-active",el.dataset.fanTopic===slug));sec.innerHTML=t?`${sectionHead(topicNo(t),t.name||"主題","相關文章",`<span>${list.length} 篇</span>`)}<div class="cards">${list.map(a=>articleCard(a)).join("")||emptyPanel("這個主題目前沒有文章。")}</div>`:"";bindCards(sec);if(replace){const u=new URL(location.href);u.searchParams.set("topic",slug);try{history.replaceState({...history.state,page:"topics"},"",u);routeKey=location.pathname+location.search;}catch(_){}}if(scroll&&t)requestAnimationFrame(()=>sec.scrollIntoView({behavior:reducedMQ.matches?"auto":"smooth",block:"start"}));}
+
   // kept for backwards compatibility (older callers)
   function renderTopicArticles(slug) {
     selectTopic(slug, { scroll: true });
