@@ -67,3 +67,12 @@ textarea.input{resize:vertical;min-height:118px;line-height:1.87;display:block}s
 }
 @media(max-width:410px){.top-actions .btn.secondary{display:none}.kpi strong{font-size:21px}.kpi{padding:13px 10px}.page{padding-left:18px;padding-right:18px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*:before,*:after{transition:none!important}}
+
+/* Harmonize mobile Studio tab navigation with Public's iOS liquid-glass slider. */
+@media(max-width:800px){
+ .mobile-nav{isolation:isolate;touch-action:pan-y;overflow:hidden}
+ .mobile-nav:before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:calc((100% - 12px)/6);border-radius:20px;background:linear-gradient(150deg,#fff,#e8eef0);box-shadow:0 3px 13px #1a364525,inset 0 1px #fff;transform:translateX(calc(var(--cms-tab-index,0) * 100%));transition:transform .34s cubic-bezier(.19,.86,.21,1.08);z-index:0;pointer-events:none}
+ .mobile-nav.is-dragging:before{transition:none}
+ .mobile-nav button{position:relative;z-index:1}
+ .mobile-nav button[aria-current=page]{background:transparent;box-shadow:none;color:#183846}
+}
