@@ -648,7 +648,9 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
 }
 @media(min-width:721px) and (max-width:950px){
   .intro h1{font-size:clamp(58px,7.5vw,77px)}
+  .intro-issue{bottom:23%;right:clamp(30px,6vw,70px)}
   .intro-issue strong{font-size:85px}
+  .study-index,.motion-skip{min-height:44px;bottom:calc(105px + env(safe-area-inset-bottom,0px))}
   .motion-skip{right:clamp(24px,5vw,60px)}
 }
 @media(prefers-reduced-motion:reduce){
