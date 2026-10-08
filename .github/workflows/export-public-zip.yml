@@ -1,0 +1,63 @@
+name: Export SIGN WELL BIO Public ZIP
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/export-public-zip.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current Public revision
+        uses: actions/checkout@v4
+      - name: Prepare Public-only static site
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import pathlib, shutil
+          root = pathlib.Path.cwd()
+          out = root / "_site_export_public"
+          out.mkdir(exist_ok=True)
+          # Public entrypoints, SEO metadata, static feeds and service worker.
+          accepted = {".html", ".js", ".json", ".xml", ".webmanifest", ".ico"}
+          for src in root.iterdir():
+              if src.is_file() and (src.suffix.lower() in accepted or src.name == ".nojekyll"):
+                  shutil.copy2(src, out / src.name)
+          # Published articles, published taxonomy, and every referenced asset.
+          for name in ("assets", "articles", "article", "topics"):
+              src = root / name
+              if src.is_dir():
+                  shutil.copytree(src, out / name, dirs_exist_ok=True)
+          # Exclude admin consoles, backend credentials/configuration,
+          # test suites, QA reports, and repository workflows.
+          assert (out / "index.html").exists()
+          assert (out / "topics.html").exists()
+          assert (out / "assets" / "public-core.js").exists()
+          assert (out / "public-data.json").exists()
+          assert not (out / "cms").exists()
+          assert not (out / "backend").exists()
+          (out / "PUBLIC-README.txt").write_text(
+              "SIGN WELL BIO — Public frontend only\n"
+              "Source: https://github.com/easylearnfromtw/signwellbio\n"
+              "Git revision: ${{ github.sha }}\n"
+              "CMS and backend are intentionally excluded.\n"
+              "Serve as static files under /signwellbio/ (e.g. GitHub Pages).\n"
+              "Opening index.html via file:// may block JSON fetches.\n",
+              encoding="utf-8")
+          print("Public files:", len([p for p in out.rglob("*") if p.is_file()]))
+          print("Public size:", sum(p.stat().st_size for p in out.rglob("*") if p.is_file()))
+          PY
+      - name: Upload Public ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: SIGNWELLBIO-Public
+          path: _site_export_public/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6
