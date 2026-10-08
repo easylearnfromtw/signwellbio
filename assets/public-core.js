@@ -522,7 +522,11 @@
         tagCardMorph($(`[data-article="${CSS.escape(leaving)}"]`, app));
       }
       setTitle(p);
-      document.dispatchEvent(new CustomEvent("signwell:render", { detail: { page: p, siteText: site, articles, topics, ready: dataReady } }));
+      // Store the most recent public-only snapshot for enhancements that load
+      // after the first render (slow networks, mobile browsers, bfcache).
+      const publicSnapshot = { page: p, siteText: site, articles, topics, ready: dataReady };
+      window.SignWellPublicSnapshot = publicSnapshot;
+      document.dispatchEvent(new CustomEvent("signwell:render", { detail: publicSnapshot }));
     };
     const canVT = transition && document.startViewTransition && !reducedMQ.matches && !document.hidden;
     if (!canVT) pendingMorph = null;
