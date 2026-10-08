@@ -1,30 +1,39 @@
-# SIGN WELL BIO · V8 Multi-page Editorial Test
+# SIGNWELL BIO / TEST — V9 Editorial Finish
 
-Independent staging folder only; production home/CMS untouched.
+This directory is an isolated design test. Production homepage, production CMS, backend and subscriber data remain unchanged.
 
-## Full public routes (all with consistent iOS draggable, snapping bottom slider)
+## Design goals
 
-- `/test/` / `/test/index.html` — Homepage / Editorial cover
-- `/test/topics.html` — Topics with interactive article filters
-- `/test/about.html` — About the publication
-- `/test/share.html` — Share with clipboard / native share
-- `/test/newsletter.html` — Newsletter layout / no-send demo form
-- `/test/article.html?story=health` — Full article reading with Aa text-size control
-- `/test/privacy.html`, `/test/terms.html` — Test-site information / links to production policies
-- `/test/profile.html` — Profile design placeholder (no personal data)
-- `/test/confirm.html`, `/test/unsubscribe.html` — Unconnected test flow explanations
-- `/test/error.html`, `/test/not-found.html` — Informational utility pages
+- Distinct, art-directed magazine cover rather than generic 3D effects.
+- Comfortable long-form typography and restrained monochrome SVG iconography; **no emoji**.
+- All pages share visual tokens, editorial spacing, responsive components and a fixed five-way iOS-style drag/snapping slider.
+- Slider supports tap, horizontal drag, animated selection, compact-on-scroll, keyboard arrows, prefers-reduced-motion and safe-area offsets.
+- Public and CMS remain separate visual systems. CMS is a review-only layout, not a publishing service.
 
-## CMS design preview
+## Routes
 
-- `/test/cms/` — Shortcut to `/test/review.html?area=cms`, with dashboard, articles, editor, publishing, analytics, and settings mock views.
-- `/test/review.html` — Full design review for desktop/mobile Public and CMS.
+Public: `/`, `/topics.html`, `/about.html`, `/share.html`, `/newsletter.html` (relative to /test/).
 
-## Architecture
+Article reading: `/article.html?story=health`; test navigation is wired directly to this page. Helpers: `/profile.html`, `/privacy.html`, `/terms.html`, `/confirm.html`, `/unsubscribe.html`, `/error.html`, `/not-found.html`.
 
-- Shared CSS: `/test/assets/site.css`.
-- Shared dock/search/interactions: `/test/assets/site.js`.
-- One shared iOS-style drag navigation (home/topics/about/share/newsletter) injected on all public and utility test pages. Thumb snaps when clicked/dragged; compact behavior on downward scroll; keyboard Left/Right support.
-- SVG monochrome icons only; no emoji. Responsive layouts.
-- All static content is a demo and is NOT a real article, publication, subscription, analytics, or user database. No live APIs or credentials.
-- Full-site test pages have `noindex,nofollow`.
+CMS review: `/cms/` redirects to `/review.html?area=cms`. `/review.html` includes desktop/mobile mockups of CMS and its article editor, publishing, analytics, settings and system rules.
+
+## Assets
+
+- `assets/site.css` — shared editorial tokens, page signatures, navigation styling.
+- `assets/site.js` — shared five-entry draggable dock, local sample search, topic filters, share, simulated newsletter, reading control.
+- `index.html` — full-bleed standalone V9 cover with links to individual test pages.
+
+## Safety and data boundaries
+
+- No real subscriptions, emails, accounts, publication, analytics or CMS writes from these demo pages.
+- All sample articles and figures are illustrative, not verified, published medical content.
+- All test HTML files are marked `noindex,nofollow`.
+- A successful GitHub Pages deploy is not a substitute for browser/device interaction QA.
+
+## Static QA performed
+
+- 15 HTML routes and two shared CSS/JS assets inspected.
+- No emoji, missing internal HTML links, unmatched SVG pairs or indexing omissions found.
+- JavaScript syntax and CSS rule structure passed checks.
+- iOS Safari / Android Chrome and desktop browser interaction testing still required before promotion to production.
