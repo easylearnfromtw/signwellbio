@@ -1,20 +1,30 @@
-# SIGN WELL BIO / TEST — V7 The Edit
+# SIGN WELL BIO · V8 Multi-page Editorial Test
 
-This is an isolated, **art-directed editorial staging environment** in the existing `easylearnfromtw/signwellbio` GitHub Pages repository.
+Independent staging folder only; production home/CMS untouched.
 
-## URLs
-- Public: https://easylearnfromtw.github.io/signwellbio/test/
-- Design review, including CMS prototypes: https://easylearnfromtw.github.io/signwellbio/test/review.html
+## Full public routes (all with consistent iOS draggable, snapping bottom slider)
 
-## V7 changes
-- Removed tape and its decorative entrance entirely.
-- Redesigned Public cover: graphite / steel-blue editorial composition, typographic masthead, bespoke vector-like sculpture, refined accent colors (yellow, dusty pink, blue).
-- Editorial hierarchy: current stories, asymmetric feature grid, editor's note, newsletter ending.
-- Mobile reading-first layout and article preview with adjustable font size.
+- `/test/` / `/test/index.html` — Homepage / Editorial cover
+- `/test/topics.html` — Topics with interactive article filters
+- `/test/about.html` — About the publication
+- `/test/share.html` — Share with clipboard / native share
+- `/test/newsletter.html` — Newsletter layout / no-send demo form
+- `/test/article.html?story=health` — Full article reading with Aa text-size control
+- `/test/privacy.html`, `/test/terms.html` — Test-site information / links to production policies
+- `/test/profile.html` — Profile design placeholder (no personal data)
+- `/test/confirm.html`, `/test/unsubscribe.html` — Unconnected test flow explanations
+- `/test/error.html`, `/test/not-found.html` — Informational utility pages
 
-## Scope and limitations
-- `/test/` only. No changes to production `index.html`, `cms/`, backend, database or published articles.
-- The articles, categories, editorial artwork, metrics and newsletter form are illustrative UI prototypes. No live article/newsletter integrations or subscription actions.
-- The CMS in `review.html` is a design prototype, not an authenticated or publishing CMS.
-- `index.html` is a standalone file and does not need external JS, CSS or assets.
-- Marked noindex/nofollow to avoid indexing the design test.
+## CMS design preview
+
+- `/test/cms/` — Shortcut to `/test/review.html?area=cms`, with dashboard, articles, editor, publishing, analytics, and settings mock views.
+- `/test/review.html` — Full design review for desktop/mobile Public and CMS.
+
+## Architecture
+
+- Shared CSS: `/test/assets/site.css`.
+- Shared dock/search/interactions: `/test/assets/site.js`.
+- One shared iOS-style drag navigation (home/topics/about/share/newsletter) injected on all public and utility test pages. Thumb snaps when clicked/dragged; compact behavior on downward scroll; keyboard Left/Right support.
+- SVG monochrome icons only; no emoji. Responsive layouts.
+- All static content is a demo and is NOT a real article, publication, subscription, analytics, or user database. No live APIs or credentials.
+- Full-site test pages have `noindex,nofollow`.
