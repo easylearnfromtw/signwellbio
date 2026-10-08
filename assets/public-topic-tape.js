@@ -61,7 +61,7 @@
   document.addEventListener("signwell:render",()=>{bind();schedule()});
   addEventListener("scroll",schedule,{passive:true});
   addEventListener("resize",schedule,{passive:true});
-  reduced.addEventListener?.("change",()=>{if(instance){instance.rail.classList.toggle("is-ready",!reduced.matches);bind();schedule()}});
+  reduced.addEventListener?.("change",()=>{if(instance){instance.rail.classList.add("is-ready");instance.cards.forEach(c=>{c.style.pointerEvents=reduced.matches?"auto":"none";c.tabIndex=reduced.matches?0:-1});schedule()}});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind,{once:true});
   else bind();
 })();
