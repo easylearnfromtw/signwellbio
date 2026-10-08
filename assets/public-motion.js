@@ -10,7 +10,7 @@
  if(!host||!template||!host.attachShadow)return;
  const root=host.attachShadow({mode:"open"});
  const style=document.createElement("link");
- style.rel="stylesheet";style.href="assets/public-motion.css?version=12.0.0";
+ style.rel="stylesheet";style.href="assets/public-motion.css?version=13.0.0";
  root.appendChild(style);
  const content=document.createElement("div");content.className="sw-public-motion-root";content.innerHTML=template;
  root.appendChild(content);
