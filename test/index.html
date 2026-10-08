@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="color-scheme" content="light"><title>SIGN WELL BIO 欣緯生醫｜V6 測試版</title><meta name="description" content="SIGN WELL BIO Hybrid Editorial V6，閱讀優先版，僅供視覺測試。"><style>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="color-scheme" content="light"><title>SIGN WELL BIO 欣緯生醫｜V7 設計測試版</title><meta name="description" content="SIGN WELL BIO Hybrid Editorial V7，閱讀優先版，僅供視覺測試。"><style>
 :root{--bg:#eae8e4;--ink:#191919;--paper:#f6f3ed;--paper2:#fbfaf7;--line:#d9d5ce;--muted:#817e78;--blue:#88a1b3;--rose:#d6b8c2;--yellow:#decf9e;--ui:#f6f6f5;--font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;--font-serif:"Noto Serif TC","Songti TC","Source Han Serif TC","PMingLiU",Georgia,serif;--font-en:Georgia,"Times New Roman",serif}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}button{font:inherit;cursor:pointer}button:focus-visible{outline:2px solid #5a859f;outline-offset:3px}a{color:inherit} .hidden{display:none!important}
 .review-header{background:#191919;color:white;padding:26px max(24px,calc((100vw - 1560px)/2));display:flex;align-items:flex-end;justify-content:space-between;gap:20px}.review-brand{font-size:12px;letter-spacing:.19em;font-weight:750}.review-sub{font-size:10px;letter-spacing:.19em;color:#d7cfc3;margin-top:8px}.review-header h1{font-family:var(--font-en);font-weight:400;letter-spacing:-.045em;font-size:clamp(32px,4vw,58px);margin:19px 0 4px}.review-header p{font-size:13px;color:#bebdbb;max-width:540px;line-height:1.7;margin:0}.review-stamp{border:1px solid #666;padding:10px 13px;border-radius:100px;font-size:11px;letter-spacing:.1em;white-space:nowrap;color:#e9e7e2}
@@ -166,12 +166,197 @@ body{min-width:0}
 #publicScreen .p-subscribe{cursor:default}
 @media(max-width:760px){#publicScreen .p-header{padding:17px 6%}#publicScreen .p-section{padding-top:66px;padding-bottom:76px}.test-design-link{font-size:10px;padding:8px 11px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
+</style><style id="ve-editorial-v7">
+/* SIGN WELL BIO — THE EDIT / V7 ART DIRECTION. Test surface only. */
+:root{--ve-ink:#181a1d;--ve-blue:#8fa7b9;--ve-paper:#f9f7f2;--ve-ivory:#efede7;--ve-yellow:#e9d66e;--ve-pink:#d0b7bc;--ve-rule:#d6d1c8}
+body{background:var(--ve-paper);color:var(--ve-ink)}
+#publicScreen,.public-screen{background:var(--ve-paper)!important;color:var(--ve-ink)}
+#publicScreen .bio-editorial-flow,#publicScreen .bio-public-layout{background:var(--ve-paper)!important}
+#publicScreen .p-announce{background:#ece9e1!important;border-bottom:1px solid #dad5cb;color:#595650!important;font:600 10px/1.3 var(--font-sans);letter-spacing:.2em;padding:10px clamp(23px,4.5vw,80px)!important}
+#publicScreen .p-announce .tiny-dot{background:#c5b650}
+#publicScreen .ve-header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:32px;padding:23px clamp(23px,4.5vw,80px)!important;background:#f9f7f2!important;border-bottom:1px solid #d4d0c8!important;position:relative;z-index:15}
+.ve-wordmark{display:inline-flex;flex-direction:column;justify-content:center;text-decoration:none;white-space:nowrap;gap:3px;min-width:0}
+.ve-wordmark-main{font:800 clamp(24px,2.15vw,34px)/1 var(--font-sans);letter-spacing:-.065em}
+.ve-logo-stop{color:#9bb1bd}
+.ve-wordmark-sub{font-size:9px;letter-spacing:.15em;font-weight:650;color:#76726b}
+.ve-wordmark-sub i{font-style:normal;color:#b2a79a;margin:0 5px}
+#publicScreen .ve-header .p-nav{display:flex;align-items:center;gap:clamp(14px,2.35vw,38px)}
+#publicScreen .ve-header .p-nav a{font-size:12px;letter-spacing:.025em;font-weight:650;white-space:nowrap;text-decoration:none;color:#55534f;transition:color .2s}
+#publicScreen .ve-header .p-nav a:hover{color:#050607}
+.ve-head-edition{justify-self:end;display:flex;flex-direction:column;align-items:flex-end;text-decoration:none;gap:4px;color:#1c1b1a}
+.ve-head-edition span{font-size:12px;font-weight:800;letter-spacing:.11em}
+.ve-head-edition span b{font-size:15px;margin-left:3px;color:#787165}
+.ve-head-edition small{font-size:9px;letter-spacing:.15em;color:#888076}
+#publicScreen .ve-hero{background:#171a1d!important;color:#f5f1e8;border:0;padding:0!important;min-height:0!important;display:block}
+.ve-hero-meta{padding:18px clamp(23px,4.5vw,80px);display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #ffffff26;color:#cccac4;font-size:9px;letter-spacing:.2em;font-weight:600}
+.ve-hero-body{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);min-height:clamp(620px,60vw,820px)}
+.ve-hero-content{padding:clamp(60px,7vw,120px) clamp(25px,5.4vw,100px) clamp(56px,6vw,100px) clamp(23px,4.5vw,80px);display:flex;flex-direction:column;align-items:flex-start;position:relative;min-width:0;z-index:2}
+.ve-index{font-size:11px;letter-spacing:.18em;font-weight:650;display:flex;align-items:center;gap:12px;color:#d1cfca}
+.ve-yellow-dash{width:29px;height:4px;background:var(--ve-yellow);display:inline-block;flex:0 0 29px}
+.ve-cover-title{margin:clamp(50px,6vw,96px) 0 28px;font:500 clamp(49px,5.35vw,96px)/1.24 var(--font-serif);letter-spacing:-.08em;max-width:11em;text-wrap:balance}
+.ve-cover-title span,.ve-cover-title em{display:block;font-style:normal;white-space:nowrap}
+.ve-cover-title em{color:#efdc90}
+.ve-hero-deck{font-size:clamp(15px,1.15vw,18px)!important;max-width:28em!important;line-height:1.93!important;letter-spacing:.03em;color:#c6c3bc!important;margin:0!important}
+.ve-cover-actions{margin-top:auto;padding-top:62px;width:100%;display:flex;align-items:center;gap:22px;justify-content:space-between}
+.ve-hero-cta{display:inline-flex;align-items:center;justify-content:space-between;gap:42px;text-decoration:none;padding:17px 19px 17px 23px;background:#ece8dd;color:#1c1c1b;font-size:13px;letter-spacing:.055em;font-weight:800;border-radius:2px;transition:background .2s,transform .3s}
+.ve-hero-cta:hover{background:#e9d66e;transform:translateY(-2px)}
+.ve-hero-cta span{font-size:20px}
+.ve-cover-actions>span{font:650 9px var(--font-sans);letter-spacing:.14em;color:#8c9294;text-align:right;line-height:1.6}
+.ve-cover-art{min-height:600px;position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 55% 40%,#8396a5 0%,#4c6577 38%,#283643 74%,#1c2934 100%);border-left:1px solid #ffffff22}
+.ve-cover-art:before{content:"";position:absolute;inset:0;background:linear-gradient(108deg,#ffffff22,transparent 30%,transparent 70%,#0f223955);z-index:5;pointer-events:none}
+.ve-art-lines{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 55px,#e8eff40f 55px 56px),repeating-linear-gradient(90deg,transparent 0 55px,#e8eff40f 55px 56px);mask-image:linear-gradient(to top,#0006,transparent 90%)}
+.ve-art-orbit{position:absolute;inset:11% 14% 18% 14%;border:1px solid #f7f7e95c;border-radius:50%;transform:rotate(-34deg) scaleX(.73);z-index:3;box-shadow:0 0 0 39px #ffffff07,0 0 0 90px #ffffff05}
+.ve-art-lettering{font:500 clamp(155px,22vw,360px)/.88 Georgia,serif;letter-spacing:-.18em;color:transparent;-webkit-text-stroke:1px #e4e9e663;position:absolute;z-index:1;bottom:17%;left:-8%;opacity:.7;transform:rotate(-90deg);transform-origin:45% 50%;user-select:none}
+.ve-art-object{position:absolute;width:72%;height:66%;left:22%;top:13%;filter:drop-shadow(36px 44px 22px #12202e99);transform:rotate(-22deg);z-index:4}
+.ve-art-object:before{content:"";position:absolute;width:72%;height:83%;top:2%;left:5%;border-radius:49% 44% 46% 46% / 40% 47% 52% 50%;background:linear-gradient(130deg,#f9f6e2 0%,#cdd2cc 17%,#8d9ba1 32%,#293b49 48%,#91acba 61%,#eee7d4 82%,#8d9c9f 100%);box-shadow:inset -28px -25px 35px #1c303a8c,inset 30px 20px 50px #ffffff66}
+.ve-art-object:after{content:"";position:absolute;width:52%;height:23%;border-radius:50%;top:28%;left:16%;background:radial-gradient(ellipse at 52% 60%,#203441 0%,#587082 48%,#e7e7d2 76%,#e4ddcc 100%);transform:rotate(-7deg);box-shadow:0 3px 25px #10203077,inset 0 -4px 10px #192a34}
+.ve-art-core{position:absolute;width:22%;height:48%;border:1px solid #e5ebea88;right:5%;bottom:0%;transform:rotate(36deg);z-index:7}
+.ve-art-detail{position:absolute;top:32px;left:34px;font:700 26px/1.02 var(--font-sans);letter-spacing:-.04em;color:#f5f3e6;z-index:7}
+.ve-art-detail span{font-size:9px;letter-spacing:.18em;font-weight:600}
+.ve-art-corner{position:absolute;bottom:32px;right:33px;z-index:8;font-size:9px;letter-spacing:.18em;color:#f5f3e5}
+.ve-hero-foot{padding:21px clamp(23px,4.5vw,80px);border-top:1px solid #ffffff24;display:flex;align-items:center;justify-content:space-between;gap:20px;color:#c7c4bc;font-size:10px;letter-spacing:.14em}
+.ve-hero-foot b{color:#f5f0e5}
+.ve-hero-foot a{color:inherit;text-decoration:none}
+.ve-hero-foot a span{margin-left:17px;color:#f2df80;font-size:15px}
+.ve-editorial-marquee{background:#e8d970;color:#252525;display:flex;align-items:center;justify-content:space-around;gap:23px;padding:16px 20px;white-space:nowrap;overflow:hidden;font:750 11px var(--font-sans);letter-spacing:.18em}
+.ve-editorial-marquee i{font-size:16px;font-style:normal;color:#65778e}
+#publicScreen .p-section{background:var(--ve-paper)!important;padding:clamp(72px,8vw,130px) clamp(23px,7.2vw,128px) clamp(84px,9vw,140px)!important}
+#publicScreen #features.p-section{background:#eae9e4!important}
+#publicScreen .p-kicker{font-size:11px;letter-spacing:.17em;color:#716d65}
+#publicScreen .p-sectionhead{align-items:flex-end;border-bottom:1px solid #a8a49c;padding-bottom:24px;gap:22px}
+#publicScreen .p-sectionhead h2{font-family:var(--font-serif);font-size:clamp(46px,5.2vw,80px)!important;font-weight:500;line-height:1.12;letter-spacing:-.075em;margin-top:17px}
+#publicScreen .p-sectionhead a{font-size:12px;text-decoration:none;color:#514e49;white-space:nowrap;border-bottom:1px solid #aaa49a;padding-bottom:8px}
+#publicScreen .p-current{grid-template-columns:minmax(0,1.13fr) minmax(0,.87fr);gap:clamp(40px,7vw,120px);margin-top:54px}
+#publicScreen .story-cover{height:clamp(310px,32vw,500px)!important;background:#d7d8d4;position:relative;overflow:hidden}
+#publicScreen .story-cover:before{content:"";position:absolute;inset:-30% -15%;background:repeating-radial-gradient(circle at 46% 45%,#859b9a 0 2px,transparent 2px 24px),linear-gradient(135deg,#eeeae1,#b5c3c1);opacity:.75;transform:rotate(-10deg)}
+#publicScreen .story-cover:after{content:"THE NEXT\A CHAPTER";white-space:pre;position:absolute;left:8%;bottom:8%;font:700 clamp(40px,5.7vw,90px)/.93 var(--font-sans);letter-spacing:-.085em;color:#1d292d;z-index:4}
+#publicScreen .story-cover .big-circle{width:43%;aspect-ratio:1;height:auto;left:48%;top:12%;border-radius:50%;background:radial-gradient(circle at 36% 32%,#fcf8e9,#e0d8c2 28%,#85959b 55%,#213d48 85%);box-shadow:18px 25px 35px #253d4459;z-index:2}
+#publicScreen .story-cover .a-line{border-color:#f9f6eaa8}
+#publicScreen .story-cover .art-label{color:#1c2c30;font-size:10px;letter-spacing:.12em;top:20px;left:8%;z-index:5}
+#publicScreen .p-story-badge{font-size:10px;letter-spacing:.15em;margin-top:26px}
+#publicScreen .p-feature-title{font-family:var(--font-serif);font-size:clamp(31px,2.6vw,43px)!important;line-height:1.45!important;font-weight:540}
+#publicScreen .p-excerpt{font-size:16px!important;line-height:1.95}
+#publicScreen .p-story-list{border-top:1px solid #a8a49c}
+#publicScreen .p-story-row{border-bottom:1px solid #c9c6be;padding:30px 0;transition:padding .22s,background .22s}
+#publicScreen .p-story-row:hover{padding-left:10px;background:#eeeae2}
+#publicScreen .p-story-row h3{font-family:var(--font-serif);font-size:clamp(19px,1.7vw,26px);font-weight:500;line-height:1.6}
+#publicScreen .p-story-row .date{font-size:13px;color:#6f6d67}
+#publicScreen .p-story-row .arrow{font-size:20px}
+#publicScreen .p-features{display:grid;grid-template-columns:1.25fr .85fr;gap:30px 42px;margin-top:52px;align-items:start}
+#publicScreen .p-feature-item:first-child{grid-row:span 2}
+#publicScreen .p-feature-item:first-child .p-feature-image{height:clamp(340px,36vw,510px)}
+#publicScreen .p-feature-item:not(:first-child) .p-feature-image{height:185px}
+#publicScreen .p-feature-item .p-feature-image{position:relative;border:1px solid #2221;overflow:hidden}
+#publicScreen .p-feature-item .p-feature-image.first{background:linear-gradient(138deg,#dcd1be 0%,#efe6d7 43%,#909ba0 100%)}
+#publicScreen .p-feature-item .p-feature-image.first:after{content:"FORM / 01";position:absolute;left:7%;bottom:7%;font:600 clamp(35px,4.8vw,73px)/.9 Georgia,serif;letter-spacing:-.06em;color:#242a2e}
+#publicScreen .p-feature-item .p-feature-image.second{background:linear-gradient(140deg,#2c4250,#8ba4ad)}
+#publicScreen .p-feature-item .p-feature-image.second:after{content:"LONGEVITY";position:absolute;bottom:18px;left:19px;font:500 clamp(23px,2.3vw,37px) Georgia,serif;letter-spacing:-.065em;color:#f5f1e7}
+#publicScreen .p-feature-item .p-feature-image.third{background:repeating-linear-gradient(90deg,#deddd6 0 2px,#b9bab5 2px 3px,#e9e8e1 3px 19px)}
+#publicScreen .p-feature-item .p-feature-image.third:after{content:"THINK.";position:absolute;top:14%;left:10%;font:800 clamp(60px,7vw,112px) var(--font-sans);letter-spacing:-.1em;color:#1f2224}
+#publicScreen .p-feature-item .category{font-size:10px;letter-spacing:.14em;color:#76736e;margin-top:20px}
+#publicScreen .p-feature-item h3{font-family:var(--font-serif);font-weight:540;font-size:clamp(23px,2.05vw,33px)!important;line-height:1.56!important;letter-spacing:-.04em}
+#publicScreen .p-feature-item p{font-size:16px!important;line-height:1.85}
+#publicScreen .p-manifesto{position:relative;background:#f8f6f0!important;padding:clamp(80px,9vw,145px) clamp(23px,11vw,180px)!important;border-top:1px solid #d7d1c6}
+#publicScreen .p-manifesto:before{content:"“";font:400 220px/.6 Georgia,serif;color:#d8d3c7;position:absolute;top:12%;right:6%;pointer-events:none}
+#publicScreen .p-manifesto h2{font-family:var(--font-serif);font-size:clamp(29px,3vw,47px);font-weight:500;line-height:1.75;letter-spacing:-.045em;max-width:20em}
+#publicScreen .p-manifesto p{font-size:17px;line-height:1.95}
+#publicScreen .p-newsletter{background:#1b1d1f!important;padding:clamp(75px,7vw,125px) clamp(23px,7vw,122px) 30px!important}
+#publicScreen .p-newsletter-inner h2{font-size:clamp(58px,7vw,112px);letter-spacing:-.09em;line-height:1.02}
+#publicScreen .p-subscribe{border-bottom:1px solid #b7b7b7;border-radius:0;background:transparent;box-shadow:none;padding:20px 0}
+#publicScreen .p-footer{border-top:1px solid #fff3;margin-top:110px}
+#publicScreen .read-more-link{font-size:13px;letter-spacing:.04em}
+#publicScreen .reader-launch:focus-visible,.ve-hero-cta:focus-visible{outline:2px solid #e6d86f;outline-offset:5px}
+@media(max-width:1020px){
+ #publicScreen .ve-header{grid-template-columns:1fr auto;gap:19px}
+ #publicScreen .ve-header .p-nav{grid-column:1/-1;grid-row:2;display:flex;overflow-x:auto;justify-content:space-between;gap:20px;border-top:1px solid #ddd7cc;padding-top:16px}
+ .ve-head-edition{grid-column:2;grid-row:1}
+ .ve-hero-body{grid-template-columns:1fr 1fr}
+ .ve-cover-title{font-size:clamp(45px,5.5vw,72px)}
+ .ve-cover-actions{align-items:flex-start;flex-direction:column}
+}
+@media(max-width:760px){
+ #publicScreen .p-announce{padding:10px 22px!important}
+ #publicScreen .ve-header{padding:17px 22px 14px!important;gap:18px}
+ .ve-wordmark-main{font-size:29px}
+ .ve-wordmark-sub{font-size:8px}
+ .ve-head-edition small{font-size:8px}
+ #publicScreen .ve-header .p-nav{width:100%;justify-content:flex-start;gap:23px;padding:13px 0 0;scrollbar-width:none}
+ #publicScreen .ve-header .p-nav::-webkit-scrollbar{display:none}
+ #publicScreen .ve-header .p-nav a{font-size:12px}
+ .ve-hero-meta{padding:14px 23px;font-size:8px;letter-spacing:.14em}
+ .ve-hero-meta span:last-child{display:none}
+ .ve-hero-body{display:flex;flex-direction:column;min-height:0}
+ .ve-hero-content{padding:46px 23px 38px}
+ .ve-index{font-size:9px}
+ .ve-cover-title{font-size:clamp(43px,11.6vw,62px);line-height:1.24;margin:45px 0 22px;letter-spacing:-.075em}
+ .ve-hero-deck{font-size:15px!important;line-height:1.88!important;max-width:32em!important}
+ .ve-cover-actions{padding-top:35px;flex-direction:row;align-items:center;gap:10px}
+ .ve-hero-cta{padding:13px 15px;gap:22px;font-size:12px}
+ .ve-cover-actions>span{font-size:8px;max-width:130px}
+ .ve-cover-art{min-height:340px;height:86vw;max-height:440px;border-left:none;border-top:1px solid #ffffff28}
+ .ve-art-object{left:27%;height:72%;width:65%;top:10%}
+ .ve-art-lettering{font-size:230px;bottom:18%}
+ .ve-art-detail{left:23px;top:21px;font-size:22px}
+ .ve-art-corner{right:19px;bottom:22px;font-size:8px}
+ .ve-hero-foot{padding:18px 23px;font-size:8px;gap:15px}
+ .ve-hero-foot span{line-height:1.8}
+ .ve-editorial-marquee{justify-content:flex-start;gap:21px;padding:12px 22px;font-size:9px}
+ #publicScreen .p-section{padding:72px 23px 83px!important}
+ #publicScreen .p-sectionhead h2{font-size:40px!important;line-height:1.2}
+ #publicScreen .p-sectionhead a{font-size:11px}
+ #publicScreen .p-current{grid-template-columns:1fr;gap:43px;margin-top:29px}
+ #publicScreen .story-cover{height:290px!important}
+ #publicScreen .story-cover:after{font-size:58px}
+ #publicScreen .p-feature-title{font-size:28px!important}
+ #publicScreen .p-story-row h3{font-size:20px;line-height:1.65}
+ #publicScreen .p-features{grid-template-columns:1fr;gap:45px;margin-top:28px}
+ #publicScreen .p-feature-item:first-child{grid-row:auto}
+ #publicScreen .p-feature-item:first-child .p-feature-image{height:330px}
+ #publicScreen .p-feature-item:not(:first-child) .p-feature-image{height:230px}
+ #publicScreen .p-feature-item .p-feature-image.third:after{font-size:87px}
+ #publicScreen .p-feature-item h3{font-size:23px!important}
+ #publicScreen .p-manifesto{padding:74px 25px 89px!important}
+ #publicScreen .p-manifesto:before{font-size:138px;top:10%}
+ #publicScreen .p-newsletter{padding:78px 25px 30px!important}
+ #publicScreen .p-newsletter-inner h2{font-size:69px}
+ #publicScreen .p-footer{margin-top:68px}
+}
+@media(prefers-reduced-motion:no-preference){
+ .ve-cover-title{animation:ve-cover-appear .8s cubic-bezier(.2,.8,.2,1) both}
+ .ve-hero-deck{animation:ve-cover-appear .8s .1s cubic-bezier(.2,.8,.2,1) both}
+ .ve-art-object{animation:ve-art-in 1.1s cubic-bezier(.2,.8,.2,1) both}
+ @keyframes ve-cover-appear{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+ @keyframes ve-art-in{from{opacity:0;transform:rotate(-26deg) translateY(30px)}to{opacity:1;transform:rotate(-22deg) translateY(0)}}
+}
 </style></head><body><div class="preview desktop" id="preview"><div class="public-screen" id="publicScreen">
 <div class="bio-public-layout" id="bioPublicLayout">
 <div class="bio-editorial-flow" id="bioEditorialFlow">
-<div class="p-announce"><span><i class="tiny-dot"></i>INDEPENDENT MEDICAL EDITORIAL</span><span>ISSUE NO. 001 / 2026</span></div>
-<header class="p-header"><div class="p-wordmark">SIGN WELL <small>BIO</small></div><nav class="p-nav"><a href="#current">最新焦點</a><a href="#features">專題閱讀</a><a href="#editorial-note">編輯觀點</a><a href="#subscribe">電子報</a></nav><div class="p-head-actions"><span aria-label="搜尋">⌕</span><span class="p-menu">☰</span></div></header>
-<section class="p-hero"><div class="p-herocopy"><div class="p-eyebrow">MEDICINE · AESTHETICS · HEALTHY AGING</div><h1 class="p-hero-title">我們如何<br/>重新理解<br/>健康。</h1><p>在資訊之外，留下一點判斷。從醫學、外觀與產業的交會處，重新思考我們習以為常的事。</p><div class="p-hero-bottom"><a class="p-inline-link" href="#current">開始閱讀 ↗</a><span class="p-edition">An Editorial Journal</span></div></div><div aria-label="封面視覺示意：抽象雕塑與建築光影，正式版需由攝影或授權影像替換" class="editorial-photo" role="img"><div class="photo-block pb1"></div><div class="photo-block pb2"></div><div class="photo-orb"></div><div class="photo-caption"><span>FORM / LIGHT / PERSPECTIVE</span><span>01</span></div></div></section>
+<div class="p-announce"><span><i class="tiny-dot"></i>SIGNWELL BIO / EDITORIAL JOURNAL</span><span>ISSUE Nº 001 &nbsp;—&nbsp; 2026</span></div>
+<header class="p-header ve-header">
+  <a class="ve-wordmark" href="#top" aria-label="SIGN WELL BIO 首頁"><span class="ve-wordmark-main">SIGNWELL<span class="ve-logo-stop">.</span></span><span class="ve-wordmark-sub">欣緯生醫 <i>/</i> INDEPENDENT JOURNAL</span></a>
+  <nav class="p-nav" aria-label="網站導覽"><a href="#current">最新焦點</a><a href="#features">專題閱讀</a><a href="#editorial-note">編輯觀點</a><a href="#subscribe">電子報</a></nav>
+  <a class="ve-head-edition" href="#current"><span>ISSUE 001 <b>↗</b></span><small>OCTOBER 2026</small></a>
+</header>
+<section class="p-hero ve-hero" id="top">
+  <div class="ve-hero-meta"><span>AN INDEPENDENT MEDICAL EDITORIAL</span><span>VOL. 01 — AUTUMN 2026</span></div>
+  <div class="ve-hero-body">
+    <div class="ve-hero-content">
+      <div class="ve-index"><span class="ve-yellow-dash"></span>THE HUMAN CONDITION / 001</div>
+      <h1 class="ve-cover-title"><span>醫療之外，</span><span>還有值得</span><em>討論的事。</em></h1>
+      <p class="ve-hero-deck">關於健康、身體、美感與醫療產業的觀察。不是更快給出答案，而是把值得思考的問題，留下來好好談。</p>
+      <div class="ve-cover-actions"><a href="#current" class="ve-hero-cta">閱讀本期 <span aria-hidden="true">↗</span></a><span>MEDICINE × AESTHETICS × CULTURE</span></div>
+    </div>
+    <div class="ve-cover-art" role="img" aria-label="專屬編輯視覺：深藍背景中的金屬質感抽象立體雕塑、醫學網格和精緻刊號字樣">
+      <div class="ve-art-lines" aria-hidden="true"></div><div class="ve-art-orbit" aria-hidden="true"></div>
+      <div class="ve-art-lettering" aria-hidden="true">BIO</div>
+      <div class="ve-art-object" aria-hidden="true"><div class="ve-art-core"></div></div>
+      <div class="ve-art-detail" aria-hidden="true">SW/01<br><span>FORM STUDY</span></div>
+      <div class="ve-art-corner" aria-hidden="true">FIG. 001 / FIELD NOTES</div>
+    </div>
+  </div>
+  <div class="ve-hero-foot"><span><b>SIGNWELL BIO</b> &nbsp; / &nbsp; ORIGINAL PERSPECTIVES</span><a href="#current">SCROLL TO EXPLORE <span aria-hidden="true">↓</span></a></div>
+</section>
+<div class="ve-editorial-marquee" aria-label="欣緯生醫觀點主題"><span>PERSPECTIVES</span><i>✳</i><span>HEALTH &amp; LONGEVITY</span><i>✳</i><span>MALE AESTHETICS</span><i>✳</i><span>BEYOND MEDICINE</span></div>
 <section class="p-section" id="current"><div class="p-sectionhead"><div><div class="p-kicker">01 / CURRENT</div><h2>最新焦點</h2></div><a href="#features">探索文章 ↗</a></div><div class="p-current"><div><div aria-label="示意封面" class="story-cover" role="img"><span class="a-line"></span><span class="big-circle"></span><span class="art-label">EDITORIAL COVER · CONCEPT ART</span></div><div class="p-story-badge">HEALTH INDUSTRY · LONG READ</div><h3 class="p-feature-title"><a class="reader-launch" data-story="health" href="#reader">當健康不再只是治療，醫療的價值會如何改變？</a></h3><a class="read-more-link" data-story="health" href="#reader">閱讀文章 <span aria-hidden="true">↗</span></a><p class="p-excerpt">從預防、管理到醫療服務的新角色，討論科技與商業模式如何改變選擇。</p></div><div class="p-story-list"><div class="p-story-row"><div class="date">08 / 10</div><div><h3><a class="reader-launch" data-story="aging" href="#reader">醫療之外，什麼才是長期健康的關鍵？</a></h3><span>HEALTHY AGING</span></div><span class="arrow">↗</span></div><div class="p-story-row"><div class="date">07 / 10</div><div><h3><a class="reader-launch" data-story="aesthetic" href="#reader">男性外觀管理，不只是美容這麼簡單。</a></h3><span>MALE AESTHETICS</span></div><span class="arrow">↗</span></div><div class="p-story-row"><div class="date">06 / 10</div><div><h3><a class="reader-launch" data-story="ai" href="#reader">AI 讓醫學知識更便宜，誰會真正受益？</a></h3><span>INDUSTRY &amp; TECHNOLOGY</span></div><span class="arrow">↗</span></div></div></div></section>
 <section class="p-section alt" id="features"><div class="p-sectionhead"><div><div class="p-kicker">02 / DEEPER READING</div><h2>精選閱讀</h2></div><a href="#editorial-note">更多專題 ↗</a></div><div class="p-features"><article class="p-feature-item"><div class="p-feature-image first"><div class="feature-graphic"></div></div><div class="category">01 — AESTHETICS</div><h3><a class="reader-launch" data-story="natural" href="#reader">對「自然」的追求，為什麼反而需要更多克制？</a></h3><p>男性輪廓、比例與審美判斷的重新理解。</p></article><article class="p-feature-item"><div class="p-feature-image second"><div class="feature-graphic"></div></div><div class="category">02 — LONGEVITY</div><h3><a class="reader-launch" data-story="longevity" href="#reader">健康老化，不等於永遠年輕。</a></h3><p>理解風險、習慣與長期選擇。</p></article><article class="p-feature-item"><div class="p-feature-image third"><div class="feature-graphic"></div></div><div class="category">03 — THINKING</div><h3><a class="reader-launch" data-story="thinking" href="#reader">當答案太容易取得。</a></h3><p>重新思考專業判斷的價值。</p></article></div></section>
 <section class="p-manifesto" id="editorial-note"><div class="kicker">編輯的話 / EDITORIAL NOTE</div><h2>好的內容，不需要每次都急著給答案。<br/>有時候，更重要的是提出對的問題。</h2><p>觀察醫學，也觀察醫學之外的世界。保留證據、立場與不確定性之間應有的距離。</p></section>
@@ -207,7 +392,7 @@ body{min-width:0}
 </article>
 </div>
 </div>
-</div><a class="test-design-link" href="review.html" aria-label="查看桌面手機與CMS設計審查">DESIGN REVIEW ↗</a><script>
+</div><a class="test-design-link" href="review.html" aria-label="查看桌面手機與CMS設計審查">DESIGN REVIEW · V7 ↗</a><script>
 (()=>{
 'use strict';
 const overlay=document.getElementById('bioReadingOverlay'); if(!overlay)return;
