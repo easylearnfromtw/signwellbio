@@ -1,0 +1,32 @@
+name: CMS Motion Integration QA
+on:
+  push:
+    branches:
+      - feature/cms-motion-home-integration-20261008
+  pull_request:
+    paths:
+      - "cms/**"
+      - "test/**"
+      - "qa/verify-cms-motion.mjs"
+      - ".github/workflows/cms-motion-qa.yml"
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout candidate branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: ""
+      - name: Validate CMS motion integration
+        run: node qa/verify-cms-motion.mjs
+      - name: Install Playwright smoke test dependencies
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Validate editor, preview, published content and mobile gestures
+        run: node qa/smoke-cms-motion.mjs
