@@ -628,7 +628,7 @@
     return i >= 0 ? HUES[i % HUES.length] : hueOf(t.name);
   }
   function topicCard(t) {
-    const count = articles.filter((a) => a.category === t.name).length;
+    const count = articles.filter((a) => a.category === t.name || (Array.isArray(t.legacyNames) && t.legacyNames.includes(a.category))).length;
     const name = String(t.name || "主題");
     return `<article class="topic-card" data-topic="${esc(t.slug || t.name)}" style="--h:${topicHue(t)}"><div class="topic-icon" aria-hidden="true">${esc(Array.from(name)[0] || "主")}</div><div><div class="kicker">TOPIC</div><h3>${esc(name)}</h3><p>${esc(t.description || "")}</p></div><div class="topic-foot"><span>${count} 篇文章</span><span class="go">查看 ${ICON.arrow}</span></div></article>`;
   }
@@ -705,7 +705,7 @@
   }
   function selectTopic(slug, { scroll = true, replace = true } = {}) {
     const t = topics.find((x) => (x.slug || x.name) === slug),
-      list = articles.filter((a) => a.category === t?.name).sort(byDate);
+      list = articles.filter((a) => t && (a.category === t.name || (Array.isArray(t.legacyNames) && t.legacyNames.includes(a.category)))).sort(byDate);
     const sec = $("#topicArticles");
     if (!sec) return;
     $$("[data-topic]", app).forEach((el) => el.classList.toggle("is-active", el.dataset.topic === slug));
