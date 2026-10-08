@@ -151,6 +151,7 @@ await check("Static SEO article links remain crawlable, styled and text intact",
  const p="article/從安寧病房事件看重症照護-身心負擔-財務毒性與健康平權的反思/";
  const ctx=await create(390,844),page=await ctx.newPage();
  await page.goto(base+p,{waitUntil:"domcontentloaded"});
+ await page.waitForFunction(()=>[...document.styleSheets].some(sheet=>sheet.href?.includes("public-inner-palette.css")),{timeout:12000});
  const s=await page.evaluate(()=>({
   match:document.body.matches("body:has(> main > article)"),
   background:getComputedStyle(document.body).backgroundColor,
