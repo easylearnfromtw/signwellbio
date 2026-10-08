@@ -477,7 +477,7 @@ async function verifySecond(){
   await completeCmsLogin('legacy');
 }
 async function swFetchCurrentPublicStaticSnapshot(){
-  const base=new URL('../',location.href);
+  const base=new URL('https://easylearnfromtw.github.io/signwellbio/');
   const getJson=async(path)=>{
     const u=new URL(String(path||''),base);
     u.searchParams.set('sw',String(Date.now()));
@@ -8024,13 +8024,12 @@ function swCanonicalPublicUrl_(raw=''){
     const u=new URL(text);
     const canonical=new URL(SW_CANONICAL_PUBLIC_URL);
     if(u.origin!==canonical.origin||!u.pathname.startsWith(canonical.pathname)){
-      throw new Error('Backend Public URL 仍指向舊網站：'+text);
+      console.warn('Ignoring stale Backend publicUrl; canonical signwellbio remains authoritative.',text);
     }
-    return SW_CANONICAL_PUBLIC_URL;
-  }catch(err){
-    if(String(err?.message||err).startsWith('Backend Public URL'))throw err;
-    throw new Error('Backend Public URL 無效：'+text);
+  }catch(_){
+    console.warn('Ignoring invalid Backend publicUrl; canonical signwellbio remains authoritative.',text);
   }
+  return SW_CANONICAL_PUBLIC_URL;
 }
 function assertSignwellMigrationTarget(g){
   if(g?.owner!=='easylearnfromtw'||g?.repo!=='signwellbio'||g?.branch!=='main')
