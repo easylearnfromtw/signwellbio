@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var VERSION = "24.38.0-reader-ux1";
+  var VERSION = "24.38.1-reader-collapse-fix";
   var STYLE_ID = "swid-style-v2435";
   var OVERLAY_ID = "swArticleIdOverlay";
   var lastFocus = null;
@@ -402,7 +402,7 @@
       '<div class="swid-shell">' +
       '<div class="swid-toolbar"><div class="swid-toolbar-left"><span class="swid-toolbar-kicker">ARTICLE ID CARD</span><span class="swid-toolbar-title" id="swid-dialog-title">' +
       esc(payload.title || "SIGN WELL") +
-      '</span></div><div class="swid-toolbar-actions"><button class="swid-icon-btn" type="button" data-swid-flip aria-label="翻至品牌背面" aria-pressed="false">↻</button><button class="swid-icon-btn" type="button" data-swid-close aria-label="關閉">×</button></div></div>' +
+      '</span></div><div class="swid-toolbar-actions"><button class="swid-icon-btn" type="button" data-swid-flip aria-label="翻至品牌背面" aria-pressed="false">↻</button><button class="swid-icon-btn swid-close-action" type="button" data-swid-close aria-label="關閉文章 ID 卡"><span aria-hidden="true">×</span><span class="swid-close-text">關閉</span></button></div></div>' +
       '<div class="swid-viewport"><div class="swid-ambient" aria-hidden="true"></div><div class="swid-shadow" aria-hidden="true"></div><div class="swid-stack" data-flipped="0" data-tray="closed">' +
       '<div class="swid-card-wrap">' +
       '<section class="swid-face swid-front"><div class="swid-front-main"><div class="swid-eyebrow">' +
@@ -430,7 +430,7 @@
       '</div><div class="swid-hint">掃描 QR Code 開啟文章</div></aside></section>' +
       '<section class="swid-face swid-back"><div class="swid-back-logo"><strong>SIGN WELL</strong><span>欣緯生醫</span></div></section>' +
       "</div>" +
-      '<section class="swid-tray"><button class="swid-tray-handle" type="button" data-swid-tray aria-controls="swid-tray-details" aria-expanded="false"><span>查看作者與引用來源</span></button><div class="swid-tray-body" id="swid-tray-details" aria-hidden="true" inert>' +
+      '<section class="swid-tray"><button class="swid-tray-handle" type="button" data-swid-tray aria-controls="swid-tray-details" aria-expanded="false"><span>查看作者與引用來源</span></button><div class="swid-tray-body" id="swid-tray-details" aria-hidden="true" inert><button class="swid-tray-collapse" type="button" data-swid-collapse aria-label="收合詳細資訊抽屜">收合詳細資訊 <span aria-hidden="true">⌃</span></button>' +
       quickMetricHtml(payload, sources) +
       '<nav class="swid-section-nav" aria-label="詳細資訊捷徑"><button type="button" data-swid-jump="sources">引用來源 <b>' + sources.length + '</b></button><button type="button" data-swid-jump="author">關於作者</button><button type="button" data-swid-jump="version">版本紀錄</button></nav>' +
       '<section class="swid-tray-section"><h3>SW Impact · 文章影響力</h3>' +
@@ -517,6 +517,7 @@
     var overlay = q("#" + OVERLAY_ID);
     if (overlay) {
       overlay.dataset.open = "0";
+      setTray(overlay,false);
       if(overlay._swidStopTilt)overlay._swidStopTilt();
       if(overlay._swidFeedbackTimer)clearTimeout(overlay._swidFeedbackTimer);
     }
@@ -561,8 +562,12 @@
   function setTray(overlay,open){
     var stack=q(".swid-stack",overlay),body=q(".swid-tray-body",overlay),handle=q("[data-swid-tray]",overlay);
     if(!stack||!body||!handle)return;
+    if(!open&&body.contains(document.activeElement)){
+      try{handle.focus({preventScroll:true})}catch(_){handle.focus()}
+    }
     stack.dataset.tray=open?"open":"closed";
     body.inert=!open;
+    if(!open)body.scrollTop=0;
     body.setAttribute("aria-hidden",open?"false":"true");
     handle.setAttribute("aria-expanded",open?"true":"false");
     var text=q("span",handle);
@@ -602,9 +607,19 @@
   }
   function bindOverlay(overlay,payload){
     var stack=q(".swid-stack",overlay);
-    q("[data-swid-close]",overlay).onclick=closeOverlay;
+    q("[data-swid-close]",overlay).onclick=function(e){
+      if(e){e.preventDefault();e.stopPropagation()}
+      closeOverlay();
+    };
     q("[data-swid-flip]",overlay).onclick=function(){setFlipped(overlay,stack.dataset.flipped!=="1")};
-    q("[data-swid-tray]",overlay).onclick=function(){setTray(overlay,stack.dataset.tray!=="open")};
+    q("[data-swid-tray]",overlay).onclick=function(){
+      if(overlay._swidSwipeAt&&Date.now()-overlay._swidSwipeAt<450)return;
+      setTray(overlay,stack.dataset.tray!=="open");
+    };
+    q("[data-swid-collapse]",overlay).onclick=function(e){
+      if(e)e.preventDefault();
+      setTray(overlay,false);
+    };
     qa("[data-swid-jump]",overlay).forEach(function(btn){
       btn.onclick=function(){jumpToCardSection(overlay,btn.dataset.swidJump)};
     });
@@ -625,6 +640,32 @@
       };
     });
     overlay.addEventListener("click",function(e){if(e.target===overlay)closeOverlay()});
+    /* Mobile: a downward drag on the handle or at the top of the scroll area
+       collapses the sheet; ordinary reading scroll and horizontal swipes do not. */
+    var sheet=q(".swid-tray",overlay),touchStart=null;
+    sheet.addEventListener("touchstart",function(e){
+      if(e.touches.length!==1){touchStart=null;return}
+      var t=e.touches[0],scroll=e.target.closest(".swid-tray-body");
+      touchStart={
+        x:t.clientX,y:t.clientY,
+        canClose:!!e.target.closest("[data-swid-tray]")||!!(scroll&&scroll.scrollTop<=3)
+      };
+    },{passive:true});
+    sheet.addEventListener("touchend",function(e){
+      if(!touchStart||!e.changedTouches.length){touchStart=null;return}
+      var t=e.changedTouches[0],dx=t.clientX-touchStart.x,dy=t.clientY-touchStart.y;
+      if(Math.abs(dy)>=54&&Math.abs(dy)>Math.abs(dx)*1.25){
+        if(stack.dataset.tray==="open"&&dy>0&&touchStart.canClose){
+          setTray(overlay,false);
+          overlay._swidSwipeAt=Date.now();
+        }else if(stack.dataset.tray==="closed"&&dy<0){
+          setTray(overlay,true);
+          overlay._swidSwipeAt=Date.now();
+        }
+      }
+      touchStart=null;
+    },{passive:true});
+    sheet.addEventListener("touchcancel",function(){touchStart=null},{passive:true});
     overlay._swidOnKey=function(e){
       if(overlay.dataset.open!=="1")return;
       if(e.key==="Escape"){e.preventDefault();closeOverlay();return;}

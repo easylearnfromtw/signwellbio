@@ -1,7 +1,7 @@
 /* SIGN WELL · canonical Public service worker (R9.9 search/logo polish · R9.8 white-blue-pink social preview + R9.7 cubic ambient background on non-home pages + R10.2 GPU governor + R9.11 stable liquid dock + R9.10 pastel favicon + R9.6 mobile lock + unified brand + clean share/newsletter · R9.4 social preview + adaptive hero + jelly glass)
    Stable filenames, network-first code/data, image/font SWR. */
 const SW_PUBLIC_CACHE_PREFIX='signwell-public-';
-const SW_PUBLIC_CACHE=SW_PUBLIC_CACHE_PREFIX+'signwellbio-20261008-editorial-e12-2-article-id-reader-ux1';
+const SW_PUBLIC_CACHE=SW_PUBLIC_CACHE_PREFIX+'signwellbio-20261009-article-id-collapse-fix';
 const SW_PUBLIC_SHELL=[
   './','./index.html','./topics.html','./about.html','./share.html','./newsletter.html',
   './manifest.webmanifest','./site-content.js','./analytics-config.js',

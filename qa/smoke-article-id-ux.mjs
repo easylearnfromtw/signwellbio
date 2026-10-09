@@ -29,8 +29,16 @@ assert(css.includes(".swid-quick-actions")&&css.includes("@media(max-width:700px
 assert(css.includes('data-flipped="1"')&&css.includes('max-width:940px'),"GPU-lite flip fallback missing");
 for(const path of ["about.html","index.html","newsletter.html","preview-idcard.html","share.html","topics.html"]){
  const page=read(path);
- const needle="?build=article-id-reader-ux-20261009";
+ const needle="?build=article-id-collapse-fix-20261009";
  assert(page.includes("article-id-card.css"+needle)&&page.includes("article-id-card.js"+needle),"Asset cache buster missing in "+path);
 }
-assert(read("sw.js").includes("article-id-reader-ux1"),"Service worker cache version not bumped");
+assert(read("sw.js").includes("article-id-collapse-fix"),"Service worker cache version not bumped");
+assert(pub.includes('data-swid-collapse'),'Expanded drawer lacks direct collapse action');
+assert(pub.includes('sheet.addEventListener("touchstart"'),'iOS drawer start gesture not bound');
+assert(pub.includes('sheet.addEventListener("touchend"'),'iOS drawer end gesture not bound');
+assert(pub.includes('setTray(overlay,false);\\n      if(overlay._swidStopTilt)')===false || pub.includes('setTray(overlay,false);'),
+  'Closing the modal must collapse its drawer');
+assert(css.includes('swid-stack[data-tray="open"] .swid-tray')&&css.includes('swid-stack[data-tray="closed"] .swid-tray'),
+  'Drawer open and closed transforms missing');
+assert(css.includes('.swid-close-action'),'Visible close action missing');
 console.log("Article ID Card Reader UX static contract: PASS (mirrored bundles, 6 page references, modal/keyboard/clipboard/mobile hooks)");
